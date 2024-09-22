@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "install-server": "cd server && npm install && npm run build && npx puppeteer browsers install firefox",
-    "start-server": "cd server && node server.ts",
+    "start-server": "cd server && npm run start",
     "install-client": "cd admin && npm install --legacy-peer-deps",
     "build-client": "cd admin && npm run build",
     "start-client": "cd admin && npm run start"
