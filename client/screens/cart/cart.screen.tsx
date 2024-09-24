@@ -6,6 +6,8 @@ import axios from "axios";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
+import { Toast } from "react-native-toast-notifications";
+
 import {
   View,
   Text,
@@ -57,12 +59,16 @@ export default function CartScreen() {
   };
 
   const handlePayment = async () => {
+    console.log("handlePayment");
+
     try {
       const accessToken = await AsyncStorage.getItem("access_token");
       const refreshToken = await AsyncStorage.getItem("refresh_token");
       const amount = Math.round(
         cartItems.reduce((total, item) => total + item.price, 0) * 100
       );
+
+      console.log("handlePayment", accessToken, refreshToken, amount);
 
       const paymentIntentResponse = await axios.post(
         `${SERVER_URI}/payment`,
@@ -83,15 +89,26 @@ export default function CartScreen() {
       });
 
       if (initSheetResponse.error) {
-        console.error(initSheetResponse.error);
+        console.error(
+          "Error initializing payment sheet:",
+          initSheetResponse.error
+        );
+        // You can also show a user-friendly alert here
+        Toast.show(
+          "Payment Error, Failed to initialize payment sheet. Please try again."
+        );
         return;
       }
 
       const paymentResponse = await presentPaymentSheet();
 
       if (paymentResponse.error) {
-        console.error(paymentResponse.error);
+        console.error("Payment failed:", paymentResponse.error);
+        Toast.show(
+          "Payment Error, Payment was unsuccessful. Please try again."
+        );
       } else {
+        // If payment succeeds, you create an order
         await createOrder(paymentResponse);
       }
     } catch (error) {
