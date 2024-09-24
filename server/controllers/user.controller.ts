@@ -262,7 +262,7 @@ export const updateAccessToken = CatchAsyncError(
       // Create a new access token
       const newAccessToken = jwt.sign(
         { id: user._id },
-        process.env.ACCESS_TOKEN_SECRET as string,
+        process.env.ACCESS_TOKEN as string,
         { expiresIn: "15m" } // 15 minutes token validity, adjust as needed
       );
 

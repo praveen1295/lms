@@ -30,13 +30,15 @@ export const accessTokenOptions: ITokenOptions = {
   secure: true,
 };
 
+// Set refresh token expiration to 2 days
 export const refreshTokenOptions: ITokenOptions = {
-  expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
-  maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
+  expires: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days in milliseconds
+  maxAge: 2 * 24 * 60 * 60 * 1000, // 2 days in milliseconds
   httpOnly: true,
   sameSite: "none",
-  secure: true,
+  secure: true, // Should be true in production (for HTTPS)
 };
+
 
 export const sendToken = (user: IUser, statusCode: number, res: Response) => {
   const accessToken = user.SignAccessToken();

@@ -82,11 +82,14 @@ export default function CartScreen() {
       );
 
       const { client_secret: clientSecret } = paymentIntentResponse.data;
+      console.log("clientSecret", clientSecret);
 
       const initSheetResponse = await initPaymentSheet({
         merchantDisplayName: "Becodemy Private Ltd.",
         paymentIntentClientSecret: clientSecret,
       });
+
+      console.log("Init sheet response:", initSheetResponse);
 
       if (initSheetResponse.error) {
         console.error(
