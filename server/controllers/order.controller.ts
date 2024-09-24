@@ -233,6 +233,7 @@ export const newPayment = CatchAsyncError(
         client_secret: myPayment.client_secret,
       });
     } catch (error: any) {
+      console.log('error', error)
       return next(new ErrorHandler(error.message, 500));
     }
   }
