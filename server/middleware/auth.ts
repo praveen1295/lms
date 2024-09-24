@@ -4,6 +4,7 @@ import ErrorHandler from "../utils/ErrorHandler";
 import jwt, { JwtPayload } from "jsonwebtoken";
 // import { redis } from "../utils/redis";
 import { updateAccessToken } from "../controllers/user.controller";
+import userModel from "../models/user.model";
 
 // authenticated user
 export const isAutheticated = CatchAsyncError(
@@ -15,6 +16,8 @@ export const isAutheticated = CatchAsyncError(
       );
     }
     const decoded = jwt.decode(access_token) as JwtPayload
+
+
     if (!decoded) {
       return next(new ErrorHandler("access token is not valid", 400));
     }
@@ -35,7 +38,18 @@ export const isAutheticated = CatchAsyncError(
       //   );
       // }
 
-      // req.user = JSON.parse(user);
+    console.log('isAutheticated, call' , decoded)
+
+
+      const user = await userModel.findById(decoded.id);
+
+      console.log('user0000000', user)
+
+      if (!user) {
+        return next(new ErrorHandler("User not found, please login", 400));
+      }
+
+      req.user = user;
 
       next();
     }

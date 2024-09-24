@@ -198,32 +198,79 @@ export const logoutUser = CatchAsyncError(
 );
 
 // update access token
+// export const updateAccessToken = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const refresh_token = req.headers["refresh-token"] as string;
+//       const decoded = jwt.verify(
+//         refresh_token,
+//         process.env.REFRESH_TOKEN as string
+//       ) as JwtPayload;
+
+//       const message = "Could not refresh token";
+//       if (!decoded) {
+//         return next(new ErrorHandler(message, 400));
+//       }
+//       // const session = await redis.get(decoded.id as string);
+
+//       // if (!session) {
+//       //   return next(
+//       //     new ErrorHandler("Please login for access this resources!", 400)
+//       //   );
+//       // }
+
+//       // const user = JSON.parse(session);
+
+//       // req.user = user;
+
+//       // await redis.set(user._id, JSON.stringify(user), "EX", 604800); // 7days
+
+//       return next();
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, 400));
+//     }
+//   }
+// );
+
+
 export const updateAccessToken = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const refresh_token = req.headers["refresh-token"] as string;
+
+      if (!refresh_token) {
+        return next(new ErrorHandler("No refresh token provided", 400));
+      }
+
+      // Verify the refresh token
       const decoded = jwt.verify(
         refresh_token,
         process.env.REFRESH_TOKEN as string
       ) as JwtPayload;
 
-      const message = "Could not refresh token";
-      if (!decoded) {
-        return next(new ErrorHandler(message, 400));
+      if (!decoded || !decoded.id) {
+        return next(new ErrorHandler("Could not refresh token", 400));
       }
-      // const session = await redis.get(decoded.id as string);
 
-      // if (!session) {
-      //   return next(
-      //     new ErrorHandler("Please login for access this resources!", 400)
-      //   );
-      // }
+      // Fetch the user from the database using the decoded ID
+      const user = await userModel.findById(decoded.id);
 
-      // const user = JSON.parse(session);
+      if (!user) {
+        return next(new ErrorHandler("User not found. Please login again.", 400));
+      }
 
-      // req.user = user;
+      // Create a new access token
+      const newAccessToken = jwt.sign(
+        { id: user._id },
+        process.env.ACCESS_TOKEN_SECRET as string,
+        { expiresIn: "15m" } // 15 minutes token validity, adjust as needed
+      );
 
-      // await redis.set(user._id, JSON.stringify(user), "EX", 604800); // 7days
+      // Send the new access token in the response headers
+      res.setHeader("access-token", newAccessToken);
+
+      // Attach the user object to the request for further use
+      req.user = user;
 
       return next();
     } catch (error: any) {
@@ -232,11 +279,17 @@ export const updateAccessToken = CatchAsyncError(
   }
 );
 
+
 // get user info
 export const getUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+
+      console.log('req.user?._id',req.user?._id)
+
       const userId = req.user?._id;
+
+
       getUserById(userId, res);
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));

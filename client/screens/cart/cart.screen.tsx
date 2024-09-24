@@ -93,10 +93,6 @@ export default function CartScreen() {
           "Error initializing payment sheet:",
           initSheetResponse.error
         );
-        // You can also show a user-friendly alert here
-        Toast.show(
-          "Payment Error, Failed to initialize payment sheet. Please try again."
-        );
         return;
       }
 
@@ -104,11 +100,8 @@ export default function CartScreen() {
 
       if (paymentResponse.error) {
         console.error("Payment failed:", paymentResponse.error);
-        Toast.show(
-          "Payment Error, Payment was unsuccessful. Please try again."
-        );
       } else {
-        // If payment succeeds, you create an order
+        console.log("Payment successful:", paymentResponse);
         await createOrder(paymentResponse);
       }
     } catch (error) {
