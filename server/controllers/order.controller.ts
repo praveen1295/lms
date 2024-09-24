@@ -9,7 +9,7 @@ import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.Model";
 import { getAllOrdersService, newOrder } from "../services/order.service";
-import { redis } from "../utils/redis";
+// import { redis } from "../utils/redis";
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -89,7 +89,7 @@ export const createOrder = CatchAsyncError(
 
       user?.courses.push(course?._id);
 
-      await redis.set(req.user?._id, JSON.stringify(user));
+      // await redis.set(req.user?._id, JSON.stringify(user));
 
       await user?.save();
 
@@ -172,7 +172,7 @@ export const createMobileOrder = CatchAsyncError(
 
       user?.courses.push(course?._id);
 
-      await redis.set(req.user?._id, JSON.stringify(user));
+      // await redis.set(req.user?._id, JSON.stringify(user));
 
       await user?.save();
 
@@ -219,7 +219,7 @@ export const newPayment = CatchAsyncError(
     try {
       const myPayment = await stripe.paymentIntents.create({
         amount: req.body.amount,
-        currency: "GBP",
+        currency: "INR",
         metadata: {
           company: "E-Learning",
         },

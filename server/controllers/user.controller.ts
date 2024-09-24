@@ -8,7 +8,7 @@ import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
-import { redis } from "../utils/redis";
+// import { redis } from "../utils/redis";
 import {
   getAllUsersService,
   getUserById,
@@ -186,7 +186,7 @@ export const logoutUser = CatchAsyncError(
       res.cookie("access_token", "", { maxAge: 1 });
       res.cookie("refresh_token", "", { maxAge: 1 });
       const userId = req.user?._id || "";
-      redis.del(userId);
+      // redis.del(userId);
       res.status(200).json({
         success: true,
         message: "Logged out successfully",
@@ -211,19 +211,19 @@ export const updateAccessToken = CatchAsyncError(
       if (!decoded) {
         return next(new ErrorHandler(message, 400));
       }
-      const session = await redis.get(decoded.id as string);
+      // const session = await redis.get(decoded.id as string);
 
-      if (!session) {
-        return next(
-          new ErrorHandler("Please login for access this resources!", 400)
-        );
-      }
+      // if (!session) {
+      //   return next(
+      //     new ErrorHandler("Please login for access this resources!", 400)
+      //   );
+      // }
 
-      const user = JSON.parse(session);
+      // const user = JSON.parse(session);
 
-      req.user = user;
+      // req.user = user;
 
-      await redis.set(user._id, JSON.stringify(user), "EX", 604800); // 7days
+      // await redis.set(user._id, JSON.stringify(user), "EX", 604800); // 7days
 
       return next();
     } catch (error: any) {
@@ -288,7 +288,7 @@ export const updateUserInfo = CatchAsyncError(
 
       await user?.save();
 
-      await redis.set(userId, JSON.stringify(user));
+      // await redis.set(userId, JSON.stringify(user));
 
       res.status(201).json({
         success: true,
@@ -331,7 +331,7 @@ export const updatePassword = CatchAsyncError(
 
       await user.save();
 
-      await redis.set(req.user?._id, JSON.stringify(user));
+      // await redis.set(req.user?._id, JSON.stringify(user));
 
       res.status(201).json({
         success: true,
@@ -385,7 +385,7 @@ export const updateProfilePicture = CatchAsyncError(
 
       await user?.save();
 
-      await redis.set(userId, JSON.stringify(user));
+      // await redis.set(userId, JSON.stringify(user));
 
       res.status(200).json({
         success: true,
@@ -444,7 +444,7 @@ export const deleteUser = CatchAsyncError(
 
       await user.deleteOne({ id });
 
-      await redis.del(id);
+      // await redis.del(id);
 
       res.status(200).json({
         success: true,
