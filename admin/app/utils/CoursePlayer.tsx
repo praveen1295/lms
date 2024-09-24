@@ -14,7 +14,7 @@ const CoursePlayer: FC<Props> = ({ videoUrl }) => {
 
   useEffect(() => {
     axios
-      .post("http://localhost:8000/api/v1/getVdoCipherOTP", {
+      .post("https://lms-bupn.onrender.com/api/v1/getVdoCipherOTP", {
         videoId: videoUrl,
       })
       .then((res) => {
@@ -23,7 +23,9 @@ const CoursePlayer: FC<Props> = ({ videoUrl }) => {
   }, [videoUrl]);
 
   return (
-    <div style={{position:"relative",paddingTop:"56.25%",overflow:"hidden"}}>
+    <div
+      style={{ position: "relative", paddingTop: "56.25%", overflow: "hidden" }}
+    >
       {videoData.otp && videoData.playbackInfo !== "" && (
         <iframe
           src={`https://player.vdocipher.com/v2/?otp=${videoData?.otp}&playbackInfo=${videoData.playbackInfo}&player=Ub9OiZXIOeUXH0Nv`}
@@ -33,7 +35,7 @@ const CoursePlayer: FC<Props> = ({ videoUrl }) => {
             left: 0,
             width: "100%",
             height: "100%",
-            border: 0
+            border: 0,
           }}
           allowFullScreen={true}
           allow="encrypted-media"
