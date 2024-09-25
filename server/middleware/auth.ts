@@ -7,7 +7,7 @@ import { updateAccessToken } from "../controllers/user.controller";
 import userModel from "../models/user.model";
 
 // authenticated user
-export const isAutheticated = CatchAsyncError(
+export const isAuthenticated = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     const access_token = req.headers["access-token"] as string;
     if (!access_token) {
@@ -38,7 +38,6 @@ export const isAutheticated = CatchAsyncError(
       //   );
       // }
 
-    console.log('isAutheticated, call' , decoded)
 
 
       const user = await userModel.findById(decoded.id);
@@ -50,6 +49,7 @@ export const isAutheticated = CatchAsyncError(
       }
 
       req.user = user;
+      // req.userId = user._id
 
       next();
     }

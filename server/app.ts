@@ -10,6 +10,22 @@ import orderRouter from "./routes/order.route";
 import notificationRouter from "./routes/notification.route";
 import analyticsRouter from "./routes/analytics.route";
 import layoutRouter from "./routes/layout.route";
+
+
+
+// import authRoute from "./routes/auth";
+import examRoute from "./routes/exam.route";
+import quizRoute from "./routes/quiz.route";
+import reportRoute from "./routes/report.route";
+// import userRoute from "./routes/user";
+import favQuestionRoute from "./routes/favQuestion.route";
+// import ProjectError from "./helper/error";
+import { ReturnResponse } from "./utils/interfaces";
+import clearBlacklistedTokenScheduler from "./utils/clearBlacklistedTokenScheduler";
+
+
+
+
 import { rateLimit } from "express-rate-limit";
 
 // body parser
@@ -56,16 +72,27 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-// routes
-app.use(
-  "/api/v1",
+// Group API version 1 routes together
+app.use("/api/v1", [
   userRouter,
   orderRouter,
   courseRouter,
   notificationRouter,
   analyticsRouter,
-  layoutRouter
-);
+  layoutRouter,
+]);
+
+// Group exam-related routes together
+app.use("/api/v1/exam", examRoute);
+app.use("/api/v1/quiz", quizRoute);
+app.use("/api/v1/report", reportRoute);
+app.use("/api/v1/favquestion", favQuestionRoute);
+
+// Health check route
+app.get("/health", (req: Request, res: Response) => {
+  res.status(200).send("Server is working!");
+});
+
 
 // testing api
 app.get("/test", (req: Request, res: Response, next: NextFunction) => {
