@@ -79,17 +79,17 @@ router.post(
 );
 
 //Get  quiz/allpublished quiz
-router.get("/allpublishedquiz",isAuthenticated, getAllQuiz);
+router.get("/allpublishedquiz", getAllQuiz);
 
 //Get  quiz/allpublished quiz/exam
 router.get("/allpublishedquiz/exam",isAuthenticated, getAllQuizExam);
 
 //Get  quiz/allpublished quiz/test
-router.get("/allpublishedquiz/test",isAuthenticated, getAllQuizTest);
+router.get("/allpublishedquiz/test", getAllQuizTest);
 
 // get
 // GET /quiz/:quizId
-router.get("/:quizId?", isAuthenticated, getQuiz);
+router.get("/:quizId", getQuiz);
 
 //
 

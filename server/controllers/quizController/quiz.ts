@@ -33,6 +33,7 @@ const createQuiz: RequestHandler = async (req, res, next) => {
 const getQuiz: RequestHandler = async (req, res, next) => {
   try {
     const quizId = req.params.quizId;
+    console.log('quizId', quizId)
     let quiz;
     if (quizId) {
       quiz = await Quiz.findById(quizId, {
@@ -51,18 +52,18 @@ const getQuiz: RequestHandler = async (req, res, next) => {
         err.statusCode = 404;
         throw err;
       }
-      if(!quiz.isPublicQuiz && !quiz.allowedUser.includes(req?.user?._id.toString())){
-        const err = new ProjectError("You are not authorized!");
-        err.statusCode = 403;
-        throw err;
-      }
-      if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
-        const err = new ProjectError("You are not authorized!");
-        err.statusCode = 403;
-        throw err;
-      }
-    } else {
-      quiz = await Quiz.find({ createdBy: req?.user?._id.toString() });
+    //   if(!quiz.isPublicQuiz && !quiz.allowedUser.includes(req?.user?._id.toString())){
+    //     const err = new ProjectError("You are not authorized!");
+    //     err.statusCode = 403;
+    //     throw err;
+    //   }
+    //   if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
+    //     const err = new ProjectError("You are not authorized!");
+    //     err.statusCode = 403;
+    //     throw err;
+    //   }
+    // } else {
+    //   quiz = await Quiz.find({ createdBy: req?.user?._id.toString() });
     }
 
     if (!quiz) {
@@ -332,13 +333,18 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
       allowedUser: 1,
     });
 
-    quiz = quiz.filter((item) => {
-      if (item.isPublicQuiz || item.allowedUser.includes(req?.user?._id.toString())) {
-        return item.createdBy.toString() !== req?.user?._id.toString();
-      }
-    });
+    // quiz = quiz.filter((item) => {
+    //   if (item.isPublicQuiz || item.allowedUser.includes(req?.user?._id.toString())) {
+    //     return item.createdBy.toString() !== req?.user?._id.toString();
+    //   }
+    // });
+
+    console.log('quiz000000', quiz)
 
     if (!quiz) {
+
+    console.log('!quizzzzz', quiz)
+
       const err = new ProjectError("No test quiz found!");
       err.statusCode = 404;
       throw err;

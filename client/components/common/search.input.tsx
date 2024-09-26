@@ -16,7 +16,13 @@ import { router } from "expo-router";
 import CourseCard from "../cards/course.card";
 import { widthPercentageToDP } from "react-native-responsive-screen";
 
-export default function SearchInput({ homeScreen }: { homeScreen?: boolean }) {
+export default function SearchInput({
+  homeScreen,
+  quizScreen,
+}: {
+  homeScreen?: boolean;
+  quizScreen?: boolean;
+}) {
   const [value, setValue] = useState("");
   const [courses, setcourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);

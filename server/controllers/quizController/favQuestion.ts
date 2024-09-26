@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import { ReturnResponse } from "../../utils/interfaces";
 
-import User from "../../models/user";
+import userModel from "../../models/user.model";
 import favQuestion from "../../models/favQuestion";
 import ProjectError from "../../helper/error";
 
@@ -12,9 +12,9 @@ const addFavQuestion: RequestHandler = async (req, res, next) => {
     const question = req.body.question;
   
     try {
-      const user = await User.findById(userId);
+      const user = await userModel.findById(userId);
       if (!user) {
-        const err = new ProjectError("User does not exist");
+        const err = new ProjectError("userModel does not exist");
         err.statusCode = 401;
         throw err;
       }
