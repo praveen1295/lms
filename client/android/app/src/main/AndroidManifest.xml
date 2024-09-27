@@ -25,8 +25,8 @@
         <action android:name="android.intent.action.VIEW"/>
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
-        <data android:scheme="betafier"/>
-        <data android:scheme="com.betafier.app"/>
+        <data android:scheme="entrance-exam-warriors"/>
+        <data android:scheme="com.entranceexamwarriors.app"/>
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" android:exported="false"/>

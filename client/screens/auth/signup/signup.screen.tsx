@@ -143,7 +143,7 @@ export default function SignUpScreen() {
           Let's get started!
         </Text>
         <Text style={styles.learningText}>
-          Create an account to Becodemy to get all features
+          Create an account to entrance exam warriors to get all features
         </Text>
         <View style={styles.inputContainer}>
           <View>
@@ -168,7 +168,7 @@ export default function SignUpScreen() {
               style={[styles.input, { paddingLeft: 40 }]}
               keyboardType="email-address"
               value={userInfo.email}
-              placeholder="support@becodemy.com"
+              placeholder="support@eew.com"
               onChangeText={(value) =>
                 setUserInfo({ ...userInfo, email: value })
               }

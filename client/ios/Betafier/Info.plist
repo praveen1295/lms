@@ -7,7 +7,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>Betafier</string>
+    <string>entrance exam warriors</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -27,8 +27,8 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>betafier</string>
-          <string>com.betafier.app</string>
+          <string>entrance exam warriors</string>
+          <string>com.entranceexamwarriors.app</string>
         </array>
       </dict>
     </array>

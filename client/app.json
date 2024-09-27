@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "Betafier",
-    "slug": "Betafier",
+    "name": "entrance exam warriors",
+    "slug": "entrance-exam-warriors",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "betafier",
+    "scheme": "entrance-exam-warriors",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -14,14 +14,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.betafier.app"
+      "bundleIdentifier": "com.entranceexamwarriors.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.betafier.app"
+      "package": "com.entranceexamwarriors.app"
     },
     "web": {
       "bundler": "metro",
@@ -37,7 +37,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "9ba7280c-41bb-44fc-b0a9-9a4e47d5c696"
+        "projectId": "4000d70e-865c-45e3-ae9c-42345da0d7d7"
       }
     }
   }

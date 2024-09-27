@@ -16,7 +16,7 @@ export default function QuizHomeScreen() {
       <Header />
       {/* <SearchInput quizScreen={true} /> */}
       {/* <ScrollView showsVerticalScrollIndicator={false}> */}
-      <QuizBannerSlider />
+      {/* <QuizBannerSlider /> */}
       <AllQuizzes />
       {/* </ScrollView> */}
     </LinearGradient>

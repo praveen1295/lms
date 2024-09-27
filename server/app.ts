@@ -11,8 +11,6 @@ import notificationRouter from "./routes/notification.route";
 import analyticsRouter from "./routes/analytics.route";
 import layoutRouter from "./routes/layout.route";
 
-
-
 // import authRoute from "./routes/auth";
 import examRoute from "./routes/exam.route";
 import quizRoute from "./routes/quiz.route";
@@ -22,9 +20,6 @@ import favQuestionRoute from "./routes/favQuestion.route";
 // import ProjectError from "./helper/error";
 import { ReturnResponse } from "./utils/interfaces";
 import clearBlacklistedTokenScheduler from "./utils/clearBlacklistedTokenScheduler";
-
-
-
 
 import { rateLimit } from "express-rate-limit";
 
@@ -38,8 +33,6 @@ app.use(cookieParser());
 // app.use(cors());
 
 const allowedOrigins = [
-  "https://biotronix-frontend.onrender.com",
-  "https://biotronixfrontend.netlify.app",
   "http://localhost:3000",
   "http://localhost:8080",
   "http://localhost:8080/api",
@@ -50,7 +43,7 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: (origin:any, callback) => {
+    origin: (origin: any, callback) => {
       if (allowedOrigins.includes(origin) || !origin) {
         callback(null, true);
       } else {
@@ -92,7 +85,6 @@ app.use("/api/v1/favquestion", favQuestionRoute);
 app.get("/health", (req: Request, res: Response) => {
   res.status(200).send("Server is working!");
 });
-
 
 // testing api
 app.get("/test", (req: Request, res: Response, next: NextFunction) => {

@@ -1,6 +1,7 @@
 import Loader from "@/components/loader/loader";
 import useUser from "@/hooks/auth/useUser";
 import { SERVER_URI } from "@/utils/uri";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
@@ -15,7 +16,6 @@ import {
 
 const QuizScreen = () => {
   const { quizId }: any = useLocalSearchParams(); // Add type any for quizId
-
   const { user, loading, setRefetch }: any = useUser(); // Add type any for user-related hooks
   const [loader, setLoader] = useState<boolean>(false);
   const [selectedAnswers, setSelectedAnswers] = useState<{
@@ -31,7 +31,85 @@ const QuizScreen = () => {
     }));
   };
 
-  const handleSubmit = () => {
+  // const handleSubmit = async () => {
+  //   if (Object.keys(selectedAnswers).length !== quiz.questionList.length) {
+  //     Alert.alert(
+  //       "Incomplete",
+  //       "Please answer all questions before submitting."
+  //     );
+  //     return;
+  //   }
+
+  //   let correctAnswers = 0;
+  //   let attemptedAnswers: any = [];
+
+  //   quiz.questionList.forEach((question: any) => {
+  //     const userAnswer = selectedAnswers[question.questionNumber];
+
+  //     console.log("hs call", question, userAnswer, quiz);
+  //     const correctAnswer = quiz.answers[question.questionNumber];
+
+  //     attemptedAnswers.push({
+  //       questionNumber: question.questionNumber,
+  //       attemptedAnswer: userAnswer,
+  //       rightAnswer: correctAnswer,
+  //     });
+  //     if (userAnswer === correctAnswer) {
+  //       correctAnswers++;
+  //     }
+  //   });
+
+  //   const percentage = (correctAnswers / quiz.questionList.length) * 100;
+  //   const result = percentage >= quiz.passingPercentage ? "Pass" : "Fail";
+
+  //   const reportData = {
+  //     quizId,
+  //     attemptedQuestion: selectedAnswers,
+  //     score: correctAnswers,
+  //     total: quiz.questionList.length,
+  //     percentage,
+  //     result,
+  //     attemptedAnswers,
+  //   };
+
+  //   const accessToken = await AsyncStorage.getItem("access_token");
+  //   const refreshToken = await AsyncStorage.getItem("refresh_token");
+
+  //   try {
+  //     setLoader(true);
+  //     const response = await axios.post(
+  //       `${SERVER_URI}/exam/submit-exam`,
+  //       reportData,
+  //       {
+  //         headers: {
+  //           "access-token": accessToken,
+  //           "refresh-token": refreshToken,
+  //         },
+  //       }
+  //     );
+
+  //     console.log("qresponse", response);
+
+  //     setSubmitted(true);
+  //     Alert.alert(
+  //       response.data.data.result === "Pass" ? "Congrats!" : "Try again",
+  //       `You ${response.data.data.result.toLowerCase()} with ${percentage.toFixed(
+  //         2
+  //       )}%.`
+  //     );
+  //   } catch (error) {
+  //     console.error("Failed to submit quiz:", error);
+  //     Alert.alert(
+  //       "Submission failed",
+  //       "There was an error submitting the quiz."
+  //     );
+  //   } finally {
+  //     setLoader(false);
+  //   }
+  // };
+
+  const handleSubmit = async () => {
+    // Check if all questions are answered
     if (Object.keys(selectedAnswers).length !== quiz.questionList.length) {
       Alert.alert(
         "Incomplete",
@@ -40,40 +118,77 @@ const QuizScreen = () => {
       return;
     }
 
-    let correctAnswers = 0;
-    quiz.questionList.forEach((question: any) => {
-      // Add any for question
-      const userAnswer = selectedAnswers[question.questionNumber];
-      const correctAnswer = quiz.answers[question.questionNumber];
-      if (userAnswer === correctAnswer) {
-        correctAnswers++;
-      }
-    });
+    const reportData = {
+      quizId,
+      attemptedQuestion: selectedAnswers,
+    };
 
-    const percentage = (correctAnswers / quiz.questionList.length) * 100;
-    setSubmitted(true);
+    const accessToken = await AsyncStorage.getItem("access_token");
+    const refreshToken = await AsyncStorage.getItem("refresh_token");
 
-    if (percentage >= quiz.passingPercentage) {
-      Alert.alert("Congrats!", `You passed with ${percentage.toFixed(2)}%!`);
-    } else {
-      Alert.alert("Try again", `You scored ${percentage.toFixed(2)}%.`);
+    try {
+      setLoader(true);
+      const response = await axios.post(
+        `${SERVER_URI}/exam/submit-exam`,
+        reportData,
+        {
+          headers: {
+            "access-token": accessToken,
+            "refresh-token": refreshToken,
+          },
+        }
+      );
+
+      console.log("response", response);
+
+      const { score, result, percentage, attemptedAnswerWithRightAnswer } =
+        response.data.data;
+
+      setSubmitted(true);
+
+      Alert.alert(
+        result === "Pass" ? "Congrats!" : "Try again",
+        `You ${result.toLowerCase()}. \nYour score is ${score}/${
+          quiz.questionList.length
+        }.`
+      );
+    } catch (error) {
+      console.error("Failed to submit quiz:", error);
+      Alert.alert(
+        "Submission failed",
+        "There was an error submitting the quiz."
+      );
+    } finally {
+      setLoader(false);
     }
   };
 
   useEffect(() => {
-    setLoader(true);
-    axios
-      .get(`${SERVER_URI}/quiz/${quizId}`)
-      .then((res) => {
-        console.log("Fetched quizzes", res.data);
-        setQuiz(res.data.data);
-      })
-      .catch((error) => {
+    const fetchQuizData = async () => {
+      setLoader(true);
+
+      try {
+        const accessToken = await AsyncStorage.getItem("access_token");
+        const refreshToken = await AsyncStorage.getItem("refresh_token");
+
+        const response = await axios.get(`${SERVER_URI}/exam/${quizId}`, {
+          headers: {
+            "access-token": accessToken,
+            "refresh-token": refreshToken,
+          },
+        });
+
+        console.log("Fetched quizzes", response.data);
+        setQuiz(response.data.data);
+      } catch (error) {
         console.error(error);
-      })
-      .finally(() => {
+      } finally {
         setLoader(false);
-      });
+      }
+    };
+
+    // Call the async function
+    fetchQuizData();
   }, [quizId]);
 
   if (loading || loader) {
