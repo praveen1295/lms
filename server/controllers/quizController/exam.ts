@@ -18,9 +18,9 @@ const startExam: RequestHandler = async (req, res, next) => {
       category: 1,
       attemptsAllowedPerUser: 1,
       attemptedUsers: 1,
-      passingPercentage:1,
-      isPublicQuiz:1,
-      allowedUser:1
+      passingPercentage: 1,
+      isPublicQuiz: 1,
+      allowedUser: 1,
     });
 
     if (!quiz) {
@@ -38,14 +38,13 @@ const startExam: RequestHandler = async (req, res, next) => {
       const err = new ProjectError("You can't attend your own quiz!");
       err.statusCode = 405;
     }
-    if(!quiz.isPublicQuiz && !quiz.allowedUser.includes(req?.user?._id)){
-      const err = new ProjectError("You are not authorized!");
-      err.statusCode = 403;
-      throw err;
-    }
+    // if(!quiz.isPublicQuiz && !quiz.allowedUser.includes(req?.user?._id)){
+    //   const err = new ProjectError("You are not authorized!");
+    //   err.statusCode = 403;
+    //   throw err;
+    // }
     if (quiz.category === "test") {
       if (quiz.attemptsAllowedPerUser) {
-
         if (quiz.attemptedUsers.length) {
           quiz.attemptedUsers.forEach((user) => {
             const id = user.id;
@@ -53,21 +52,21 @@ const startExam: RequestHandler = async (req, res, next) => {
               if (user.attemptsLeft !== undefined) {
                 if (user.attemptsLeft > 0) {
                   user.attemptsLeft -= 1;
-                }
-                else {
+                } else {
                   const err = new ProjectError("You have zero attempts left!");
                   err.statusCode = 405;
                   throw err;
                 }
               }
             }
-          })
+          });
           const updated = await quiz.save();
-        }
-        else {
-
+        } else {
           if (req?.user?._id && quiz.attemptsAllowedPerUser) {
-            const newUser = { id: req?.user?._id.toString(), attemptsLeft: quiz.attemptsAllowedPerUser - 1 };
+            const newUser = {
+              id: req?.user?._id.toString(),
+              attemptsLeft: quiz.attemptsAllowedPerUser - 1,
+            };
             quiz.attemptedUsers.push(newUser);
             const updated = await quiz.save();
           }
@@ -90,19 +89,24 @@ const submitExam: RequestHandler = async (req, res, next) => {
     const userId = req?.user?._id;
     const quizId = req.body.quizId;
     const attemptedQuestion = req.body.attemptedQuestion;
-    
-    const quiz = await Quiz.findById(quizId, { questionList: 1 ,answers: 1, passingPercentage:1 });
+    console.log("attemptedQuestion", userId, quizId, attemptedQuestion);
+    const quiz = await Quiz.findById(quizId, {
+      questionList: 1,
+      answers: 1,
+      passingPercentage: 1,
+    });
     if (!quiz) {
       const err = new ProjectError("No quiz found!");
       err.statusCode = 404;
       throw err;
     }
 
-    if (quiz.createdBy.toString() === userId) {
-      const err = new ProjectError("You can't submit your own quiz!");
-      err.statusCode = 405;
-      throw err;
-    }
+    // if (quiz?.createdBy.toString() === userId) {
+    //   const err = new ProjectError("You can't submit your own quiz!");
+    //   err.statusCode = 405;
+    //   throw err;
+    // }
+
     const answers = quiz.answers;
     const passingPercentage = quiz.passingPercentage;
     const allQuestions = Object.keys(answers);
@@ -115,12 +119,12 @@ const submitExam: RequestHandler = async (req, res, next) => {
       let questionNumber = allQuestions[i];
       const attemptedAnswer = attemptedQuestion[questionNumber];
       const rightAnswer = answers[questionNumber];
-      if(!!attemptedAnswer){
+      if (!!attemptedAnswer) {
         attemptedAnswerWithRightAnswer.push({
           questionNumber,
           attemptedAnswer,
-          rightAnswer
-        })
+          rightAnswer,
+        });
       }
 
       if (
@@ -148,14 +152,24 @@ const submitExam: RequestHandler = async (req, res, next) => {
       total,
       percentage,
       result,
-      attemtedAnswers: attemptedAnswerWithRightAnswer
+      attemtedAnswers: attemptedAnswerWithRightAnswer,
     });
     const data = await report.save();
+
     const resp: ReturnResponse = {
       status: "success",
       message: "Quiz submitted",
-      data: { total, score,result, reportId: data._id, attemptedAnswerWithRightAnswer} 
+      data: {
+        total,
+        score,
+        result,
+        reportId: data._id,
+        attemptedAnswerWithRightAnswer,
+      },
     };
+
+    console.log("ccccccccccc", resp);
+
     res.status(200).send(resp);
   } catch (error) {
     next(error);

@@ -10,14 +10,13 @@ import {
 import { validateRequest } from "../helper/validateRequest";
 import { authorizeRoles, isAuthenticated } from "../middleware/auth";
 
-
 const router = express.Router();
 // GET /exam/quizId
 router.get("/:quizId", isAuthenticated, startExam);
 
 // POST /exam
 router.post(
-  "/",
+  "/submit-exam",
   isAuthenticated,
   [
     body("quizId")

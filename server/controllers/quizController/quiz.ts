@@ -4,10 +4,23 @@ import { RequestHandler } from "express";
 import ProjectError from "../../helper/error";
 import Quiz from "../../models/quiz";
 import { ReturnResponse } from "../../utils/interfaces";
+import userModel from "../../models/user.model";
 
 const createQuiz: RequestHandler = async (req, res, next) => {
   try {
     const createdBy = req?.user?._id.toString();
+
+    const user: any = await userModel.findById(req.user?._id);
+
+    if (user.role !== "admin") {
+      const resp: ReturnResponse = {
+        status: "error",
+        message: "Quiz not created!",
+        data: { message: "Only admin/owner can able to create quiz." },
+      };
+      return res.status(500).send(resp);
+    }
+
     const name = req.body.name;
     const category = req.body.category;
     const difficultyLevel = req.body.difficultyLevel;
@@ -17,7 +30,18 @@ const createQuiz: RequestHandler = async (req, res, next) => {
     const attemptsAllowedPerUser = req.body.attemptsAllowedPerUser;
     const isPublicQuiz = req.body.isPublicQuiz;
     const allowedUser = req.body.allowedUser;
-    const quiz = new Quiz({ name, category, difficultyLevel, questionList, answers, passingPercentage, createdBy, attemptsAllowedPerUser, isPublicQuiz, allowedUser });
+    const quiz = new Quiz({
+      name,
+      category,
+      difficultyLevel,
+      questionList,
+      answers,
+      passingPercentage,
+      createdBy,
+      attemptsAllowedPerUser,
+      isPublicQuiz,
+      allowedUser,
+    });
     const result = await quiz.save();
     const resp: ReturnResponse = {
       status: "success",
@@ -33,7 +57,7 @@ const createQuiz: RequestHandler = async (req, res, next) => {
 const getQuiz: RequestHandler = async (req, res, next) => {
   try {
     const quizId = req.params.quizId;
-    console.log('quizId', quizId)
+    console.log("quizId", quizId);
     let quiz;
     if (quizId) {
       quiz = await Quiz.findById(quizId, {
@@ -44,7 +68,7 @@ const getQuiz: RequestHandler = async (req, res, next) => {
         createdBy: 1,
         passingPercentage: 1,
         isPublicQuiz: 1,
-        allowedUser: 1
+        allowedUser: 1,
       });
 
       if (!quiz) {
@@ -52,18 +76,18 @@ const getQuiz: RequestHandler = async (req, res, next) => {
         err.statusCode = 404;
         throw err;
       }
-    //   if(!quiz.isPublicQuiz && !quiz.allowedUser.includes(req?.user?._id.toString())){
-    //     const err = new ProjectError("You are not authorized!");
-    //     err.statusCode = 403;
-    //     throw err;
-    //   }
-    //   if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
-    //     const err = new ProjectError("You are not authorized!");
-    //     err.statusCode = 403;
-    //     throw err;
-    //   }
-    // } else {
-    //   quiz = await Quiz.find({ createdBy: req?.user?._id.toString() });
+      //   if(!quiz.isPublicQuiz && !quiz.allowedUser.includes(req?.user?._id.toString())){
+      //     const err = new ProjectError("You are not authorized!");
+      //     err.statusCode = 403;
+      //     throw err;
+      //   }
+      //   if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
+      //     const err = new ProjectError("You are not authorized!");
+      //     err.statusCode = 403;
+      //     throw err;
+      //   }
+      // } else {
+      //   quiz = await Quiz.find({ createdBy: req?.user?._id.toString() });
     }
 
     if (!quiz) {
@@ -178,7 +202,7 @@ const publishQuiz: RequestHandler = async (req, res, next) => {
       err.statusCode = 404;
       throw err;
     }
-console.log('first', quiz.createdBy, req?.user?._id.toString())
+    console.log("first", quiz.createdBy, req?.user?._id.toString());
     if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
       const err = new ProjectError("You are not authorized!");
       err.statusCode = 403;
@@ -190,11 +214,11 @@ console.log('first', quiz.createdBy, req?.user?._id.toString())
       err.statusCode = 405;
       throw err;
     }
-    if(quiz.isPublicQuiz === false && quiz.allowedUser.length === 0){
+    if (quiz.isPublicQuiz === false && quiz.allowedUser.length === 0) {
       const err = new ProjectError("Specify users for private quiz!");
-          err.statusCode = 404;
-          throw err;
-  }
+      err.statusCode = 404;
+      throw err;
+    }
 
     quiz.isPublished = true;
     await quiz.save();
@@ -225,9 +249,10 @@ const isValidQuiz = async (
       let opt = Object.keys(question["options"]);
       if (
         opt.indexOf(
-          `${Object.values(answers)[
-          Object.keys(answers).indexOf(question.questionNumber.toString())
-          ]
+          `${
+            Object.values(answers)[
+              Object.keys(answers).indexOf(question.questionNumber.toString())
+            ]
           }`
         ) == -1
       ) {
@@ -248,37 +273,41 @@ const isValidQuizName = async (name: String) => {
 
 const getAllQuiz: RequestHandler = async (req, res, next) => {
   try {
-    let quiz = await Quiz.find({ isPublished: true }, {
-      name: 1,
-      category: 1,
-      questionList: 1,
-      createdBy: 1,
-      passingPercentage: 1,
-      isPublicQuiz:1,
-      allowedUser:1
-    });
-    
-    //filter quizzes created by user itself
-    quiz = quiz.filter(item => {
-      if(item.isPublicQuiz || item.allowedUser.includes(req?.user?._id.toString())){
-          return item.createdBy.toString() !== req?.user?._id.toString();
+    let quiz = await Quiz.find(
+      { isPublished: true },
+      {
+        name: 1,
+        category: 1,
+        questionList: 1,
+        createdBy: 1,
+        passingPercentage: 1,
+        isPublicQuiz: 1,
+        allowedUser: 1,
       }
-      
+    );
+
+    //filter quizzes created by user itself
+    quiz = quiz.filter((item) => {
+      if (
+        item.isPublicQuiz ||
+        item.allowedUser.includes(req?.user?._id.toString())
+      ) {
+        return item.createdBy.toString() !== req?.user?._id.toString();
+      }
     });
-    
+
     if (!quiz) {
       const err = new ProjectError("No quiz found!");
       err.statusCode = 404;
       throw err;
     }
-    
+
     const resp: ReturnResponse = {
       status: "success",
       message: "All Published Quiz",
       data: quiz,
     };
     res.status(200).send(resp);
-
   } catch (error) {
     next(error);
   }
@@ -286,19 +315,24 @@ const getAllQuiz: RequestHandler = async (req, res, next) => {
 
 const getAllQuizExam: RequestHandler = async (req, res, next) => {
   try {
-    let quiz = await Quiz.find({ isPublished: true, category: "exam" },
-    {
-      name: 1,
-      category: 1,
-      questionList: 1,
-      createdBy: 1,
-      passingPercentage: 1,
-      isPublicQuiz: 1,
-      allowedUser: 1,
-    });
+    let quiz = await Quiz.find(
+      { isPublished: true, category: "exam" },
+      {
+        name: 1,
+        category: 1,
+        questionList: 1,
+        createdBy: 1,
+        passingPercentage: 1,
+        isPublicQuiz: 1,
+        allowedUser: 1,
+      }
+    );
 
     quiz = quiz.filter((item) => {
-      if (item.isPublicQuiz || item.allowedUser.includes(req?.user?._id.toString())) {
+      if (
+        item.isPublicQuiz ||
+        item.allowedUser.includes(req?.user?._id.toString())
+      ) {
         return item.createdBy.toString() !== req?.user?._id.toString();
       }
     });
@@ -322,16 +356,18 @@ const getAllQuizExam: RequestHandler = async (req, res, next) => {
 
 const getAllQuizTest: RequestHandler = async (req, res, next) => {
   try {
-    let quiz = await Quiz.find({ isPublished: true, category: "test" },
-    {
-      name: 1,
-      category: 1,
-      questionList: 1,
-      createdBy: 1,
-      passingPercentage: 1,
-      isPublicQuiz: 1,
-      allowedUser: 1,
-    });
+    let quiz = await Quiz.find(
+      { isPublished: true, category: "test" },
+      {
+        name: 1,
+        category: 1,
+        questionList: 1,
+        createdBy: 1,
+        passingPercentage: 1,
+        isPublicQuiz: 1,
+        allowedUser: 1,
+      }
+    );
 
     // quiz = quiz.filter((item) => {
     //   if (item.isPublicQuiz || item.allowedUser.includes(req?.user?._id.toString())) {
@@ -339,11 +375,10 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
     //   }
     // });
 
-    console.log('quiz000000', quiz)
+    console.log("quiz000000", quiz);
 
     if (!quiz) {
-
-    console.log('!quizzzzz', quiz)
+      console.log("!quizzzzz", quiz);
 
       const err = new ProjectError("No test quiz found!");
       err.statusCode = 404;
@@ -371,5 +406,5 @@ export {
   updateQuiz,
   getAllQuiz,
   getAllQuizExam,
-  getAllQuizTest
+  getAllQuizTest,
 };
