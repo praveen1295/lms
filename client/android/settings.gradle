@@ -44,7 +44,7 @@ if (getRNMinorVersion() >= 75) {
   }
 }
 
-rootProject.name = 'Betafier'
+rootProject.name = 'entrance-exam-warriors'
 
 dependencyResolutionManagement {
   versionCatalogs {

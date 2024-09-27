@@ -19,7 +19,7 @@ export default function TabsLayout() {
             } else if (route.name === "profile/index") {
               iconName = require("@/assets/icons/User.png");
             } else if (route.name === "quiz/index") {
-              iconName = require("@/assets/icons/User.png");
+              iconName = require("@/assets/icons/Test.png");
             }
 
             return (

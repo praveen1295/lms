@@ -15,7 +15,6 @@ import {
 
 const QuizScreen = () => {
   const { quizId }: any = useLocalSearchParams(); // Add type any for quizId
-
   const { user, loading, setRefetch }: any = useUser(); // Add type any for user-related hooks
   const [loader, setLoader] = useState<boolean>(false);
   const [selectedAnswers, setSelectedAnswers] = useState<{
@@ -31,7 +30,7 @@ const QuizScreen = () => {
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (Object.keys(selectedAnswers).length !== quiz.questionList.length) {
       Alert.alert(
         "Incomplete",
@@ -41,22 +40,52 @@ const QuizScreen = () => {
     }
 
     let correctAnswers = 0;
+    let attemptedAnswers: any = [];
+
     quiz.questionList.forEach((question: any) => {
-      // Add any for question
       const userAnswer = selectedAnswers[question.questionNumber];
       const correctAnswer = quiz.answers[question.questionNumber];
+      attemptedAnswers.push({
+        questionNumber: question.questionNumber,
+        attemptedAnswer: userAnswer,
+        rightAnswer: correctAnswer,
+      });
       if (userAnswer === correctAnswer) {
         correctAnswers++;
       }
     });
 
     const percentage = (correctAnswers / quiz.questionList.length) * 100;
-    setSubmitted(true);
+    const result = percentage >= quiz.passingPercentage ? "Pass" : "Fail";
 
-    if (percentage >= quiz.passingPercentage) {
-      Alert.alert("Congrats!", `You passed with ${percentage.toFixed(2)}%!`);
-    } else {
-      Alert.alert("Try again", `You scored ${percentage.toFixed(2)}%.`);
+    const reportData = {
+      quizId,
+      attemptedQuestion: selectedAnswers,
+      score: correctAnswers,
+      total: quiz.questionList.length,
+      percentage,
+      result,
+      attemptedAnswers,
+    };
+
+    try {
+      setLoader(true);
+      const response = await axios.post(`${SERVER_URI}/exam`, reportData);
+      setSubmitted(true);
+      Alert.alert(
+        response.data.data.result === "Pass" ? "Congrats!" : "Try again",
+        `You ${response.data.data.result.toLowerCase()} with ${percentage.toFixed(
+          2
+        )}%.`
+      );
+    } catch (error) {
+      console.error("Failed to submit quiz:", error);
+      Alert.alert(
+        "Submission failed",
+        "There was an error submitting the quiz."
+      );
+    } finally {
+      setLoader(false);
     }
   };
 
