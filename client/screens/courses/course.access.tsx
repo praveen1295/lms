@@ -19,6 +19,7 @@ import { Toast } from "react-native-toast-notifications";
 import ReviewCard from "@/components/cards/review.card";
 import { FontAwesome } from "@expo/vector-icons";
 import useUser from "@/hooks/auth/useUser";
+import VideoPlayer from "./video.player";
 
 export default function CourseAccessScreen() {
   const [isLoading, setisLoading] = useState(true);
@@ -149,6 +150,8 @@ export default function CourseAccessScreen() {
     return starts;
   };
 
+  console.log("courseContentData", courseContentData);
+
   return (
     <>
       {isLoading ? (
@@ -158,10 +161,24 @@ export default function CourseAccessScreen() {
           <View
             style={{ width: "100%", aspectRatio: 16 / 9, borderRadius: 10 }}
           >
-            <WebView
+            {/* <WebView
               source={{ uri: courseContentData[activeVideo]?.videoUrl! }}
               allowsFullscreenVideo={true}
-            />
+            /> */}
+            {courseContentData.length > 0 && (
+              <VideoPlayer
+                videoUrl={courseContentData[activeVideo]?.videoUrl}
+              />
+            )}
+
+            {/* <WebView
+              source={{ uri: courseContentData[activeVideo]?.videoUrl }}
+              allowsFullscreenVideo={true}
+              javaScriptEnabled={true} // Ensure JavaScript is enabled for better video handling
+              mediaPlaybackRequiresUserAction={false} // Autoplay videos without user action
+              domStorageEnabled={true} // Enable DOM storage for better performance
+              startInLoadingState={true} // Show a loading indicator until the video loads
+            /> */}
           </View>
           <View
             style={{
