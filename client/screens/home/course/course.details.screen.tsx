@@ -359,7 +359,7 @@ export default function CourseDetailScreen() {
               }}
               onPress={() =>
                 router.push({
-                  pathname: "/(routes)/course-assess",
+                  pathname: "/(routes)/course-access",
                   params: { courseData: JSON.stringify(courseData) },
                 })
               }

@@ -42,8 +42,8 @@ export interface ICourse extends Document {
   tags: string;
   level: string;
   demoUrl: string;
-  coursePdf: {
-    link: String;
+  notes: {
+    url: String;
     price: Number;
   };
   benefits: { title: string }[];
@@ -135,7 +135,7 @@ const courseSchema = new Schema<ICourse>(
       type: String,
       required: true,
     },
-    coursePdf: {
+    notes: {
       link: {
         type: String,
         price: Number,

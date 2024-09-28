@@ -67,16 +67,20 @@
 import { View, Text, StyleSheet, Dimensions } from "react-native";
 import React from "react";
 import Pdf from "react-native-pdf";
+import { useLocalSearchParams } from "expo-router";
 
 const PDFViewer = () => {
+  const { courseData: item } = useLocalSearchParams();
+  const courseData: any = JSON.parse(item as string);
+  console.log("courseData?.notes.url", courseData?.notes.url);
   const PdfResource = {
-    uri: "http://192.168.1.113:8000/api/v1/static/pdf_files/project_file.pdf",
+    uri: courseData?.notes.url,
     cache: true,
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bug Ninza</Text>
+      <Text style={styles.title}>{courseData.name}</Text>
       <Pdf
         trustAllCerts={false}
         source={PdfResource}
