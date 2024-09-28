@@ -134,7 +134,7 @@ export default function LoginScreen() {
               style={[styles.input, { paddingLeft: 40 }]}
               keyboardType="email-address"
               value={userInfo.email}
-              placeholder="support@eew.com"
+              placeholder="support@entranceexamwarriors.com"
               onChangeText={(value) =>
                 setUserInfo({ ...userInfo, email: value })
               }

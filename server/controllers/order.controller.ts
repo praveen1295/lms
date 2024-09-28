@@ -214,14 +214,39 @@ export const sendStripePublishableKey = CatchAsyncError(
 );
 
 // new payment
+// export const newPayment = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const myPayment = await stripe.paymentIntents.create({
+//         amount: req.body.amount,
+//         currency: "INR",
+//         metadata: {
+//           company: "E-Learning",
+//         },
+//         automatic_payment_methods: {
+//           enabled: true,
+//         },
+//       });
+
+//       res.status(201).json({
+//         success: true,
+//         client_secret: myPayment.client_secret,
+//       });
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, 500));
+//     }
+//   }
+// );
+
 export const newPayment = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const myPayment = await stripe.paymentIntents.create({
         amount: req.body.amount,
         currency: "INR",
+        description: "Payment for Entrance Exam Warriors course",
         metadata: {
-          company: "E-Learning",
+          company: "Entrance Exam Warriors",
         },
         automatic_payment_methods: {
           enabled: true,
