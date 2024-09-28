@@ -36,6 +36,9 @@
       "router": {
         "origin": false
       },
+      "extra": {
+        "stripePublishableKey": "pk_test_51PKXAESISP6fGftpqiahHAMAhasIDUGuRNT1U4WwsWV18zN2y7FXqsrBMeg191CPU44XATyN3Wpj5qe4qtzsyuq6002anizgrF"
+      },
       "eas": {
         "projectId": "4000d70e-865c-45e3-ae9c-42345da0d7d7"
       }

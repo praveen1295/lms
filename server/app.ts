@@ -11,27 +11,24 @@ import notificationRouter from "./routes/notification.route";
 import analyticsRouter from "./routes/analytics.route";
 import layoutRouter from "./routes/layout.route";
 
-// import authRoute from "./routes/auth";
+// Routes imports
 import examRoute from "./routes/exam.route";
 import quizRoute from "./routes/quiz.route";
 import reportRoute from "./routes/report.route";
-// import userRoute from "./routes/user";
 import favQuestionRoute from "./routes/favQuestion.route";
-// import ProjectError from "./helper/error";
-import { ReturnResponse } from "./utils/interfaces";
-import clearBlacklistedTokenScheduler from "./utils/clearBlacklistedTokenScheduler";
 
+// Utility imports
 import { rateLimit } from "express-rate-limit";
+import { rootDir, upload } from "./middleware/fileUpload.middleware";
+import path from "path";
 
-// body parser
+// Body parser
 app.use(express.json({ limit: "50mb" }));
 
-// cookie parser
+// Cookie parser
 app.use(cookieParser());
 
-// cors => cross origin resource sharing
-// app.use(cors());
-
+// CORS setup
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:8080",
@@ -52,12 +49,21 @@ app.use(
     },
     credentials: true,
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    // allowedHeaders: "Content-Type,Authorization",
     exposedHeaders: ["X-Total-Count"],
   })
 );
 
-// api requests limit
+// Serve static files
+app.use(
+  "/api/v1/static/thumbnail",
+  express.static(path.join(rootDir, "THUMBNAIL"))
+);
+app.use(
+  "/api/v1/static/pdf_files",
+  express.static(path.join(rootDir, "PDF_FILES"))
+);
+
+// API request limit setup
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -65,7 +71,9 @@ const limiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Group API version 1 routes together
+app.use(limiter);
+
+// Grouped API v1 routes
 app.use("/api/v1", [
   userRouter,
   orderRouter,
@@ -75,7 +83,7 @@ app.use("/api/v1", [
   layoutRouter,
 ]);
 
-// Group exam-related routes together
+// Exam-related routes
 app.use("/api/v1/exam", examRoute);
 app.use("/api/v1/quiz", quizRoute);
 app.use("/api/v1/report", reportRoute);
@@ -86,21 +94,20 @@ app.get("/health", (req: Request, res: Response) => {
   res.status(200).send("Server is working!");
 });
 
-// testing api
+// Test API
 app.get("/test", (req: Request, res: Response, next: NextFunction) => {
   res.status(200).json({
-    succcess: true,
+    success: true,
     message: "API is working",
   });
 });
 
-// unknown route
+// Handle unknown routes
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
   const err = new Error(`Route ${req.originalUrl} not found`) as any;
   err.statusCode = 404;
   next(err);
 });
 
-// middleware calls
-app.use(limiter);
+// Error handling middleware
 app.use(ErrorMiddleware);

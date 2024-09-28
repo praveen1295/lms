@@ -237,7 +237,13 @@ export const sendStripePublishableKey = CatchAsyncError(
 //     }
 //   }
 // );
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 export const newPayment = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
