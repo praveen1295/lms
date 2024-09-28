@@ -50,6 +50,7 @@ type CoursesType = {
     public_id: string | any;
     url: string | any;
   };
+  notes?: {};
   tags: string;
   level: string;
   demoUrl: string;

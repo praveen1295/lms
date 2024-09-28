@@ -86,6 +86,14 @@ function RootLayoutNav() {
           }}
         />
         <Stack.Screen
+          name="(routes)/course-notes-access/index"
+          options={{
+            headerShown: true,
+            title: "Course Notes",
+            headerBackTitle: "Back",
+          }}
+        />
+        <Stack.Screen
           name="(routes)/enrolled-courses/index"
           options={{
             headerShown: true,

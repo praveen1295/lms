@@ -344,18 +344,49 @@ export default function CourseDetailScreen() {
               marginHorizontal: 16,
               paddingVertical: 11,
               marginBottom: 10,
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
             }}
           >
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#2467EC",
+                paddingVertical: 10,
+                paddingHorizontal: 8,
+                borderRadius: 50,
+              }}
+              onPress={() =>
+                router.push({
+                  pathname: "/(routes)/course-assess",
+                  params: { courseData: JSON.stringify(courseData) },
+                })
+              }
+            >
+              <Text
+                style={{
+                  textAlign: "center",
+                  color: "#FFFF",
+                  fontSize: 16,
+                  fontFamily: "Nunito_600SemiBold",
+                }}
+              >
+                Go to the course
+              </Text>
+            </TouchableOpacity>
+
             {checkPurchased === true ? (
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#2467EC",
-                  paddingVertical: 16,
-                  borderRadius: 4,
+                  backgroundColor: "green",
+                  paddingVertical: 10,
+                  paddingHorizontal: 8,
+                  borderRadius: 50,
                 }}
                 onPress={() =>
                   router.push({
-                    pathname: "/(routes)/course-access",
+                    pathname: "/(routes)/course-notes-access",
                     params: { courseData: JSON.stringify(courseData) },
                   })
                 }
@@ -368,15 +399,16 @@ export default function CourseDetailScreen() {
                     fontFamily: "Nunito_600SemiBold",
                   }}
                 >
-                  Go to the course
+                  Go to the notes
                 </Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 style={{
-                  backgroundColor: "#2467EC",
-                  paddingVertical: 16,
-                  borderRadius: 4,
+                  backgroundColor: "red",
+                  paddingVertical: 10,
+                  paddingHorizontal: 8,
+                  borderRadius: 50,
                 }}
                 onPress={() => handleAddToCart()}
               >
@@ -388,7 +420,7 @@ export default function CourseDetailScreen() {
                     fontFamily: "Nunito_600SemiBold",
                   }}
                 >
-                  Add to cart
+                  Buy notes
                 </Text>
               </TouchableOpacity>
             )}

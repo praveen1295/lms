@@ -13,6 +13,8 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@config-plugins/react-native-blob-util": "^8.0.0",
+    "@config-plugins/react-native-pdf": "^8.0.0",
     "@expo-google-fonts/nunito": "^0.2.3",
     "@expo-google-fonts/raleway": "^0.2.3",
     "@expo/vector-icons": "^14.0.2",
@@ -23,7 +25,7 @@
     "axios": "^1.6.8",
     "deprecated-react-native-prop-types": "^2.3.0",
     "expo": "~51.0.5",
-    "expo-dev-client": "^4.0.25",
+    "expo-dev-client": "~4.0.27",
     "expo-file-system": "^17.0.1",
     "expo-font": "~12.0.5",
     "expo-image-picker": "~15.0.5",
@@ -40,6 +42,8 @@
     "react-native": "0.74.1",
     "react-native-animated-loader": "^1.0.0",
     "react-native-app-intro-slider": "^4.0.4",
+    "react-native-blob-util": "^0.19.11",
+    "react-native-pdf": "^6.7.5",
     "react-native-reanimated": "~3.10.1",
     "react-native-responsive-dimensions": "^3.1.1",
     "react-native-responsive-screen": "^1.4.2",

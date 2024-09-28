@@ -18,9 +18,27 @@ export default function index() {
       const data = courses.filter((i: CoursesType) =>
         user?.courses?.some((d: any) => d._id === i._id)
       );
+
+      console.log("dataaaaaa, data", data);
       setcourses(data);
     });
   }, [loader, user]);
+
+  // useEffect(() => {
+  //   axios.get(`${SERVER_URI}/get-courses`).then((res: any) => {
+  //     const data = courses.map((i: CoursesType) => {
+  //       // Check if the user's courses include the current course
+  //       if (user?.courses?.some((d: any) => d._id === i._id)) {
+  //         // Return a new object without the 'notes' key
+  //         const { notes, ...rest } = i; // Destructure to remove 'notes'
+  //         return rest; // Return the rest of the object
+  //       }
+  //       return i; // Return the original object if the condition is false
+  //     });
+
+  //     setcourses(data);
+  //   });
+  // }, [loader, user]);
 
   return (
     <>
