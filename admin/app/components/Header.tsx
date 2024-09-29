@@ -41,7 +41,7 @@ const Header: FC<Props> = ({ activeItem, setOpen }) => {
                 href="/"
                 className="text-[25px] font-Poppins font-500 text-black dark:text-white"
               >
-                ELearning
+                Entrance Exam Warriors
               </Link>
             </div>
             <div className="flex items-center">

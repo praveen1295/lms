@@ -72,9 +72,9 @@ import { useLocalSearchParams } from "expo-router";
 const PDFViewer = () => {
   const { courseData: item } = useLocalSearchParams();
   const courseData: any = JSON.parse(item as string);
-  console.log("courseData?.notes.url", courseData?.notes.url);
+  console.log("courseData?.notes.url", courseData?.notes);
   const PdfResource = {
-    uri: courseData?.notes.url,
+    uri: courseData?.notes.notesUrl,
     cache: true,
   };
 

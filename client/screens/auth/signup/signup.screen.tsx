@@ -123,7 +123,7 @@ export default function SignUpScreen() {
       .catch((error) => {
         console.log("error", error);
         setButtonSpinner(false);
-        Toast.show("Email already exist!", {
+        Toast.show("Something went wrong, please try after some time!", {
           type: "danger",
         });
       });

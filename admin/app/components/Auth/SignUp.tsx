@@ -54,7 +54,7 @@ const Signup: FC<Props> = ({ setRoute }) => {
 
   return (
     <div className="w-full">
-      <h1 className={`${styles.title}`}>Join to ELearning</h1>
+      <h1 className={`${styles.title}`}>Join to Entrance Exam Warriors</h1>
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className={`${styles.label}`} htmlFor="email">
