@@ -29,10 +29,8 @@ export const registrationUser = CatchAsyncError(
     try {
       const { name, email, password } = req.body;
 
-
-
       const isEmailExist = await userModel.findOne({ email });
-      console.log( isEmailExist )
+      console.log(isEmailExist);
 
       if (isEmailExist) {
         return next(new ErrorHandler("Email already exist", 400));
@@ -46,14 +44,13 @@ export const registrationUser = CatchAsyncError(
 
       const activationToken = createActivationToken(user);
 
-      console.log( 'activationToken',activationToken )
-
+      console.log("activationToken", activationToken);
 
       const activationCode = activationToken.activationCode;
 
       const data = { user: { name: user.name }, activationCode };
       const html = await ejs.renderFile(
-        path.join(__dirname, "../mails/activation-mail.ejs"),
+        path.join(__dirname, "../../mails/activation-mail.ejs"),
         data
       );
 
@@ -165,10 +162,10 @@ export const loginUser = CatchAsyncError(
         return next(new ErrorHandler("Invalid email or password", 400));
       }
 
-      console.log('user',user)
+      console.log("user", user);
 
       const isPasswordMatch = await user.comparePassword(password);
-      console.log('isPasswordMatch',isPasswordMatch)
+      console.log("isPasswordMatch", isPasswordMatch);
       if (!isPasswordMatch) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
@@ -232,7 +229,6 @@ export const logoutUser = CatchAsyncError(
 //   }
 // );
 
-
 export const updateAccessToken = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -256,7 +252,9 @@ export const updateAccessToken = CatchAsyncError(
       const user = await userModel.findById(decoded.id);
 
       if (!user) {
-        return next(new ErrorHandler("User not found. Please login again.", 400));
+        return next(
+          new ErrorHandler("User not found. Please login again.", 400)
+        );
       }
 
       // Create a new access token
@@ -279,16 +277,13 @@ export const updateAccessToken = CatchAsyncError(
   }
 );
 
-
 // get user info
 export const getUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-
-      console.log('req.user?._id',req.user?._id)
+      console.log("req.user?._id", req.user?._id);
 
       const userId = req.user?._id;
-
 
       getUserById(userId, res);
     } catch (error: any) {
