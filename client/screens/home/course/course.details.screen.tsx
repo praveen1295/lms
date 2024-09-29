@@ -28,6 +28,7 @@ export default function CourseDetailScreen() {
   const courseData: CoursesType = JSON.parse(item as string);
   const [checkPurchased, setCheckPurchased] = useState(false);
 
+  console.log("courseData", courseData, "===========================");
   useEffect(() => {
     if (user?.courses?.find((i: any) => i._id === courseData?._id)) {
       setCheckPurchased(true);
@@ -411,6 +412,12 @@ export default function CourseDetailScreen() {
                   borderRadius: 50,
                 }}
                 onPress={() => handleAddToCart()}
+                // onPress={() =>
+                //   router.push({
+                //     pathname: "/(routes)/course-notes-access",
+                //     params: { courseData: JSON.stringify(courseData) },
+                //   })
+                // }
               >
                 <Text
                   style={{

@@ -43,8 +43,8 @@ export interface ICourse extends Document {
   level: string;
   demoUrl: string;
   notes: {
-    url: String;
-    price: Number;
+    notesUrl: string;
+    price: number;
   };
   benefits: { title: string }[];
   prerequisites: { title: string }[];
@@ -136,9 +136,12 @@ const courseSchema = new Schema<ICourse>(
       required: true,
     },
     notes: {
-      link: {
+      notesUrl: {
         type: String,
-        price: Number,
+      },
+      price: {
+        type: Number,
+        required: true,
       },
     },
     benefits: [{ title: String }],
