@@ -109,6 +109,31 @@ function RootLayoutNav() {
             headerBackTitle: "Back",
           }}
         />
+        <Stack.Screen
+          name="(routes)/quiz-list/index"
+          options={{
+            headerShown: true,
+            title: "Quiz",
+            headerBackTitle: "Back",
+          }}
+        />
+        <Stack.Screen
+          name="(routes)/test-list/index"
+          options={{
+            headerShown: true,
+            title: "Test",
+            headerBackTitle: "Back",
+          }}
+        />
+
+        <Stack.Screen
+          name="(routes)/ebook-list/index"
+          options={{
+            headerShown: true,
+            title: "Ebook",
+            headerBackTitle: "Back",
+          }}
+        />
       </Stack>
     </ToastProvider>
   );
