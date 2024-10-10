@@ -115,6 +115,7 @@ export const createMobileOrder = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { courseId, payment_info } = req.body as IOrder;
+      console.log("courseId, payment_info", courseId, payment_info);
       const user = await userModel.findById(req.user?._id);
 
       const courseExistInUser = user?.courses.some(
@@ -128,6 +129,8 @@ export const createMobileOrder = CatchAsyncError(
       }
 
       const course: ICourse | null = await CourseModel.findById(courseId);
+
+      console.log("course=====", course);
 
       if (!course) {
         return next(new ErrorHandler("Course not found", 404));
@@ -167,6 +170,7 @@ export const createMobileOrder = CatchAsyncError(
           });
         }
       } catch (error: any) {
+        console.log("eee1", error);
         return next(new ErrorHandler(error.message, 500));
       }
 
@@ -188,6 +192,8 @@ export const createMobileOrder = CatchAsyncError(
 
       newOrder(data, res, next);
     } catch (error: any) {
+      console.log("eee2", error);
+
       return next(new ErrorHandler(error.message, 500));
     }
   }
