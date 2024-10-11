@@ -53,7 +53,7 @@ function RootLayoutNav() {
         <Stack.Screen name="(routes)/sign-up/index" />
         <Stack.Screen name="(routes)/forgot-password/index" />
         <Stack.Screen name="(routes)/quiz/index" />
-        {/* <Stack.Screen name="(routes)/course-list/index" />
+        {/* <Stack.Screen name="(routes)/course-list-layout/index" />
         <Stack.Screen name="(routes)/test-list/index" />
         <Stack.Screen name="(routes)/quiz-list/index" /> */}
 
@@ -110,6 +110,14 @@ function RootLayoutNav() {
           options={{
             headerShown: true,
             title: "Quiz",
+            headerBackTitle: "Back",
+          }}
+        />
+        <Stack.Screen
+          name="(routes)/course-list-layout/index"
+          options={{
+            headerShown: true,
+            title: "Courses",
             headerBackTitle: "Back",
           }}
         />

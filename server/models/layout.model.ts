@@ -1,59 +1,59 @@
 import { Schema, model, Document } from "mongoose";
 
-export interface FaqItem extends Document {
+export interface IFaqItem {
   question: string;
   answer: string;
 }
 
-export interface Category extends Document {
+export interface ICategory {
   title: string;
   value: string;
   description: string;
 }
 
-export interface BannerImage extends Document {
+export interface IBannerImage {
   public_id: string;
   url: string;
 }
 
-interface Layout extends Document {
+interface ILayout {
   type: string;
-  faq: FaqItem[];
-  categories: Category[];
+  faq: IFaqItem[];
+  categories: ICategory[];
   banner: {
-    image: BannerImage;
+    image: IBannerImage;
     title: string;
     subTitle: string;
   };
 }
 
-const faqSchema = new Schema<FaqItem>({
-  question: { type: String },
-  answer: { type: String },
+const faqSchema = new Schema<IFaqItem>({
+  question: { type: String, required: true }, // Required field added
+  answer: { type: String, required: true }, // Required field added
 });
 
-const categorySchema = new Schema<Category>({
-  title: { type: String },
-  value: { type: String },
-  description: { type: String },
+const categorySchema = new Schema<ICategory>({
+  title: { type: String, required: true }, // Required field added
+  value: { type: String, required: true }, // Required field added
+  description: { type: String, required: true }, // Required field added
 });
 
-const bannerImageSchema = new Schema<BannerImage>({
-  public_id: { type: String },
-  url: { type: String },
+const bannerImageSchema = new Schema<IBannerImage>({
+  public_id: { type: String, required: true }, // Required field added
+  url: { type: String, required: true }, // Required field added
 });
 
-const layoutSchema = new Schema<Layout>({
-  type: { type: String },
-  faq: [faqSchema],
-  categories: [categorySchema],
+const layoutSchema = new Schema<ILayout>({
+  type: { type: String, required: true }, // Required field added
+  faq: { type: [faqSchema], required: true }, // Ensure the array of faq items is required
+  categories: { type: [categorySchema], required: true }, // Ensure the array of categories is required
   banner: {
-    image: bannerImageSchema,
-    title: { type: String },
-    subTitle: { type: String },
+    image: { type: bannerImageSchema, required: true }, // Required field added
+    title: { type: String, required: true }, // Required field added
+    subTitle: { type: String, required: true }, // Required field added
   },
 });
 
-const LayoutModel = model<Layout>("Layout", layoutSchema);
+const LayoutModel = model<ILayout & Document>("Layout", layoutSchema);
 
 export default LayoutModel;

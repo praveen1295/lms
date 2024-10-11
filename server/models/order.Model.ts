@@ -1,8 +1,8 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IOrder extends Document {
-  courseId: string | null;
-  testId: string | null;
+  courseId: [string] | null;
+  testId: [string] | null;
   userId?: string;
   payment_info: object;
 }
@@ -10,11 +10,11 @@ export interface IOrder extends Document {
 const orderSchema = new Schema<IOrder>(
   {
     courseId: {
-      type: String,
+      type: [String],
       default: null, // Set default to null if no value is provided
     },
     testId: {
-      type: String,
+      type: [String],
       default: null, // Set default to null if no value is provided
     },
     userId: {

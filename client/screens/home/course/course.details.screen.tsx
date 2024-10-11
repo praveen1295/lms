@@ -36,8 +36,10 @@ export default function CourseDetailScreen() {
   }, [user]);
 
   const handleAddToCart = async () => {
+    // AsyncStorage.removeItem("cart");
     const existingCartData = await AsyncStorage.getItem("cart");
     const cartData = existingCartData ? JSON.parse(existingCartData) : {};
+    console.log("cartData", cartData);
     const itemExists = cartData.courses.some(
       (item: any) => item._id === courseData._id
     );

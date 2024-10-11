@@ -12,20 +12,22 @@ import Header from "@/components/header/header";
 import SearchInput from "@/components/common/search.input";
 import HomeBannerSlider from "@/components/home/home.banner.slider";
 import { router } from "expo-router";
+import AllCourses from "@/components/courses/all.courses";
 
 const categories = [
   {
     title: "Paid Courses",
     filter: "paid",
     icon: "",
-    redirectPath: "/(routes)/course-list",
-    layout: "freeTest",
+    redirectPath: "/(routes)/course-list-layout",
+    layout: "paidCourse",
   },
   {
     title: "Free Courses",
     filter: "free",
     icon: "",
-    redirectPath: "/(routes)/course-list",
+    redirectPath: "/(routes)/course-list-layout",
+    layout: "freeCourse",
   },
   {
     title: "Paid Test",
@@ -105,6 +107,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))}
         </View>
+        <AllCourses />
       </ScrollView>
     </LinearGradient>
   );
