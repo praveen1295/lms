@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import PropTypes from "prop-types"; // Import PropTypes
 import {
   View,
@@ -12,6 +12,9 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "@/components/header/header";
 import SearchInput from "@/components/common/search.input";
+import { useLocalSearchParams } from "expo-router";
+import axios from "axios";
+import { SERVER_URI } from "@/utils/uri";
 
 const quizzes = [
   {
@@ -33,10 +36,35 @@ export default function QuizList({ isPayed = false }) {
   const [loading, setLoading] = useState(false);
   const flatListRef = useRef(null);
 
+  const { category: item } = useLocalSearchParams();
+  const category: any = JSON.parse(item as string);
+
+  const [loader, setLoader] = useState(false);
+
+  const [tests, setTests] = useState([]);
+
   const handleQuizPress = (quizId: any) => {
     console.log(`Quiz selected: ${quizId}`);
     // Implement navigation to quiz detail or quiz start screen
   };
+
+  useEffect(() => {
+    setLoader(true);
+    axios
+      .get(
+        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${category.filter}`
+      ) // API call with filter
+      .then((res) => {
+        console.log("Fetched quizzes", res.data);
+        setTests(res.data.data); // Access the `data` field inside `res.data`
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  }, []);
 
   return (
     <LinearGradient colors={["#E5ECF9", "#F6F7F9"]} style={styles.container}>

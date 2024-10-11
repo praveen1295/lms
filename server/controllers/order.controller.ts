@@ -130,8 +130,6 @@ export const createMobileOrder = CatchAsyncError(
 
       const course: ICourse | null = await CourseModel.findById(courseId);
 
-      console.log("course=====", course);
-
       if (!course) {
         return next(new ErrorHandler("Course not found", 404));
       }

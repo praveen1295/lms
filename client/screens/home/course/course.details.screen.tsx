@@ -37,13 +37,15 @@ export default function CourseDetailScreen() {
 
   const handleAddToCart = async () => {
     const existingCartData = await AsyncStorage.getItem("cart");
-    const cartData = existingCartData ? JSON.parse(existingCartData) : [];
-    const itemExists = cartData.some(
+    const cartData = existingCartData ? JSON.parse(existingCartData) : {};
+    const itemExists = cartData.courses.some(
       (item: any) => item._id === courseData._id
     );
     if (!itemExists) {
-      cartData.push(courseData);
-      await AsyncStorage.setItem("cart", JSON.stringify(cartData));
+      cartData.courses.push(courseData);
+      const cartObj = { ...cartData, courses: cartData };
+
+      await AsyncStorage.setItem("cart", JSON.stringify(cartObj));
     }
     router.push("/(routes)/cart");
   };

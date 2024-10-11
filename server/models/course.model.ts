@@ -37,6 +37,7 @@ export interface ICourse extends Document {
   description: string;
   categories: string;
   price: number;
+  isPaid: Boolean;
   estimatedPrice?: number;
   thumbnail: object;
   tags: string;
@@ -108,6 +109,7 @@ const courseSchema = new Schema<ICourse>(
       type: String,
       required: true,
     },
+    isPaid: { type: Boolean, default: true },
     price: {
       type: Number,
       required: true,
