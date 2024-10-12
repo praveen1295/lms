@@ -13,7 +13,6 @@ export default function useUser() {
     const subscription = async () => {
       const accessToken = await AsyncStorage.getItem("access_token");
       const refreshToken = await AsyncStorage.getItem("refresh_token");
-      console.log("call useUser", accessToken, "----", refreshToken);
 
       await axios
         .get(`${SERVER_URI}/me`, {

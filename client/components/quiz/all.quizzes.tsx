@@ -5,18 +5,19 @@ import {
   FlatList,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import axios from "axios";
 import { SERVER_URI } from "@/utils/uri";
 import QuizCard from "./quiz.card"; // Ensure the correct import path
 import useUser from "@/hooks/auth/useUser";
 import Loader from "../loader/loader";
+import TestsCard from "../cards/tests.card";
 
 export default function AllQuizzes({ examName, filter }) {
   const [quizzes, setQuizzes] = useState<any>([]);
   const { user, loading, setRefetch } = useUser();
   const [loader, setLoader] = useState(false);
-  // const [filter, setFilter] = useState("all"); // Default filter is 'all'
 
   useEffect(() => {
     setLoader(true);
@@ -24,7 +25,6 @@ export default function AllQuizzes({ examName, filter }) {
       .get(
         `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${filter}&examName=${examName}`
       )
-      // API call with filter
       .then((res) => {
         console.log("Fetched quizzes", res.data);
         const demoTest = res.data.data.filter(
@@ -33,7 +33,16 @@ export default function AllQuizzes({ examName, filter }) {
         const paidTests = res.data.data.filter(
           (item: any) => item.isDemo === false
         );
-        setQuizzes([...demoTest, ...paidTests]); // Access the `data` field inside `res.data`
+
+        const data = paidTests.map((i: any) => {
+          if (user?.tests?.some((d: any) => d._id === i._id)) {
+            return { ...i, locked: false };
+          } else {
+            return { ...i, locked: true };
+          }
+        });
+
+        setQuizzes([...demoTest, ...data]);
       })
       .catch((error) => {
         console.error(error);
@@ -41,25 +50,27 @@ export default function AllQuizzes({ examName, filter }) {
       .finally(() => {
         setLoader(false);
       });
-  }, [filter]); // Re-run effect when filter changes
+  }, [filter]);
 
   if (loading || loader) {
     return (
-      <View>
+      <View style={styles.loaderContainer}>
         <Loader />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ flexGrow: 1 }}
+    >
       <Text style={styles.header}>Available Quizzes</Text>
 
       {/* Filter buttons */}
       <View style={styles.filterContainer}>
         <TouchableOpacity
           style={[styles.filterButton, filter === "all" && styles.activeFilter]}
-          // onPress={() => setFilter("rall")}
         >
           <Text style={styles.filterText}>All</Text>
         </TouchableOpacity>
@@ -68,7 +79,6 @@ export default function AllQuizzes({ examName, filter }) {
             styles.filterButton,
             filter === "paid" && styles.activeFilter,
           ]}
-          // onPress={() => setFilter("paid")}
         >
           <Text style={styles.filterText}>Paid</Text>
         </TouchableOpacity>
@@ -77,7 +87,6 @@ export default function AllQuizzes({ examName, filter }) {
             styles.filterButton,
             filter === "free" && styles.activeFilter,
           ]}
-          // onPress={() => setFilter("free")}
         >
           <Text style={styles.filterText}>Free</Text>
         </TouchableOpacity>
@@ -86,20 +95,27 @@ export default function AllQuizzes({ examName, filter }) {
       {quizzes.length > 0 ? (
         <FlatList
           data={quizzes}
-          keyExtractor={(item: any) => item?._id.toString()} // Use the correct key extractor
-          renderItem={({ item }) => <QuizCard item={item} />} // Pass each quiz object to QuizCard
+          keyExtractor={(item: any) => item?._id.toString()}
+          renderItem={({ item }) => <TestsCard item={item} />}
+          contentContainerStyle={{ paddingBottom: 50 }}
         />
       ) : (
         <Text style={styles.noQuizText}>No quizzes available</Text>
       )}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     marginBottom: 16,
     paddingHorizontal: 16,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
     fontSize: 20,
