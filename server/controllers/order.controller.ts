@@ -9,6 +9,7 @@ import ejs from "ejs";
 import sendMail from "../utils/sendMail";
 import NotificationModel from "../models/notification.Model";
 import { getAllOrdersService, newOrder } from "../services/order.service";
+import TestCourseModel from "../models/test.course.model";
 // import { redis } from "../utils/redis";
 require("dotenv").config();
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
@@ -114,37 +115,59 @@ export const createOrder = CatchAsyncError(
 export const createMobileOrder = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { courseId, payment_info } = req.body as IOrder;
-      console.log("courseId, payment_info", courseId, payment_info);
+      const { courseId, testId, payment_info } = req.body as IOrder;
+      console.log("courseId, payment_info", courseId, testId, payment_info);
       const user = await userModel.findById(req.user?._id);
+      let courseExistInUser;
+      let course: any = null;
+      let test: any = null;
+      let objKey = "";
 
-      const courseExistInUser = user?.courses.some(
-        (course: any) => course._id.toString() === courseId
-      );
+      if (courseId) {
+        course = await CourseModel.findById(courseId);
 
+        courseExistInUser = user?.courses.some(
+          (course: any) => course._id.toString() === courseId
+        );
+        objKey = "courseId";
+      } else if (testId) {
+        objKey = "testId";
+        test = await TestCourseModel.findById(testId);
+
+        courseExistInUser = user?.tests.some(
+          (test: any) => test._id.toString() === testId
+        );
+        console.log("test", test);
+      }
+      console.log("courseExistInUser", courseExistInUser);
       if (courseExistInUser) {
         return next(
           new ErrorHandler("You have already purchased this course", 400)
         );
       }
+      console.log("courseExistInUser111", courseExistInUser);
 
-      const course: ICourse | null = await CourseModel.findById(courseId);
-
-      if (!course) {
+      if (!course && courseId) {
+        return next(new ErrorHandler("Course not found", 404));
+      } else if (!test && testId) {
         return next(new ErrorHandler("Course not found", 404));
       }
+      console.log("courseExistInUser22222", courseExistInUser);
 
       const data: any = {
-        courseId: course._id,
+        [objKey]: courseId ? course._id : test._id,
         userId: user?._id,
         payment_info,
       };
+      console.log("data", data);
 
       const mailData = {
         order: {
-          _id: course._id.toString().slice(0, 6),
-          name: course.name,
-          price: course.price,
+          _id: courseId
+            ? course._id.toString().slice(0, 6)
+            : test._id.toString().slice(0, 6),
+          name: courseId ? course.name : test.name,
+          price: courseId ? course.price : test.price,
           date: new Date().toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
@@ -153,10 +176,14 @@ export const createMobileOrder = CatchAsyncError(
         },
       };
 
-      const html = await ejs.renderFile(
-        path.join(__dirname, "../mails/order-confirmation.ejs"),
-        { order: mailData }
-      );
+      console.log("datarrrrrrrr", data);
+
+      // const html = await ejs.renderFile(
+      //   path.join(__dirname, "../mails/order-confirmation.ejs"),
+      //   { order: mailData }
+      // );
+
+      // console.log("html", html);
 
       try {
         if (user) {
@@ -172,7 +199,12 @@ export const createMobileOrder = CatchAsyncError(
         return next(new ErrorHandler(error.message, 500));
       }
 
-      user?.courses.push(course?._id);
+      console.log("after mail");
+      if (courseId) {
+        user?.courses.push(course?._id);
+      } else {
+        user?.tests.push(test?._id);
+      }
 
       // await redis.set(req.user?._id, JSON.stringify(user));
 
@@ -181,12 +213,17 @@ export const createMobileOrder = CatchAsyncError(
       await NotificationModel.create({
         user: user?._id,
         title: "New Order",
-        message: `You have a new order from ${course?.name}`,
+        message: `You have a new order from ${
+          courseId ? course?.name : test?.name
+        }`,
       });
-
-      course.purchased = course.purchased + 1;
-
-      await course.save();
+      if (courseId) {
+        course.purchased = course.purchased + 1;
+        await course.save();
+      } else if (testId) {
+        test.purchased = test.purchased + 1;
+        await test.save();
+      }
 
       newOrder(data, res, next);
     } catch (error: any) {

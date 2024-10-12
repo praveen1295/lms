@@ -16,6 +16,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import { SERVER_URI } from "@/utils/uri";
 import { createNavigatorFactory } from "@react-navigation/native";
+import { handlePayment } from "@/utils/helper";
 
 export default function TestListLayout({}) {
   const [loading, setLoading] = useState(false);
@@ -30,6 +31,7 @@ export default function TestListLayout({}) {
 
   const [layout, setLayout] = useState<any>({});
   const [loader, setLoader] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
   const handleCoursePress = (courseId: String) => {
     console.log(`Quiz selected: ${courseId}`);
@@ -40,10 +42,10 @@ export default function TestListLayout({}) {
     setLoader(true);
     axios
       // .get(`${SERVER_URI}/get-layout?filterType=${category.filter}`)
-      .get(`${SERVER_URI}/get-layout/${category.layout}`)
+      .get(`${SERVER_URI}/get-test-courses`)
       .then((res) => {
-        setLayout(res.data.layout.categories);
-        console.log("res.data.+++++++", res.data.layout);
+        setLayout(res.data.testCourses);
+        console.log("res.data.+++++++", res.data);
       })
       .catch((error) => {
         console.error(error);
@@ -90,7 +92,7 @@ export default function TestListLayout({}) {
                   style={styles.courseImage}
                 />
                 <View style={styles.courseContent}>
-                  <Text style={styles.courseTitle}>{item.title}</Text>
+                  <Text style={styles.courseTitle}>{item.name}</Text>
                   <Text style={styles.courseDescription}>
                     {item.description.split(" ").slice(0, 7).join(" ") +
                       (item.description.split(" ").length > 7 ? "..." : "")}
@@ -98,7 +100,10 @@ export default function TestListLayout({}) {
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
                       style={styles.button}
-                      onPress={() => console.log("Buy Now pressed")}
+                      onPress={() => {
+                        const cartItems = { tests: [{ ...item }] };
+                        handlePayment(cartItems, setOrderSuccess);
+                      }}
                     >
                       <Text style={styles.buttonText}>Buy Now</Text>
                     </TouchableOpacity>

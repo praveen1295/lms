@@ -21,6 +21,8 @@ export default function TestsList() {
   const flatListRef = useRef(null);
   const { item } = useLocalSearchParams();
   const layout: any = JSON.parse(item as string);
+
+  console.log("layout.value", layout.value);
   const [tests, setTests] = useState<any>([]);
   const [featuredTest, setFeaturedTest] = useState<any>(null);
 
@@ -28,7 +30,7 @@ export default function TestsList() {
     setLoader(true);
     axios
       .get(
-        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${layout?.filter}&examName=${layout.examName}`
+        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${layout?.filter}&examName=${layout.value}`
       )
       .then((res) => {
         const demoTest = res.data.data.filter(
@@ -82,7 +84,11 @@ export default function TestsList() {
         </View>
       )}
 
-      <AllQuizzes filter={layout.filter} examName={layout.examName} />
+      <AllQuizzes
+        filter={layout.filter}
+        examName={layout.value}
+        examId={layout._id}
+      />
     </LinearGradient>
   );
 }

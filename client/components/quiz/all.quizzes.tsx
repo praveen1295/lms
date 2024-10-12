@@ -14,7 +14,7 @@ import useUser from "@/hooks/auth/useUser";
 import Loader from "../loader/loader";
 import TestsCard from "../cards/tests.card";
 
-export default function AllQuizzes({ examName, filter }) {
+export default function AllQuizzes({ examName, filter, examId }) {
   const [quizzes, setQuizzes] = useState<any>([]);
   const { user, loading, setRefetch } = useUser();
   const [loader, setLoader] = useState(false);
@@ -26,7 +26,6 @@ export default function AllQuizzes({ examName, filter }) {
         `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${filter}&examName=${examName}`
       )
       .then((res) => {
-        console.log("Fetched quizzes", res.data);
         const demoTest = res.data.data.filter(
           (item: any) => item.isDemo === true
         );
@@ -34,8 +33,12 @@ export default function AllQuizzes({ examName, filter }) {
           (item: any) => item.isDemo === false
         );
 
+        console.log("user.tests", user?.tests, "examId", examId);
+
         const data = paidTests.map((i: any) => {
-          if (user?.tests?.some((d: any) => d._id === i._id)) {
+          if (user?.tests?.some((d: any) => d._id === examId)) {
+            console.log("user.tests1111111", user?.tests, "examId", examId);
+
             return { ...i, locked: false };
           } else {
             return { ...i, locked: true };
@@ -50,7 +53,9 @@ export default function AllQuizzes({ examName, filter }) {
       .finally(() => {
         setLoader(false);
       });
-  }, [filter]);
+  }, [user]);
+
+  console.log("user0000000", user);
 
   if (loading || loader) {
     return (

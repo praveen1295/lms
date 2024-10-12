@@ -13,6 +13,10 @@ const quizSchema = new schema(
       type: String,
       required: true,
     },
+    testCategory: {
+      type: String,
+      require: true,
+    },
     examName: {
       type: String,
       required: true,
