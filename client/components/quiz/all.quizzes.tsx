@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Image,
 } from "react-native";
 import axios from "axios";
 import { SERVER_URI } from "@/utils/uri";
@@ -18,6 +19,8 @@ export default function AllQuizzes({ examName, filter, examId }) {
   const [quizzes, setQuizzes] = useState<any>([]);
   const { user, loading, setRefetch } = useUser();
   const [loader, setLoader] = useState(false);
+  const [featuredTest, setFeaturedTest] = useState<any>(null);
+  const [showBanner, setShowBanner] = useState<any>(null);
 
   useEffect(() => {
     setLoader(true);
@@ -45,6 +48,10 @@ export default function AllQuizzes({ examName, filter, examId }) {
           }
         });
 
+        if (user?.tests?.some((d: any) => d._id === examId))
+          setFeaturedTest(data[0]);
+        setShowBanner(false);
+
         setQuizzes([...demoTest, ...data]);
       })
       .catch((error) => {
@@ -70,6 +77,34 @@ export default function AllQuizzes({ examName, filter, examId }) {
       style={styles.container}
       contentContainerStyle={{ flexGrow: 1 }}
     >
+      {featuredTest && showBanner && (
+        <View style={styles.bannerCard}>
+          <Image
+            source={{ uri: featuredTest.thumbnailUrl }}
+            style={styles.bannerImage}
+          />
+          <View style={styles.bannerContent}>
+            <Text style={styles.bannerTitle}>{featuredTest.name}</Text>
+            <Text style={styles.bannerDescription}>
+              {featuredTest.description}
+            </Text>
+            <View style={styles.bannerButtonContainer}>
+              {!user?.tests?.some(
+                (test: any) => test._id === featuredTest._id
+              ) ? (
+                <TouchableOpacity
+                  style={styles.buyButton}
+                  onPress={() => console.log("Buy Now pressed")}
+                >
+                  <Text style={styles.buttonText}>Buy Now</Text>
+                </TouchableOpacity>
+              ) : (
+                <Text style={styles.purchasedText}>Test Purchased</Text>
+              )}
+            </View>
+          </View>
+        </View>
+      )}
       <Text style={styles.header}>Available Quizzes</Text>
 
       {/* Filter buttons */}
@@ -150,5 +185,57 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontSize: 16,
     color: "gray",
+  },
+  bannerCard: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    borderRadius: 15,
+    padding: 20,
+    marginHorizontal: 16,
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  bannerImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+  },
+  bannerContent: {
+    flex: 1,
+    paddingLeft: 15,
+  },
+  bannerTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#000",
+  },
+  bannerDescription: {
+    fontSize: 14,
+    color: "#777",
+    marginTop: 5,
+  },
+  bannerButtonContainer: {
+    marginTop: 15,
+  },
+  buyButton: {
+    backgroundColor: "#007BFF",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  purchasedText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#28A745",
   },
 });

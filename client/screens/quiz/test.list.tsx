@@ -55,35 +55,6 @@ export default function TestsList() {
 
   return (
     <LinearGradient colors={["#E5ECF9", "#F6F7F9"]} style={styles.container}>
-      {featuredTest && (
-        <View style={styles.bannerCard}>
-          <Image
-            source={{ uri: featuredTest.thumbnailUrl }}
-            style={styles.bannerImage}
-          />
-          <View style={styles.bannerContent}>
-            <Text style={styles.bannerTitle}>{featuredTest.name}</Text>
-            <Text style={styles.bannerDescription}>
-              {featuredTest.description}
-            </Text>
-            <View style={styles.bannerButtonContainer}>
-              {!user?.tests?.some(
-                (test: any) => test._id === featuredTest._id
-              ) ? (
-                <TouchableOpacity
-                  style={styles.buyButton}
-                  onPress={() => console.log("Buy Now pressed")}
-                >
-                  <Text style={styles.buttonText}>Buy Now</Text>
-                </TouchableOpacity>
-              ) : (
-                <Text style={styles.purchasedText}>Test Purchased</Text>
-              )}
-            </View>
-          </View>
-        </View>
-      )}
-
       <AllQuizzes
         filter={layout.filter}
         examName={layout.value}
@@ -102,57 +73,5 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 50,
-  },
-  bannerCard: {
-    flexDirection: "row",
-    backgroundColor: "#fff",
-    borderRadius: 15,
-    padding: 20,
-    marginHorizontal: 16,
-    marginBottom: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  bannerImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-  },
-  bannerContent: {
-    flex: 1,
-    paddingLeft: 15,
-  },
-  bannerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#000",
-  },
-  bannerDescription: {
-    fontSize: 14,
-    color: "#777",
-    marginTop: 5,
-  },
-  bannerButtonContainer: {
-    marginTop: 15,
-  },
-  buyButton: {
-    backgroundColor: "#007BFF",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  purchasedText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#28A745",
   },
 });
