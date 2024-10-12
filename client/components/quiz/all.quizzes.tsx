@@ -12,8 +12,8 @@ import QuizCard from "./quiz.card"; // Ensure the correct import path
 import useUser from "@/hooks/auth/useUser";
 import Loader from "../loader/loader";
 
-export default function AllQuizzes({ filter = "free" }) {
-  const [quizzes, setQuizzes] = useState([]);
+export default function AllQuizzes({ examName, filter }) {
+  const [quizzes, setQuizzes] = useState<any>([]);
   const { user, loading, setRefetch } = useUser();
   const [loader, setLoader] = useState(false);
   // const [filter, setFilter] = useState("all"); // Default filter is 'all'
@@ -21,10 +21,19 @@ export default function AllQuizzes({ filter = "free" }) {
   useEffect(() => {
     setLoader(true);
     axios
-      .get(`${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${filter}`) // API call with filter
+      .get(
+        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${filter}&examName=${examName}`
+      )
+      // API call with filter
       .then((res) => {
         console.log("Fetched quizzes", res.data);
-        setQuizzes(res.data.data); // Access the `data` field inside `res.data`
+        const demoTest = res.data.data.filter(
+          (item: any) => item.isDemo === true
+        );
+        const paidTests = res.data.data.filter(
+          (item: any) => item.isDemo === false
+        );
+        setQuizzes([...demoTest, ...paidTests]); // Access the `data` field inside `res.data`
       })
       .catch((error) => {
         console.error(error);
@@ -50,7 +59,7 @@ export default function AllQuizzes({ filter = "free" }) {
       <View style={styles.filterContainer}>
         <TouchableOpacity
           style={[styles.filterButton, filter === "all" && styles.activeFilter]}
-          onPress={() => setFilter("all")}
+          // onPress={() => setFilter("rall")}
         >
           <Text style={styles.filterText}>All</Text>
         </TouchableOpacity>
@@ -59,7 +68,7 @@ export default function AllQuizzes({ filter = "free" }) {
             styles.filterButton,
             filter === "paid" && styles.activeFilter,
           ]}
-          onPress={() => setFilter("paid")}
+          // onPress={() => setFilter("paid")}
         >
           <Text style={styles.filterText}>Paid</Text>
         </TouchableOpacity>
@@ -68,7 +77,7 @@ export default function AllQuizzes({ filter = "free" }) {
             styles.filterButton,
             filter === "free" && styles.activeFilter,
           ]}
-          onPress={() => setFilter("free")}
+          // onPress={() => setFilter("free")}
         >
           <Text style={styles.filterText}>Free</Text>
         </TouchableOpacity>

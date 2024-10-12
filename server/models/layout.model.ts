@@ -7,7 +7,7 @@ export interface IFaqItem {
 
 export interface ICategory {
   title: string;
-  value: string;
+  examName: string;
   description: string;
 }
 
@@ -34,7 +34,7 @@ const faqSchema = new Schema<IFaqItem>({
 
 const categorySchema = new Schema<ICategory>({
   title: { type: String, required: true }, // Required field added
-  value: { type: String, required: true }, // Required field added
+  examName: { type: String, required: true }, // Required field added
   description: { type: String, required: true }, // Required field added
 });
 

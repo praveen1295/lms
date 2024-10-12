@@ -10,42 +10,40 @@ import {
   Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, useRouter } from "expo-router"; // Import useSearchParams
-import { SERVER_URI } from "@/utils/uri";
+import Header from "@/components/header/header"; // You can uncomment this if you want to use Header
+import SearchInput from "@/components/common/search.input"; // You can uncomment this if you want to use SearchInput
+import { router, useLocalSearchParams } from "expo-router";
 import axios from "axios";
-import AllQuizzes from "@/components/quiz/all.quizzes";
+import { SERVER_URI } from "@/utils/uri";
+import { createNavigatorFactory } from "@react-navigation/native";
 
-export default function TestsList() {
+export default function TestListLayout({}) {
+  const [loading, setLoading] = useState(false);
+  const flatListRef = useRef(null);
+
+  const { category: item } = useLocalSearchParams();
+
+  console.log("Item0000000000", item);
+  const category: any = JSON.parse(item as string);
+
+  console.log("categorycategory", category);
+
+  const [layout, setLayout] = useState<any>({});
   const [loader, setLoader] = useState(false);
 
-  const flatListRef = useRef(null);
-  const { item } = useLocalSearchParams();
-  // console.log("useLocalSearchParams()", useLocalSearchParams());
-  const layout: any = JSON.parse(item as string);
-
-  const [tests, setTests] = useState<any>([]);
-
-  const handleTestPress = (testId: String) => {
-    console.log(`Test selected: ${testId}`);
-    // Implement navigation to test detail or test start screen
+  const handleCoursePress = (courseId: String) => {
+    console.log(`Quiz selected: ${courseId}`);
+    // Implement navigation to quiz detail or quiz start screen
   };
 
   useEffect(() => {
     setLoader(true);
     axios
-      .get(
-        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${layout?.filter}&examName=${layout.examName}`
-      )
+      // .get(`${SERVER_URI}/get-layout?filterType=${category.filter}`)
+      .get(`${SERVER_URI}/get-layout/${category.layout}`)
       .then((res) => {
-        const demoTest = res.data.data.filter(
-          (item: any) => item.isDemo === true
-        );
-        const paidTests = res.data.data.filter(
-          (item: any) => item.isDemo === false
-        );
-
-        console.log("demotest-----", demoTest, "testtttt===++++===", paidTests);
-        setTests([...demoTest, ...paidTests]); // Access the `data` field inside `res.data`
+        setLayout(res.data.layout.categories);
+        console.log("res.data.+++++++", res.data.layout);
       })
       .catch((error) => {
         console.error(error);
@@ -53,34 +51,50 @@ export default function TestsList() {
       .finally(() => {
         setLoader(false);
       });
-  }, []); // Re-run effect when filter changes
+  }, [createNavigatorFactory]); // Re-run effect when filter changes
+  console.log("layout", layout);
 
   return (
     <LinearGradient colors={["#E5ECF9", "#F6F7F9"]} style={styles.container}>
-      {/* <ScrollView showsVerticalScrollIndicator={false}>
+      {/* <Header /> */}
+      {/* <SearchInput homeScreen={true} /> */}
+      <ScrollView showsVerticalScrollIndicator={false}>
         <Text style={styles.headingText}>
-          {layout?.filter === "paid" ? "Paid Tests" : "Free Tests"}
+          {category.filter.charAt(0).toUpperCase() + category.filter.slice(1)}{" "}
+          Courses
         </Text>
-        {loader ? (
-          <Text style={styles.loadingText}>Loading Tests...</Text>
+        {loading ? (
+          <Text style={styles.loadingText}>Loading Courses...</Text>
         ) : (
           <FlatList
             ref={flatListRef}
-            data={tests}
+            data={layout}
             keyExtractor={(item) => item._id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.testCard}>
+            renderItem={({ item }: { item: any }) => (
+              <TouchableOpacity
+                style={styles.courseCard}
+                onPress={() =>
+                  router.push({
+                    pathname: "/(routes)/test-list",
+                    params: {
+                      item: JSON.stringify({
+                        ...item,
+                        filter: category.filter,
+                      }),
+                    },
+                  })
+                }
+              >
                 <Image
                   source={{ uri: item.thumbnailUrl }}
-                  style={styles.testImage}
+                  style={styles.courseImage}
                 />
-                <View style={styles.testContent}>
-                  <Text style={styles.testTitle}>
-                    ExamName: {item.examName}
+                <View style={styles.courseContent}>
+                  <Text style={styles.courseTitle}>{item.title}</Text>
+                  <Text style={styles.courseDescription}>
+                    {item.description.split(" ").slice(0, 7).join(" ") +
+                      (item.description.split(" ").length > 7 ? "..." : "")}
                   </Text>
-                  <Text style={styles.testTitle}>isDemo: {item.isDemo}</Text>
-                  <Text style={styles.testTitle}>{item.name}</Text>
-                  <Text style={styles.testDescription}>{item.description}</Text>
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
                       style={styles.button}
@@ -96,19 +110,18 @@ export default function TestsList() {
                     </TouchableOpacity>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             )}
             showsVerticalScrollIndicator={false}
           />
         )}
-      </ScrollView> */}
-      <AllQuizzes filter={layout.filter} examName={layout.examName} />
+      </ScrollView>
     </LinearGradient>
   );
 }
 
 // Define PropTypes for the component
-TestsList.propTypes = {
+TestListLayout.propTypes = {
   isPayed: PropTypes.bool.isRequired, // Prop validation
 };
 
@@ -128,7 +141,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 20,
   },
-  testCard: {
+  courseCard: {
     flexDirection: "row",
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -141,21 +154,21 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
-  testImage: {
+  courseImage: {
     width: 80, // Smaller width
     height: 80, // Smaller height
     borderRadius: 10,
   },
-  testContent: {
+  courseContent: {
     flex: 1,
     paddingLeft: 10,
   },
-  testTitle: {
+  courseTitle: {
     fontSize: 16,
     fontWeight: "600",
     color: "#000",
   },
-  testDescription: {
+  courseDescription: {
     fontSize: 14,
     color: "#777",
     marginTop: 5,

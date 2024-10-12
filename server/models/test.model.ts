@@ -13,6 +13,10 @@ const quizSchema = new schema(
       type: String,
       required: true,
     },
+    examName: {
+      type: String,
+      required: true,
+    },
     difficultyLevel: {
       type: String,
       required: true,
@@ -63,6 +67,10 @@ const quizSchema = new schema(
     isPaid: {
       type: Boolean,
       default: true,
+    },
+    isDemo: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
