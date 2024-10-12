@@ -1,4 +1,5 @@
 import { Schema, model, Document } from "mongoose";
+import { v4 as uuidv4 } from "uuid"; // Import UUID
 
 export interface IFaqItem {
   question: string;
@@ -6,9 +7,11 @@ export interface IFaqItem {
 }
 
 export interface ICategory {
+  _id: string; // Custom ID field
   title: string;
   examName: string;
   description: string;
+  price: Number;
 }
 
 export interface IBannerImage {
@@ -28,29 +31,36 @@ interface ILayout {
 }
 
 const faqSchema = new Schema<IFaqItem>({
-  question: { type: String, required: true }, // Required field added
-  answer: { type: String, required: true }, // Required field added
+  question: { type: String, required: true },
+  answer: { type: String, required: true },
 });
 
 const categorySchema = new Schema<ICategory>({
-  title: { type: String, required: true }, // Required field added
-  examName: { type: String, required: true }, // Required field added
-  description: { type: String, required: true }, // Required field added
+  _id: {
+    type: String,
+    default: uuidv4, // Generate a unique ID using uuid
+  },
+  title: { type: String, required: true },
+  examName: { type: String, required: true },
+  description: { type: String, required: true },
+  price: {
+    type: Number,
+  },
 });
 
 const bannerImageSchema = new Schema<IBannerImage>({
-  public_id: { type: String, required: true }, // Required field added
-  url: { type: String, required: true }, // Required field added
+  public_id: { type: String, required: true },
+  url: { type: String, required: true },
 });
 
 const layoutSchema = new Schema<ILayout>({
-  type: { type: String, required: true }, // Required field added
-  faq: { type: [faqSchema], required: true }, // Ensure the array of faq items is required
-  categories: { type: [categorySchema], required: true }, // Ensure the array of categories is required
+  type: { type: String, required: true },
+  faq: { type: [faqSchema], required: true },
+  categories: { type: [categorySchema], required: true },
   banner: {
-    image: { type: bannerImageSchema, required: true }, // Required field added
-    title: { type: String, required: true }, // Required field added
-    subTitle: { type: String, required: true }, // Required field added
+    image: { type: bannerImageSchema, required: true },
+    title: { type: String, required: true },
+    subTitle: { type: String, required: true },
   },
 });
 
