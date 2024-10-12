@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Header() {
-  const [cartItems, setCartItems] = useState([]);
+  const [cartItems, setCartItems] = useState({ courses: [], tests: [] });
 
   useEffect(() => {
     const subscription = async () => {
@@ -55,7 +55,7 @@ export default function Header() {
           <Feather name="shopping-bag" size={26} color={"black"} />
           <View style={styles.bellContainer}>
             <Text style={{ color: "#fff", fontSize: 14 }}>
-              {cartItems?.length}
+              {cartItems?.courses?.length}
             </Text>
           </View>
         </View>

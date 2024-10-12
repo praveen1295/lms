@@ -10,53 +10,42 @@ import {
   Image,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import Header from "@/components/header/header";
-import SearchInput from "@/components/common/search.input";
-import { useLocalSearchParams } from "expo-router";
+import Header from "@/components/header/header"; // You can uncomment this if you want to use Header
+import SearchInput from "@/components/common/search.input"; // You can uncomment this if you want to use SearchInput
+import { router, useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import { SERVER_URI } from "@/utils/uri";
+import { createNavigatorFactory } from "@react-navigation/native";
+import { handlePayment } from "@/utils/helper";
 
-const quizzes = [
-  {
-    _id: "quiz1",
-    title: "General Knowledge Quiz",
-    description: "Test your knowledge on various subjects.",
-    thumbnailUrl: "https://example.com/quiz1-thumbnail.jpg",
-  },
-  {
-    _id: "quiz2",
-    title: "Science Quiz",
-    description: "Challenge yourself with science questions.",
-    thumbnailUrl: "https://example.com/quiz2-thumbnail.jpg",
-  },
-  // More quizzes...
-];
-
-export default function QuizList({ isPayed = false }) {
+export default function TestListLayout({}) {
   const [loading, setLoading] = useState(false);
   const flatListRef = useRef(null);
 
   const { category: item } = useLocalSearchParams();
+
+  console.log("Item0000000000", item);
   const category: any = JSON.parse(item as string);
 
+  console.log("categorycategory", category);
+
+  const [layout, setLayout] = useState<any>({});
   const [loader, setLoader] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
 
-  const [tests, setTests] = useState([]);
-
-  const handleQuizPress = (quizId: any) => {
-    console.log(`Quiz selected: ${quizId}`);
+  const handleCoursePress = (courseId: String) => {
+    console.log(`Quiz selected: ${courseId}`);
     // Implement navigation to quiz detail or quiz start screen
   };
 
   useEffect(() => {
     setLoader(true);
     axios
-      .get(
-        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${category.filter}`
-      ) // API call with filter
+      // .get(`${SERVER_URI}/get-layout?filterType=${category.filter}`)
+      .get(`${SERVER_URI}/get-test-courses`)
       .then((res) => {
-        console.log("Fetched quizzes", res.data);
-        setTests(res.data.data); // Access the `data` field inside `res.data`
+        setLayout(res.data.testCourses);
+        console.log("res.data.+++++++", res.data);
       })
       .catch((error) => {
         console.error(error);
@@ -64,34 +53,57 @@ export default function QuizList({ isPayed = false }) {
       .finally(() => {
         setLoader(false);
       });
-  }, []);
+  }, [createNavigatorFactory]); // Re-run effect when filter changes
+  console.log("layout", layout);
 
   return (
     <LinearGradient colors={["#E5ECF9", "#F6F7F9"]} style={styles.container}>
       {/* <Header /> */}
       {/* <SearchInput homeScreen={true} /> */}
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text style={styles.headingText}>Quiz</Text>
+        <Text style={styles.headingText}>
+          {category.filter.charAt(0).toUpperCase() + category.filter.slice(1)}{" "}
+          Courses
+        </Text>
         {loading ? (
-          <Text style={styles.loadingText}>Loading Quizzes...</Text>
+          <Text style={styles.loadingText}>Loading Courses...</Text>
         ) : (
           <FlatList
             ref={flatListRef}
-            data={quizzes}
+            data={layout}
             keyExtractor={(item) => item._id.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.quizCard}>
+            renderItem={({ item }: { item: any }) => (
+              <TouchableOpacity
+                style={styles.courseCard}
+                onPress={() =>
+                  router.push({
+                    pathname: "/(routes)/test-list",
+                    params: {
+                      item: JSON.stringify({
+                        ...item,
+                        filter: category.filter,
+                      }),
+                    },
+                  })
+                }
+              >
                 <Image
                   source={{ uri: item.thumbnailUrl }}
-                  style={styles.quizImage}
+                  style={styles.courseImage}
                 />
-                <View style={styles.quizContent}>
-                  <Text style={styles.quizTitle}>{item.title}</Text>
-                  <Text style={styles.quizDescription}>{item.description}</Text>
+                <View style={styles.courseContent}>
+                  <Text style={styles.courseTitle}>{item.name}</Text>
+                  <Text style={styles.courseDescription}>
+                    {item.description.split(" ").slice(0, 7).join(" ") +
+                      (item.description.split(" ").length > 7 ? "..." : "")}
+                  </Text>
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity
                       style={styles.button}
-                      onPress={() => console.log("Buy Now pressed")}
+                      onPress={() => {
+                        const cartItems = { tests: [{ ...item }] };
+                        handlePayment(cartItems, setOrderSuccess);
+                      }}
                     >
                       <Text style={styles.buttonText}>Buy Now</Text>
                     </TouchableOpacity>
@@ -103,7 +115,7 @@ export default function QuizList({ isPayed = false }) {
                     </TouchableOpacity>
                   </View>
                 </View>
-              </View>
+              </TouchableOpacity>
             )}
             showsVerticalScrollIndicator={false}
           />
@@ -114,7 +126,7 @@ export default function QuizList({ isPayed = false }) {
 }
 
 // Define PropTypes for the component
-QuizList.propTypes = {
+TestListLayout.propTypes = {
   isPayed: PropTypes.bool.isRequired, // Prop validation
 };
 
@@ -134,7 +146,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 20,
   },
-  quizCard: {
+  courseCard: {
     flexDirection: "row",
     backgroundColor: "#fff",
     borderRadius: 10,
@@ -147,21 +159,21 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
   },
-  quizImage: {
+  courseImage: {
     width: 80, // Smaller width
     height: 80, // Smaller height
     borderRadius: 10,
   },
-  quizContent: {
+  courseContent: {
     flex: 1,
     paddingLeft: 10,
   },
-  quizTitle: {
+  courseTitle: {
     fontSize: 16,
     fontWeight: "600",
     color: "#000",
   },
-  quizDescription: {
+  courseDescription: {
     fontSize: 14,
     color: "#777",
     marginTop: 5,

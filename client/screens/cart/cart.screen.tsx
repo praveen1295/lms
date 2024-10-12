@@ -16,9 +16,16 @@ import {
   Image,
   RefreshControl,
 } from "react-native";
+interface CartItemsType {
+  courses: CoursesType[];
+  tests: CoursesType[];
+}
 
 export default function CartScreen() {
-  const [cartItems, setCartItems] = useState<CoursesType[]>([]);
+  const [cartItems, setCartItems] = useState<CartItemsType>({
+    courses: [],
+    tests: [],
+  });
   const [refreshing, setRefreshing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const { initPaymentSheet, presentPaymentSheet } = useStripe();
@@ -39,7 +46,10 @@ export default function CartScreen() {
   };
 
   const calculateTotalPrice = () => {
-    const totalPrice = cartItems.reduce((total, item) => total + item.price, 0);
+    const totalPrice = cartItems.courses.reduce(
+      (total, item) => total + item.price,
+      0
+    );
     return totalPrice.toFixed(2);
   };
 
@@ -52,9 +62,12 @@ export default function CartScreen() {
 
   const handleRemoveItem = async (item: any) => {
     const existingCartData = await AsyncStorage.getItem("cart");
-    const cartData = existingCartData ? JSON.parse(existingCartData) : [];
-    const updatedCartData = cartData.filter((i: any) => i._id !== item._id);
-    await AsyncStorage.setItem("cart", JSON.stringify(updatedCartData));
+    const cartData = existingCartData ? JSON.parse(existingCartData) : {};
+    const updatedCartData = cartData.courses.filter(
+      (i: any) => i._id !== item._id
+    );
+    const cartObj = { ...cartData, courses: updatedCartData };
+    await AsyncStorage.setItem("cart", JSON.stringify(cartObj));
     setCartItems(updatedCartData);
   };
 
@@ -123,9 +136,14 @@ export default function CartScreen() {
         throw new Error("Access token not found");
       }
 
-      const amount = Math.round(
-        cartItems.reduce((total, item) => total + item.price, 0) * 100
+      const coursesAmount = Math.round(
+        cartItems.courses.reduce((total, item) => total + item.price, 0) * 100
       );
+      const testsAmount = Math.round(
+        cartItems.tests.reduce((total, item) => total + item.price, 0) * 100
+      );
+
+      const amount = coursesAmount + testsAmount;
 
       console.log("handlePayment", accessToken, refreshToken, amount);
 
@@ -196,7 +214,7 @@ export default function CartScreen() {
       .post(
         `${SERVER_URI}/create-mobile-order`,
         {
-          courseId: cartItems[0]._id,
+          courseId: cartItems.courses[0]._id,
           payment_info: paymentResponse,
         },
         {
@@ -257,7 +275,7 @@ export default function CartScreen() {
       ) : (
         <>
           <FlatList
-            data={cartItems}
+            data={[...cartItems.courses, ...cartItems.tests]}
             keyExtractor={(item) => item._id.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
@@ -401,8 +419,8 @@ export default function CartScreen() {
             }
           />
           <View style={{ marginBottom: 25 }}>
-            {cartItems?.length === 0 ||
-              (cartItems?.length > 0 && (
+            {cartItems?.courses?.length === 0 ||
+              (cartItems?.courses?.length > 0 && (
                 <Text
                   style={{
                     fontSize: 18,
@@ -414,8 +432,8 @@ export default function CartScreen() {
                   Total Price: ${calculateTotalPrice()}
                 </Text>
               ))}
-            {cartItems?.length === 0 ||
-              (cartItems?.length > 0 && (
+            {cartItems?.courses?.length === 0 ||
+              (cartItems?.courses?.length > 0 && (
                 <TouchableOpacity
                   style={{
                     backgroundColor: "#007BFF",

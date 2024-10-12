@@ -11,7 +11,6 @@ type QuizItemType = {
 };
 
 const QuizCard = ({ item }: { item: any }) => {
-  console.log("quizzzzz777", item);
   return (
     <TouchableOpacity
       style={styles.card}
@@ -24,6 +23,7 @@ const QuizCard = ({ item }: { item: any }) => {
     >
       {/* Display Quiz Name */}
       <Text style={styles.title}>{item.name}</Text>
+      <Text style={styles.title}>{item.isDemo ? "demo" : "nodemo"}</Text>
 
       {/* Display Quiz Category */}
       <Text style={styles.description}>Category: {item.category}</Text>

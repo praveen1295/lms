@@ -12,17 +12,72 @@ import Header from "@/components/header/header";
 import SearchInput from "@/components/common/search.input";
 import HomeBannerSlider from "@/components/home/home.banner.slider";
 import { router } from "expo-router";
+import AllCourses from "@/components/courses/all.courses";
 
 const categories = [
-  { title: "Paid Courses", icon: "", redirectPath: "/(routes)/course-list" },
-  { title: "Free Courses", icon: "", redirectPath: "/(routes)/course-list" },
-  { title: "Paid Test", icon: "", redirectPath: "/(routes)/test-list" },
-  { title: "Free Test", icon: "", redirectPath: "/(routes)/test-list" },
-  { title: "Quiz", icon: "", redirectPath: "/(routes)/quiz-list" },
-  { title: "Paid Ebook", icon: "", redirectPath: "/(routes)/ebook-list" },
-  { title: "Free Ebook", icon: "", redirectPath: "/(routes)/ebook-list" },
-  { title: "Social Media", icon: "", redirectPath: "/(routes)/quiz-list" },
-  { title: "Updates", icon: "", redirectPath: "/(routes)/quiz-list" },
+  {
+    title: "Paid Courses",
+    filter: "paid",
+    icon: "",
+    redirectPath: "/(routes)/course-list-layout",
+    layout: "paidCourse",
+  },
+  {
+    title: "Free Courses",
+    filter: "free",
+    icon: "",
+    redirectPath: "/(routes)/course-list-layout",
+    layout: "freeCourse",
+  },
+  {
+    title: "Paid Test",
+    filter: "paid",
+    icon: "",
+    redirectPath: "/(routes)/test-list-layout",
+    layout: "paidTest",
+  },
+  {
+    title: "Free Test",
+    filter: "free",
+    icon: "",
+    redirectPath: "/(routes)/test-list-layout",
+    layout: "freeTest",
+  },
+  {
+    title: "Quiz",
+    filter: "",
+    icon: "",
+    redirectPath: "/(routes)/quiz",
+    layout: "freeTest",
+  },
+  {
+    title: "Paid Ebook",
+    filter: "paid",
+    icon: "",
+    redirectPath: "/(routes)/ebook-list",
+    layout: "freeTest",
+  },
+  {
+    title: "Free Ebook",
+    filter: "free",
+    icon: "",
+    redirectPath: "/(routes)/ebook-list",
+    layout: "freeTest",
+  },
+  {
+    title: "Social Media",
+    filter: "",
+    icon: "",
+    redirectPath: "/(routes)/quiz",
+    layout: "freeTest",
+  },
+  {
+    title: "Updates",
+    filter: "",
+    icon: "",
+    redirectPath: "/(routes)/quiz-list",
+    layout: "freeTest",
+  },
 ];
 
 export default function HomeScreen() {
@@ -40,13 +95,19 @@ export default function HomeScreen() {
             <TouchableOpacity
               key={index}
               style={styles.categoryCard}
-              onPress={() => router.push(category.redirectPath)}
+              onPress={() =>
+                router.push({
+                  pathname: category.redirectPath,
+                  params: { category: JSON.stringify(category) },
+                })
+              }
             >
               <Image source={category.icon} style={styles.icon} />
               <Text style={styles.categoryTitle}>{category.title}</Text>
             </TouchableOpacity>
           ))}
         </View>
+        <AllCourses />
       </ScrollView>
     </LinearGradient>
   );
