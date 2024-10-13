@@ -1,5 +1,5 @@
-import QuizHomeScreen from "@/screens/quiz/quiz.homescreen";
+// import QuizHomeScreen from "@/screens/quiz/quiz.homescreen";
 
-export default function QuizScreen() {
-  return <QuizHomeScreen />;
-}
+// export default function QuizScreen() {
+//   return <QuizHomeScreen />;
+// }
