@@ -121,11 +121,31 @@ export const getSingleCourse = CatchAsyncError(
 export const getAllCourses = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // const courses = await CourseModel.find().select(
-      //   "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
-      // );
+      const { filterType } = req.query; // Expecting 'paid', 'free', or 'all' from query parameter
 
-      const courses = await CourseModel.find();
+      // Fetch all courses first
+      let courses: any = await CourseModel.find().select(
+        "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
+      );
+
+      console.log("Fetched courses:", courses); // Log to check structure
+
+      // Apply filtering based on the filterType
+      if (filterType === "paid") {
+        courses = courses.filter((course: any) => {
+          console.log("Course `isPaid` value:", course.isPaid); // Debugging
+          return course.isPaid === true;
+        });
+        console.log("Filtered paid courses:", courses);
+      } else if (filterType === "free") {
+        courses = courses.filter((course: any) => {
+          console.log("Course `isPaid` value:", course.isPaid); // Debugging
+          return course.isPaid === false;
+        });
+        console.log("Filtered free courses:", courses);
+      }
+
+      // If 'all', no additional filtering is required
 
       res.status(200).json({
         success: true,

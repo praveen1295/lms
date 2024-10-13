@@ -13,10 +13,6 @@ const quizSchema = new schema(
       type: String,
       required: true,
     },
-    testCategory: {
-      type: String,
-      require: true,
-    },
     examName: {
       type: String,
       required: true,
@@ -56,11 +52,11 @@ const quizSchema = new schema(
       default: [],
     },
     attemptsAllowedPerUser: {
-      //how many times quiz can be attempted by user
-      type: Number, //required is false, if not provided quiz can be attempted multiple times
+      //how many times test can be attempted by user
+      type: Number, //required is false, if not provided test can be attempted multiple times
     },
     attemptedUsers: [
-      //Stores an array of objects users who have attempted the quiz
+      //Stores an array of objects users who have attempted the test
       {
         //and number of attempts left
         id: String,
@@ -80,6 +76,6 @@ const quizSchema = new schema(
   { timestamps: true }
 );
 
-const Quiz = mongoose.model("Quiz", quizSchema);
+const Test = mongoose.model("Test", quizSchema);
 
-export default Quiz;
+export default Test;

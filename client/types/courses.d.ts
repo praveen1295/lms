@@ -45,6 +45,7 @@ type CoursesType = {
   description: string;
   categories: string;
   price: number;
+  isPaid: Boolean;
   estimatedPrice?: number;
   thumbnail: {
     public_id: string | any;

@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
 import courseRouter from "./routes/course.route";
+import testCourseRouter from "./routes/test.course.route";
+
 import orderRouter from "./routes/order.route";
 import notificationRouter from "./routes/notification.route";
 import analyticsRouter from "./routes/analytics.route";
@@ -78,6 +80,7 @@ app.use("/api/v1", [
   userRouter,
   orderRouter,
   courseRouter,
+  testCourseRouter,
   notificationRouter,
   analyticsRouter,
   layoutRouter,

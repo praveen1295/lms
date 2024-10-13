@@ -16,6 +16,7 @@ import {
 import Loader from "@/components/loader/loader";
 import { LinearGradient } from "expo-linear-gradient";
 import CourseCard from "@/components/cards/course.card";
+import NoDataCard from "@/components/cards/no.data.card";
 
 export default function CoursesScreen() {
   const [courses, setCourses] = useState<CoursesType[]>([]);
@@ -75,6 +76,8 @@ export default function CoursesScreen() {
     }
   };
 
+  console.log("courses=====", courses);
+
   return (
     <>
       {loading ? (
@@ -105,6 +108,7 @@ export default function CoursesScreen() {
               </TouchableOpacity>
               {categories?.map((i: any, index: number) => (
                 <TouchableOpacity
+                  key={index}
                   style={{
                     padding: 10,
                     backgroundColor:
@@ -129,14 +133,10 @@ export default function CoursesScreen() {
               {courses?.map((item: CoursesType, index: number) => (
                 <CourseCard item={item} key={index} />
               ))}
+              {courses?.length === 0 && (
+                <NoDataCard message="No data available!" />
+              )}
             </ScrollView>
-            {courses?.length === 0 && (
-              <Text
-                style={{ textAlign: "center", paddingTop: 50, fontSize: 18 }}
-              >
-                No data available!
-              </Text>
-            )}
           </View>
         </LinearGradient>
       )}

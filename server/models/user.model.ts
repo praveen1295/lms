@@ -98,9 +98,6 @@
 
 // export default userModel;
 
-
-
-
 require("dotenv").config();
 import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
@@ -125,6 +122,8 @@ export interface IUser extends Document {
   accountBlocked: boolean;
   isTempKeyUsed: boolean;
   courses: Array<{ courseId: string }>;
+  tests: Array<{ testId: string }>;
+
   comparePassword: (password: string) => Promise<boolean>;
   SignAccessToken: () => string;
   SignRefreshToken: () => string;
@@ -174,7 +173,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
     },
     temperoryKey: {
       type: String,
-      default: '',
+      default: "",
     },
     freezeTime: {
       type: Date,
@@ -191,6 +190,11 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
     courses: [
       {
         courseId: String,
+      },
+    ],
+    tests: [
+      {
+        testId: String,
       },
     ],
   },

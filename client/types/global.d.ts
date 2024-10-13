@@ -19,6 +19,7 @@ type User = {
   avatar?: Avatar;
   password?: string;
   courses: any;
+  tests: any;
   createdAt: Date;
   updatedAt: Date;
 };
