@@ -14,25 +14,33 @@ import {
   Nunito_600SemiBold,
   Nunito_500Medium,
 } from "@expo-google-fonts/nunito";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { SERVER_URI } from "@/utils/uri";
 import CourseCard from "@/components/cards/course.card";
+import NoDataCard from "@/components/cards/no.data.card";
 
 export default function CourseList() {
+  const { category: item } = useLocalSearchParams();
+
+  console.log("Item0000000000", item);
+  const category: any = JSON.parse(item as string);
+
   const [courses, setCourses] = useState<CoursesType[]>([]);
   const [loading, setLoading] = useState(true);
   const flatListRef = useRef(null);
 
   useEffect(() => {
     axios
-      .get(`${SERVER_URI}/get-courses`)
+      .get(`${SERVER_URI}/get-courses?filterType=${category.filter}`)
       .then((res: any) => {
         setCourses(res.data.courses);
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
+        setLoading(false);
       });
   }, []);
 
@@ -77,13 +85,28 @@ export default function CourseList() {
           </Text>
         </TouchableOpacity>
       </View>
-      <FlatList
-        ref={flatListRef}
-        data={courses}
-        showsHorizontalScrollIndicator={false}
-        keyExtractor={(item) => item._id.toString()}
-        renderItem={({ item }) => <CourseCard item={item} />}
-      />
+      {loading ? (
+        <Text
+          style={{
+            fontSize: 16,
+            color: "#000",
+            textAlign: "center",
+            marginTop: 20,
+          }}
+        >
+          Loading...
+        </Text>
+      ) : courses.length === 0 ? (
+        <NoDataCard message="No courses found." />
+      ) : (
+        <FlatList
+          ref={flatListRef}
+          data={courses}
+          showsHorizontalScrollIndicator={false}
+          keyExtractor={(item) => item._id.toString()}
+          renderItem={({ item }) => <CourseCard item={item} />}
+        />
+      )}
     </View>
   );
 }

@@ -24,7 +24,7 @@ interface CartItemsType {
 const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
 const handlePayment = async (cartItems: any, setOrderSuccess: any) => {
-  console.log("handlePayment");
+  console.log("handlePayment cartItems", cartItems);
 
   try {
     const accessToken = await AsyncStorage.getItem("access_token");

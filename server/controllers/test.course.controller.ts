@@ -15,9 +15,18 @@ export const createTestCourse = async (req: Request, res: Response) => {
 };
 
 // Get all courses
-export const getTestCourses = async (_req: Request, res: Response) => {
+export const getTestCourses = async (req: Request, res: Response) => {
+  const { isPaid } = req.query;
+  const query: any = {};
+
+  if (isPaid) {
+    query.isPaid = isPaid === "paid";
+  }
+
+  console.log("query", query);
+
   try {
-    const testCourses = await TestCourseModel.find();
+    const testCourses = await TestCourseModel.find(query);
     res.status(200).json({ testCourses });
   } catch (error) {
     res.status(500).json({ message: "Error fetching courses", error });

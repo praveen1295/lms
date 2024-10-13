@@ -85,8 +85,8 @@ export default function CourseListLayout({}) {
                 <View style={styles.courseContent}>
                   <Text style={styles.courseTitle}>{item.title}</Text>
                   <Text style={styles.courseDescription}>
-                    {item.description.split(" ").slice(0, 7).join(" ") +
-                      (item.description.split(" ").length > 7 ? "..." : "")}
+                    {/* {item.description.split(" ").slice(0, 7).join(" ") +
+                      (item.description.split(" ").length > 7 ? "..." : "")} */}
                   </Text>
                   <View style={styles.buttonContainer}>
                     <TouchableOpacity

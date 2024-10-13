@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import PropTypes from "prop-types"; // Import PropTypes
+import PropTypes from "prop-types";
 import {
   View,
   Text,
@@ -7,9 +7,10 @@ import {
   TouchableOpacity,
   FlatList,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, useRouter } from "expo-router"; // Import useSearchParams
+import { useLocalSearchParams } from "expo-router";
 import { SERVER_URI } from "@/utils/uri";
 import axios from "axios";
 import AllQuizzes from "@/components/quiz/all.quizzes";
@@ -20,11 +21,10 @@ export default function TestsList() {
   const [loader, setLoader] = useState(false);
   const flatListRef = useRef(null);
   const { item } = useLocalSearchParams();
-  const layout: any = JSON.parse(item as string);
+  const layout = JSON.parse(item as string);
 
-  console.log("layout.value", layout.value);
-  const [tests, setTests] = useState<any>([]);
-  const [featuredTest, setFeaturedTest] = useState<any>(null);
+  const [tests, setTests] = useState([]);
+  const [featuredTest, setFeaturedTest] = useState(null);
 
   useEffect(() => {
     setLoader(true);
@@ -33,12 +33,8 @@ export default function TestsList() {
         `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${layout?.filter}&examName=${layout.value}`
       )
       .then((res) => {
-        const demoTest = res.data.data.filter(
-          (item: any) => item.isDemo === true
-        );
-        const paidTests = res.data.data.filter(
-          (item: any) => item.isDemo === false
-        );
+        const demoTest = res.data.data.filter((item) => item.isDemo === true);
+        const paidTests = res.data.data.filter((item) => item.isDemo === false);
 
         // Set the first test as the featured test (you can modify this logic)
         setFeaturedTest(paidTests[0]);
@@ -53,25 +49,67 @@ export default function TestsList() {
       });
   }, []);
 
+  const renderNoData = () => (
+    <View style={styles.noDataContainer}>
+      <Image
+        source={require("@/assets/images/no-data.png")} // Replace with the path to your "no data" image
+        style={styles.noDataImage}
+      />
+      <Text style={styles.noDataText}>
+        No tests available. Please try again later.
+      </Text>
+    </View>
+  );
+
   return (
     <LinearGradient colors={["#E5ECF9", "#F6F7F9"]} style={styles.container}>
-      <AllQuizzes
-        filter={layout.filter}
-        examName={layout.value}
-        examId={layout._id}
-      />
+      {loader ? (
+        <ActivityIndicator size="large" color="#3b82f6" style={styles.loader} />
+      ) : tests.length === 0 ? (
+        renderNoData()
+      ) : (
+        <AllQuizzes
+          filter={layout.filter}
+          examName={layout.value}
+          examId={layout._id}
+          tests={tests}
+          featuredTest={featuredTest}
+        />
+      )}
     </LinearGradient>
   );
 }
 
-// Define PropTypes for the component
 TestsList.propTypes = {
-  isPayed: PropTypes.bool.isRequired, // Prop validation
+  isPayed: PropTypes.bool.isRequired,
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 50,
+  },
+  loader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  noDataImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+    resizeMode: "contain",
+  },
+  noDataText: {
+    fontSize: 18,
+    color: "#555",
+    textAlign: "center",
+    fontWeight: "bold",
   },
 });
