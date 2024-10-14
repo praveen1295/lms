@@ -150,12 +150,24 @@ export default function TestListLayout({}) {
                           </TouchableOpacity>
                         )}
                       </View>
-                      <TouchableOpacity
-                        style={[styles.button, styles.demoButton]}
-                        onPress={() => console.log("View Demo pressed")}
-                      >
-                        <Text style={styles.buttonText}>View Demo</Text>
-                      </TouchableOpacity>
+                      {!user?.tests?.some((d: any) => d._id === item._id) && (
+                        <TouchableOpacity
+                          style={[styles.button, styles.demoButton]}
+                          onPress={() =>
+                            router.push({
+                              pathname: "/(routes)/test-list",
+                              params: {
+                                item: JSON.stringify({
+                                  ...item,
+                                  filter: category.filter,
+                                }),
+                              },
+                            })
+                          }
+                        >
+                          <Text style={styles.buttonText}>View Demo</Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
                   </View>
                 </View>

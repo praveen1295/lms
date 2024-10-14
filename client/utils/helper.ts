@@ -38,11 +38,17 @@ const handlePayment = async (cartItems: any, setOrderSuccess: any) => {
 
     if (cartItems.courses) {
       amount = Math.round(
-        cartItems.courses.reduce((total, item) => total + item.price, 0) * 100
+        cartItems.courses.reduce(
+          (total: any, item: any) => total + item.price,
+          0
+        ) * 100
       );
     } else if (cartItems.tests) {
       amount = Math.round(
-        cartItems.tests.reduce((total, item) => total + item.price, 0) * 100
+        cartItems.tests.reduce(
+          (total: any, item: any) => total + item.price,
+          0
+        ) * 100
       );
     }
 

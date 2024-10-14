@@ -23,7 +23,7 @@ export default function TestsList() {
   const { item } = useLocalSearchParams();
   const layout = JSON.parse(item as string);
 
-  const [tests, setTests] = useState([]);
+  const [tests, setTests] = useState<any>([]);
   const [featuredTest, setFeaturedTest] = useState(null);
 
   useEffect(() => {
@@ -33,8 +33,12 @@ export default function TestsList() {
         `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${layout?.filter}&examName=${layout.value}`
       )
       .then((res) => {
-        const demoTest = res.data.data.filter((item) => item.isDemo === true);
-        const paidTests = res.data.data.filter((item) => item.isDemo === false);
+        const demoTest = res.data.data.filter(
+          (item: any) => item.isDemo === true
+        );
+        const paidTests = res.data.data.filter(
+          (item: any) => item.isDemo === false
+        );
 
         // Set the first test as the featured test (you can modify this logic)
         setFeaturedTest(paidTests[0]);
@@ -51,10 +55,7 @@ export default function TestsList() {
 
   const renderNoData = () => (
     <View style={styles.noDataContainer}>
-      <Image
-        source={require("@/assets/images/no-data.png")} // Replace with the path to your "no data" image
-        style={styles.noDataImage}
-      />
+      <Image source={require("@/assets/images/noData.png")} />
       <Text style={styles.noDataText}>
         No tests available. Please try again later.
       </Text>
@@ -72,8 +73,8 @@ export default function TestsList() {
           filter={layout.filter}
           examName={layout.value}
           examId={layout._id}
-          tests={tests}
-          featuredTest={featuredTest}
+          // tests={tests}
+          // featuredTest={featuredTest}
         />
       )}
     </LinearGradient>
