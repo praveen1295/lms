@@ -18,66 +18,67 @@ const categories = [
   {
     title: "Paid Courses",
     filter: "paid",
-    icon: "",
+    icon: require("@/assets/images/icon.png"),
     redirectPath: "/(routes)/course-list",
     layout: "Categories",
   },
   {
     title: "Free Courses",
     filter: "free",
-    icon: "",
+    icon: require("@/assets/images/icon.png"),
+
     redirectPath: "/(routes)/course-list",
     layout: "Categories",
   },
   {
     title: "Paid Test",
     filter: "paid",
-    icon: "",
+    icon: require("@/assets/images/icon.png"),
     redirectPath: "/(routes)/test-list-layout",
     layout: "paidTest",
   },
   {
     title: "Free Test",
     filter: "free",
-    icon: "",
+    icon: require("@/assets/images/icon.png"),
     redirectPath: "/(routes)/test-list-layout",
     layout: "freeTest",
   },
-  {
-    title: "Quiz",
-    filter: "",
-    icon: "",
-    redirectPath: "/(routes)/quiz",
-    layout: "freeTest",
-  },
+  // {
+  //   title: "Quiz",
+  //   filter: "",
+  //   icon: require("@/assets/images/icon.png"),
+  //   redirectPath: "/(routes)/quiz",
+  //   layout: "freeQuiz",
+  // },
   {
     title: "Paid Ebook",
     filter: "paid",
-    icon: "",
+    icon: require("@/assets/images/icon.png"),
     redirectPath: "/(routes)/ebook-list",
     layout: "freeTest",
   },
   {
     title: "Free Ebook",
     filter: "free",
-    icon: "",
+    icon: require("@/assets/images/icon.png"),
     redirectPath: "/(routes)/ebook-list",
     layout: "freeTest",
   },
-  {
-    title: "Social Media",
-    filter: "",
-    icon: "",
-    redirectPath: "/(routes)/quiz",
-    layout: "freeTest",
-  },
-  {
-    title: "Updates",
-    filter: "",
-    icon: "",
-    redirectPath: "/(routes)/quiz-list",
-    layout: "freeTest",
-  },
+  // {
+  //   title: "Social Media",
+  //   filter: "",
+  //   icon: require("@/assets/images/icon.png"),
+  //   redirectPath: "/(routes)/quiz",
+  //   layout: "freeTest",
+  // },
+  // {
+  //   title: "Updates",
+  //   filter: "",
+  //   icon: require("@/assets/images/icon.png"),
+  //   redirectPath: "/(routes)/quiz-list",
+  //   layout: "freeTest",
+  // },
 ];
 
 export default function HomeScreen() {
@@ -107,7 +108,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           ))}
         </View>
-        <AllCourses />
+        {/* <AllCourses /> */}
       </ScrollView>
     </LinearGradient>
   );

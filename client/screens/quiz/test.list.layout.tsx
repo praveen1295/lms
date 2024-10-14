@@ -17,16 +17,19 @@ import axios from "axios";
 import { SERVER_URI } from "@/utils/uri";
 import { createNavigatorFactory } from "@react-navigation/native";
 import { handlePayment } from "@/utils/helper";
+import useUser from "@/hooks/auth/useUser";
 
 export default function TestListLayout({}) {
   const [loading, setLoading] = useState(false);
   const flatListRef = useRef(null);
   const { category: item } = useLocalSearchParams();
   const category = JSON.parse(item as string);
+  const { user, setRefetch } = useUser();
 
   const [layout, setLayout] = useState<any>([]);
   const [loader, setLoader] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
+  const [isPurchased, setIsPurchased] = useState(false);
 
   const handleCoursePress = (courseId: String) => {
     console.log(`Quiz selected: ${courseId}`);
@@ -90,10 +93,6 @@ export default function TestListLayout({}) {
         </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
-          {/* <Text style={styles.headingText}>
-          {category.filter.charAt(0).toUpperCase() + category.filter.slice(1)}{" "}
-          Tests
-        </Text> */}
           {loader ? (
             <Text style={styles.loadingText}>Loading Tests...</Text>
           ) : layout.length === 0 ? (
@@ -109,22 +108,9 @@ export default function TestListLayout({}) {
               data={layout}
               keyExtractor={(item) => item._id.toString()}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.courseCard}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/(routes)/test-list",
-                      params: {
-                        item: JSON.stringify({
-                          ...item,
-                          filter: category.filter,
-                        }),
-                      },
-                    })
-                  }
-                >
+                <View style={styles.courseCard}>
                   <Image
-                    source={{ uri: item.thumbnailUrl }}
+                    source={require("@/assets/images/icon.png")}
                     style={styles.courseImage}
                   />
                   <View style={styles.courseContent}>
@@ -134,24 +120,57 @@ export default function TestListLayout({}) {
                         (item.description.split(" ").length > 7 ? "..." : "")}
                     </Text>
                     <View style={styles.buttonContainer}>
-                      <TouchableOpacity
-                        style={styles.button}
-                        onPress={() => {
-                          const cartItems = { tests: [{ ...item }] };
-                          handlePayment(cartItems, setOrderSuccess);
-                        }}
-                      >
-                        <Text style={styles.buttonText}>Buy Now</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={[styles.button, styles.demoButton]}
-                        onPress={() => console.log("View Demo pressed")}
-                      >
-                        <Text style={styles.buttonText}>View Demo</Text>
-                      </TouchableOpacity>
+                      <View>
+                        {user?.tests?.some((d: any) => d._id === item._id) ? (
+                          <TouchableOpacity
+                            style={[styles.button, styles.goButton]}
+                            onPress={() =>
+                              router.push({
+                                pathname: "/(routes)/test-list",
+                                params: {
+                                  item: JSON.stringify({
+                                    ...item,
+                                    filter: category.filter,
+                                  }),
+                                },
+                              })
+                            }
+                          >
+                            <Text style={styles.buttonText}>Start </Text>
+                          </TouchableOpacity>
+                        ) : (
+                          <TouchableOpacity
+                            style={styles.button}
+                            onPress={() => {
+                              const cartItems = { tests: [{ ...item }] };
+                              handlePayment(cartItems, setOrderSuccess);
+                            }}
+                          >
+                            <Text style={styles.buttonText}>Buy Test</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                      {!user?.tests?.some((d: any) => d._id === item._id) && (
+                        <TouchableOpacity
+                          style={[styles.button, styles.demoButton]}
+                          onPress={() =>
+                            router.push({
+                              pathname: "/(routes)/test-list",
+                              params: {
+                                item: JSON.stringify({
+                                  ...item,
+                                  filter: category.filter,
+                                }),
+                              },
+                            })
+                          }
+                        >
+                          <Text style={styles.buttonText}>View Demo</Text>
+                        </TouchableOpacity>
+                      )}
                     </View>
                   </View>
-                </TouchableOpacity>
+                </View>
               )}
               showsVerticalScrollIndicator={false}
             />
@@ -170,13 +189,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 50,
-  },
-  headingText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginVertical: 7,
-    color: "#1A73E8",
   },
   loadingText: {
     fontSize: 18,
@@ -237,18 +249,27 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   button: {
-    backgroundColor: "#007BFF",
-    paddingVertical: 6,
-    paddingHorizontal: 18,
-    borderRadius: 5,
+    backgroundColor: "#4A90E2",
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 30,
     marginRight: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   demoButton: {
-    backgroundColor: "#28A745",
+    backgroundColor: "#34D399",
+  },
+  goButton: {
+    backgroundColor: "#6C63FF",
   },
   buttonText: {
     color: "#fff",
     fontSize: 14,
-    fontWeight: "500",
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

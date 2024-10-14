@@ -9,13 +9,11 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Header from "@/components/header/header";
-import SearchInput from "@/components/common/search.input";
-import QuizBannerSlider from "@/components/quiz/quiz.banner.slider";
-import AllQuizzes from "@/components/quiz/all.quizzes";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { SERVER_URI } from "@/utils/uri";
 import { useLocalSearchParams } from "expo-router";
+import NoDataCard from "@/components/cards/no.data.card";
 
 export default function QuizHomeScreen() {
   const { category: item } = useLocalSearchParams();
@@ -28,7 +26,7 @@ export default function QuizHomeScreen() {
 
   const [courses, setCourses] = useState<CoursesType[]>([]);
   const [originalCourses, setOriginalCourses] = useState<CoursesType[]>([]);
-  const [loading, setLoading] = useState(true); // Now we'll use this
+  const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("All");
 
@@ -37,11 +35,11 @@ export default function QuizHomeScreen() {
       .get(`${SERVER_URI}/get-layout/${category.layout}`)
       .then((res) => {
         setCategories(res.data.layout.categories);
-        setLoading(false); // Loading complete
+        setLoading(false);
       })
       .catch((error) => {
         console.log(error);
-        setLoading(false); // In case of an error, stop loading
+        setLoading(false);
       });
   }, []);
 
@@ -71,37 +69,9 @@ export default function QuizHomeScreen() {
       style={{ flex: 1, paddingTop: 50 }}
     >
       <Header />
-      {/* Add SearchInput here if needed */}
-      {/* <QuizBannerSlider /> */}
 
       <View style={{ padding: 10 }}>
-        {/* <FlatList
-          data={categories}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          keyExtractor={(item, index) => index.toString()}
-          renderItem={({ item }: { item: any }) => (
-            <TouchableOpacity
-              style={[
-                styles.categoryCard,
-                {
-                  backgroundColor:
-                    activeCategory === item.title ? "#2467EC" : "#000",
-                },
-              ]}
-              onPress={() => handleCategories(item.title)}
-            >
-              <Image
-                source={{ uri: item.iconUrl }} // Make sure your API returns this field
-                style={styles.categoryImage}
-              />
-              <Text style={styles.categoryTitle}>{item.title}</Text>
-            </TouchableOpacity>
-          )}
-        /> */}
-
         <FlatList
-          // ref={flatListRef}
           data={categories}
           keyExtractor={(item: any) => item._id.toString()}
           renderItem={({ item }) => (
@@ -130,12 +100,12 @@ export default function QuizHomeScreen() {
               </View>
             </View>
           )}
+          ListEmptyComponent={
+            <NoDataCard message="No quizzes available at the moment. Please check back later!" />
+          }
           showsVerticalScrollIndicator={false}
         />
       </View>
-
-      {/* Ensure filter is defined in AllQuizzes */}
-      {/* <AllQuizzes filter={activeCategory} /> */}
     </LinearGradient>
   );
 }
@@ -164,7 +134,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
   container: {
     flex: 1,
     paddingTop: 50,
@@ -194,8 +163,8 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   quizImage: {
-    width: 80, // Smaller width
-    height: 80, // Smaller height
+    width: 80,
+    height: 80,
     borderRadius: 10,
   },
   quizContent: {

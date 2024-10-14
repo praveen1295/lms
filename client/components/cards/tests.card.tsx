@@ -8,13 +8,6 @@ const TestsCard = ({ item }: { item: any }) => {
   return (
     <TouchableOpacity
       style={styles.cardContainer}
-      onPress={() =>
-        !item.locked && // Prevent navigation if the quiz is locked
-        router.push({
-          pathname: "/(routes)/quiz-instruction",
-          params: { quiz: JSON.stringify(item) },
-        })
-      }
       disabled={item.locked} // Disable the touchable if locked
     >
       {/* Card Background with Gradient */}
@@ -53,7 +46,16 @@ const TestsCard = ({ item }: { item: any }) => {
 
           {/* Show Start Quiz button if not locked */}
           {!item.locked && (
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() =>
+                !item.locked && // Prevent navigation if the quiz is locked
+                router.push({
+                  pathname: "/(routes)/quiz-instruction",
+                  params: { quiz: JSON.stringify(item) },
+                })
+              }
+            >
               <Text style={styles.buttonText}>Start Quiz</Text>
             </TouchableOpacity>
           )}

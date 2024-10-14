@@ -80,7 +80,7 @@ export default function AllQuizzes({ examName, filter, examId }) {
       {featuredTest && showBanner && (
         <View style={styles.bannerCard}>
           <Image
-            source={{ uri: featuredTest.thumbnailUrl }}
+            source={require("@/assets/images/icon.png")}
             style={styles.bannerImage}
           />
           <View style={styles.bannerContent}>
