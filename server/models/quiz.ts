@@ -25,6 +25,20 @@ const quizSchema = new schema(
       required: true,
       // enum: ["nursing, GNST/PNST"],
     },
+    duration: {
+      type: Number,
+      required: true,
+    },
+
+    isShowTimer: {
+      type: Boolean,
+      require: true,
+    },
+
+    isShuffle: {
+      type: Number,
+      required: true,
+    },
     difficultyLevel: {
       type: String,
       required: true,
