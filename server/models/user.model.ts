@@ -102,6 +102,7 @@ require("dotenv").config();
 import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 const emailRegexPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -122,9 +123,12 @@ export interface IUser extends Document {
   accountBlocked: boolean;
   isTempKeyUsed: boolean;
   courses: Array<{ courseId: string }>;
+  resetPasswordToken: String | undefined;
+  resetPasswordExpire: Date | undefined;
   tests: Array<{ testId: string }>;
 
   comparePassword: (password: string) => Promise<boolean>;
+  getResetPasswordToken: any;
   SignAccessToken: () => string;
   SignRefreshToken: () => string;
 }
@@ -197,6 +201,8 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
         testId: String,
       },
     ],
+    resetPasswordToken: { type: String || undefined },
+    resetPasswordExpire: { type: Date || undefined },
   },
   { timestamps: true }
 );
@@ -229,6 +235,22 @@ userSchema.methods.comparePassword = async function (
   enteredPassword: string
 ): Promise<boolean> {
   return await bcrypt.compare(enteredPassword, this.password);
+};
+
+userSchema.methods.getResetPasswordToken = function () {
+  // Generate token
+  const resetToken = crypto.randomBytes(20).toString("hex");
+
+  // Hash the token and set it to the resetPasswordToken field
+  this.resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  // Set token expiration time (e.g., 15 minutes)
+  this.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 minutes
+
+  return resetToken; // Return the plain reset token (to be sent to the user via email)
 };
 
 const userModel: Model<IUser> = mongoose.model("User", userSchema);

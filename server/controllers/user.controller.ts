@@ -8,6 +8,7 @@ import ejs from "ejs";
 import path from "path";
 import sendMail from "../utils/sendMail";
 import { sendToken } from "../utils/jwt";
+import crypto from "crypto";
 // import { redis } from "../utils/redis";
 import {
   getAllUsersService,
@@ -501,5 +502,94 @@ export const deleteUser = CatchAsyncError(
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
+  }
+);
+
+export const forgotPassword = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { email } = req.body;
+    console.log("email", email);
+    const user = await userModel.findOne({ email });
+    console.log("user", user);
+
+    if (!user) {
+      return next(new ErrorHandler("User not found with this email", 404));
+    }
+
+    // Generate password reset token
+    const resetToken = user.getResetPasswordToken();
+
+    await user.save({ validateBeforeSave: false });
+
+    // Create reset password URL
+    const resetUrl = `${req.protocol}://${req.get(
+      "host"
+    )}/password/reset/${resetToken}`;
+
+    try {
+      // Prepare email options
+      const emailOptions = {
+        email: user.email,
+        subject: "Password Reset Request",
+        template: "resetPassword.ejs", // Assuming you have a template named resetPassword.ejs
+        data: {
+          name: user.name,
+          resetUrl,
+        },
+      };
+
+      // Send the email
+      await sendMail(emailOptions);
+
+      res.status(200).json({
+        success: true,
+        message: `Email sent to: ${user.email}`,
+      });
+    } catch (error: any) {
+      user.resetPasswordToken = undefined;
+      user.resetPasswordExpire = undefined;
+
+      await user.save({ validateBeforeSave: false });
+
+      return next(new ErrorHandler(error.message, 500));
+    }
+  }
+);
+
+export const resetPassword = CatchAsyncError(
+  async (req: Request, res: Response, next: NextFunction) => {
+    // Hash the token sent in the URL
+    const resetPasswordToken = crypto
+      .createHash("sha256")
+      .update(req.params.token)
+      .digest("hex");
+
+    const user = await userModel.findOne({
+      resetPasswordToken,
+      resetPasswordExpire: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return next(
+        new ErrorHandler("Password reset token is invalid or has expired", 400)
+      );
+    }
+
+    if (req.body.password !== req.body.confirmPassword) {
+      return next(new ErrorHandler("Passwords do not match", 400));
+    }
+
+    // Set the new password
+    user.password = req.body.password;
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+    });
   }
 );

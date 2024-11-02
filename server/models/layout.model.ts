@@ -112,7 +112,7 @@ const bannerImageSchema = new Schema<BannerImage>({
 });
 
 const layoutSchema = new Schema<Layout>({
-  type: { type: String },
+  type: { type: String, enum: ["Category, examName"] },
   faq: [faqSchema],
   categories: [categorySchema],
   banner: {

@@ -7,6 +7,7 @@ import { ReturnResponse } from "../../utils/interfaces";
 import userModel from "../../models/user.model";
 
 const createQuiz: RequestHandler = async (req, res, next) => {
+  console.log("create quiz callled");
   try {
     const createdBy = req?.user?._id.toString();
 
@@ -30,8 +31,11 @@ const createQuiz: RequestHandler = async (req, res, next) => {
     const attemptsAllowedPerUser = req.body.attemptsAllowedPerUser;
     const isPublicQuiz = req.body.isPublicQuiz;
     const allowedUser = req.body.allowedUser;
+    const description = req.body.allowedUser;
+    const { examName } = req.body;
     const quiz = new Quiz({
       name,
+      examName,
       category,
       difficultyLevel,
       questionList,
@@ -41,6 +45,7 @@ const createQuiz: RequestHandler = async (req, res, next) => {
       attemptsAllowedPerUser,
       isPublicQuiz,
       allowedUser,
+      description,
     });
     const result = await quiz.save();
     const resp: ReturnResponse = {
@@ -50,6 +55,7 @@ const createQuiz: RequestHandler = async (req, res, next) => {
     };
     res.status(201).send(resp);
   } catch (error) {
+    console.error("error", error);
     next(error);
   }
 };

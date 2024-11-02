@@ -55,7 +55,7 @@ export default function TestsList() {
 
   const renderNoData = () => (
     <View style={styles.noDataContainer}>
-      <Image source={require("@/assets/images/noData.png")} />
+      {/* <Image source={require("@/assets/images/noData.png")} /> */}
       <Text style={styles.noDataText}>
         No tests available. Please try again later.
       </Text>

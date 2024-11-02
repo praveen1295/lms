@@ -1,9 +1,11 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import {
@@ -12,9 +14,14 @@ import {
   Nunito_700Bold,
   Nunito_400Regular,
 } from "@expo-google-fonts/nunito";
+import axios from "axios";
 import { router } from "expo-router";
+import { SERVER_URI } from "@/utils/uri";
 
 export default function ForgotPassword() {
+  const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(false);
+
   let [fontsLoaded, fontError] = useFonts({
     Nunito_600SemiBold,
     Nunito_700Bold,
@@ -25,6 +32,35 @@ export default function ForgotPassword() {
     return null;
   }
 
+  const handleSubmit = async () => {
+    if (!email) {
+      Alert.alert("Error", "Please enter your email");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await axios.post(`${SERVER_URI}/forgot-password`, {
+        email: email,
+      });
+
+      if (response.status === 200) {
+        Alert.alert(
+          "Success",
+          "Password reset link has been sent to your email."
+        );
+        setEmail(""); // Reset input after success
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.message || "Something went wrong";
+      Alert.alert("Error", errorMessage);
+    }
+
+    setLoading(false);
+  };
+
   return (
     <LinearGradient colors={["#E5ECF9", "#F6F7F9"]} style={styles.container}>
       <Text style={[styles.headerText, { fontFamily: "Nunito_600SemiBold" }]}>
@@ -34,10 +70,16 @@ export default function ForgotPassword() {
         style={[styles.input, { fontFamily: "Nunito_400Regular" }]}
         placeholder="Username@gmail.com"
         keyboardType="email-address"
+        value={email}
+        onChangeText={(text) => setEmail(text)}
       />
-      <TouchableOpacity style={styles.button}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleSubmit}
+        disabled={loading}
+      >
         <Text style={[styles.buttonText, { fontFamily: "Nunito_600SemiBold" }]}>
-          Send
+          {loading ? "Sending..." : "Send"}
         </Text>
       </TouchableOpacity>
       <View style={styles.loginLink}>
@@ -96,6 +138,5 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontSize: 16,
   },
-
   backText: { fontSize: 16 },
 });

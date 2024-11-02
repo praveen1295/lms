@@ -13,6 +13,9 @@ const quizSchema = new schema(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+    },
     testCategory: {
       type: String,
       require: true,
@@ -20,6 +23,7 @@ const quizSchema = new schema(
     examName: {
       type: String,
       required: true,
+      // enum: ["nursing, GNST/PNST"],
     },
     difficultyLevel: {
       type: String,

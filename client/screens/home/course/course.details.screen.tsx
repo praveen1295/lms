@@ -200,7 +200,8 @@ export default function CourseDetailScreen() {
                         paddingVertical: 10,
                       }}
                     >
-                      ${courseData?.price}
+                      ₹{item?.price}
+                      {courseData?.price}
                     </Text>
                     <Text
                       style={{
@@ -210,7 +211,8 @@ export default function CourseDetailScreen() {
                         textDecorationLine: "line-through",
                       }}
                     >
-                      ${courseData?.estimatedPrice}
+                      ₹{item?.price}
+                      {courseData?.estimatedPrice}
                     </Text>
                   </View>
                   <Text style={{ fontSize: 15 }}>

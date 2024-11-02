@@ -7,6 +7,7 @@ const validateRequest: RequestHandler = (req, res, next) => {
   //validation
   try {
     const validationError = validationResult(req);
+    console.log("validationError", validationError);
     if (!validationError.isEmpty()) {
       const err = new ProjectError("Validation failed!");
       err.statusCode = 422;

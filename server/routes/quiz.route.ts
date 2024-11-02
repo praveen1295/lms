@@ -11,10 +11,10 @@ import {
   updateQuiz,
   getAllQuiz,
   getAllQuizExam,
-  getAllQuizTest
+  getAllQuizTest,
 } from "../controllers/quizController/quiz";
 import { validateRequest } from "../helper/validateRequest";
-import { isAuthenticated } from '../middleware/auth';
+import { isAuthenticated } from "../middleware/auth";
 
 const router = express.Router();
 
@@ -28,7 +28,7 @@ router.post(
       .trim()
       .not()
       .isEmpty()
-      .isLength({ min: 10 })
+      .isLength({ min: 4 })
       .withMessage("Please enter a valid name, minimum 10 character long")
       .custom((name) => {
         return isValidQuizName(name)
@@ -46,7 +46,7 @@ router.post(
       .not()
       .isEmpty()
       .toLowerCase()
-      .isIn(['test', 'exam'])
+      .isIn(["test", "exam"])
       .withMessage("category can only be 'test' or 'exam'"),
     body("questionList").custom((questionList, { req }) => {
       return isValidQuiz(questionList, req.body["answers"])
@@ -61,14 +61,17 @@ router.post(
           return Promise.reject(err);
         });
     }),
-    body("passingPercentage").custom((passingPercentage:Number)=>{
-      if(passingPercentage==0){
+    body("passingPercentage").custom((passingPercentage: Number) => {
+      if (passingPercentage == 0) {
         return Promise.reject("Passing percentage can not be zero..");
       }
       return true;
     }),
     body("difficultyLevel").custom((difficultyLevel) => {
-      if (!difficultyLevel || !["easy", "medium", "hard"].includes(difficultyLevel)) {
+      if (
+        !difficultyLevel ||
+        !["easy", "medium", "hard"].includes(difficultyLevel)
+      ) {
         return Promise.reject("Difficulty level must be easy, medium and hard");
       }
       return true;
@@ -82,7 +85,7 @@ router.post(
 router.get("/allpublishedquiz", getAllQuiz);
 
 //Get  quiz/allpublished quiz/exam
-router.get("/allpublishedquiz/exam",isAuthenticated, getAllQuizExam);
+router.get("/allpublishedquiz/exam", isAuthenticated, getAllQuizExam);
 
 //Get  quiz/allpublished quiz/test
 router.get("/allpublishedquiz/test", getAllQuizTest);
@@ -118,14 +121,17 @@ router.put(
           return Promise.reject(err);
         });
     }),
-    body("passingPercentage").custom((passingPercentage:Number)=>{
-      if(passingPercentage==0){
+    body("passingPercentage").custom((passingPercentage: Number) => {
+      if (passingPercentage == 0) {
         return Promise.reject("Passing percentage can not be zero..");
       }
       return true;
     }),
     body("difficultyLevel").custom((difficultyLevel) => {
-      if (!difficultyLevel || !["easy", "medium", "hard"].includes(difficultyLevel)) {
+      if (
+        !difficultyLevel ||
+        !["easy", "medium", "hard"].includes(difficultyLevel)
+      ) {
         return Promise.reject("Difficulty level must be easy, medium and hard");
       }
       return true;
