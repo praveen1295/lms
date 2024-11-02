@@ -6,10 +6,12 @@ import ProjectError from "./error";
 const validateRequest: RequestHandler = (req, res, next) => {
   //validation
   try {
-    const validationError = validationResult(req);
+    const validationError: any = validationResult(req);
     console.log("validationError", validationError);
     if (!validationError.isEmpty()) {
-      const err = new ProjectError("Validation failed!");
+      const err = new ProjectError(
+        "Validation failed! " + validationError?.errors[0].msg
+      );
       err.statusCode = 422;
       err.data = validationError.array();
       throw err;

@@ -31,7 +31,7 @@ const createQuiz: RequestHandler = async (req, res, next) => {
     const attemptsAllowedPerUser = req.body.attemptsAllowedPerUser;
     const isPublicQuiz = req.body.isPublicQuiz;
     const allowedUser = req.body.allowedUser;
-    const description = req.body.allowedUser;
+    const description = req.body.description;
     const { examName } = req.body;
     const quiz = new Quiz({
       name,
