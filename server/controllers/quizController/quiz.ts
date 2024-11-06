@@ -6,60 +6,75 @@ import Quiz from "../../models/quiz";
 import { ReturnResponse } from "../../utils/interfaces";
 import userModel from "../../models/user.model";
 
-const createQuiz: RequestHandler = async (req, res, next) => {
-  console.log("create quiz callled");
+const createQuiz = async (req, res) => {
   try {
-    const createdBy = req?.user?._id.toString();
+    const createdBy = req.user._id.toString();
 
-    const user: any = await userModel.findById(req.user?._id);
-
-    if (user.role !== "admin") {
-      const resp: ReturnResponse = {
-        status: "error",
-        message: "Quiz not created!",
-        data: { message: "Only admin/owner can able to create quiz." },
-      };
-      return res.status(500).send(resp);
-    }
-
-    const name = req.body.name;
-    const category = req.body.category;
-    const difficultyLevel = req.body.difficultyLevel;
-    const questionList = req.body.questionList;
-    const answers = req.body.answers;
-    const passingPercentage = req.body.passingPercentage;
-    const attemptsAllowedPerUser = req.body.attemptsAllowedPerUser;
-    const isPublicQuiz = req.body.isPublicQuiz;
-    const allowedUser = req.body.allowedUser;
-    const description = req.body.description;
-    const { examName, duration, isShowTimer, isShuffle } = req.body;
-    const quiz = new Quiz({
+    const {
       name,
-      examName,
+      description,
       category,
       difficultyLevel,
-      questionList,
-      answers,
       passingPercentage,
-      createdBy,
       attemptsAllowedPerUser,
       isPublicQuiz,
       allowedUser,
-      description,
-      duration,
-      isShowTimer,
+      answers,
+      examName,
       isShuffle,
+      duration,
+      questionList: rawQuestionList,
+    } = req.body;
+
+    const questionList =
+      typeof rawQuestionList === "string"
+        ? JSON.parse(rawQuestionList)
+        : rawQuestionList;
+
+    // Attach images to each question in questionList
+    const formattedQuestionList = questionList.map((question, index) => {
+      const questionImgFiles =
+        req.files[`questionList[${index}][questionImg]`] || [];
+      const questionImages = questionImgFiles.map(
+        (file) =>
+          `${process.env.BACKEND_URL}/api/v1/static/question_img/${file.filename}`
+      );
+
+      return { ...question, questionImages };
     });
+
+    // Create and save the quiz
+    const quiz = new Quiz({
+      name,
+      description,
+      category,
+      difficultyLevel,
+      questionList: formattedQuestionList,
+      passingPercentage,
+      attemptsAllowedPerUser,
+      isPublicQuiz: isPublicQuiz === "true" ? true : false,
+      allowedUser,
+      createdBy,
+      answers,
+      examName,
+      isShuffle: isShuffle === "true" ? true : false,
+      duration: Number(duration),
+    });
+
     const result = await quiz.save();
-    const resp: ReturnResponse = {
-      status: "success",
+
+    res.status(201).json({
+      success: true,
       message: "Quiz created successfully",
       data: { quizId: result._id },
-    };
-    res.status(201).send(resp);
+    });
   } catch (error) {
-    console.error("error", error);
-    next(error);
+    console.error("Error creating quiz:", error);
+    res.status(500).json({
+      success: false,
+      message: "Quiz creation failed",
+      error: error.message,
+    });
   }
 };
 
@@ -243,34 +258,76 @@ const publishQuiz: RequestHandler = async (req, res, next) => {
 };
 
 const isValidQuiz = async (
-  questionList: [{ questionNumber: Number; question: String; options: {} }],
-  answers: {}
+  questionList: {
+    questionNumber: string;
+    question: string;
+    options: Record<string, string>;
+    questionImg: any;
+  }[],
+  answers: Record<string, string>
 ) => {
+  // Check if questionList is non-empty
+  console.log("answers", answers);
   if (!questionList.length) {
+    console.log("Validation failed: questionList is empty.");
     return false;
   }
-  if (questionList.length != Object.keys(answers).length) {
+
+  // Ensure each question has a corresponding answer
+  if (questionList.length !== Object.keys(answers).length) {
+    console.log(
+      "Validation failed: Number of questions and answers do not match."
+    );
     return false;
   }
-  let flag = true;
-  questionList.forEach(
-    (question: { questionNumber: Number; question: String; options: {} }) => {
-      let opt = Object.keys(question["options"]);
-      if (
-        opt.indexOf(
-          `${
-            Object.values(answers)[
-              Object.keys(answers).indexOf(question.questionNumber.toString())
-            ]
-          }`
-        ) == -1
-      ) {
-        flag = false;
-      }
+
+  // Validate each question and its corresponding answer
+  let isValid = true;
+  questionList.forEach((question) => {
+    const answerKey = question.questionNumber.toString(); // Ensure consistent key format
+    const answerValue = answers[answerKey];
+
+    // Check if the answer exists in the options
+    if (!answerValue || !question.options[answerValue]) {
+      console.log(
+        `Validation failed: No matching option for answer "${answerValue}" in question ${question.questionNumber}`
+      );
+      isValid = false;
     }
-  );
-  return flag;
+  });
+
+  return isValid;
 };
+
+// const isValidQuiz = async (
+//   questionList: [{ questionNumber: Number; question: String; options: {} }],
+//   answers: {}
+// ) => {
+//   if (!questionList.length) {
+//     return false;
+//   }
+//   if (questionList.length != Object.keys(answers).length) {
+//     return false;
+//   }
+//   let flag = true;
+//   questionList.forEach(
+//     (question: { questionNumber: Number; question: String; options: {} }) => {
+//       let opt = Object.keys(question["options"]);
+//       if (
+//         opt.indexOf(
+//           `${
+//             Object.values(answers)[
+//               Object.keys(answers).indexOf(question.questionNumber.toString())
+//             ]
+//           }`
+//         ) == -1
+//       ) {
+//         flag = false;
+//       }
+//     }
+//   );
+//   return flag;
+// };
 
 const isValidQuizName = async (name: String) => {
   const quiz = await Quiz.findOne({ name });

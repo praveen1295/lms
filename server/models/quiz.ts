@@ -36,7 +36,7 @@ const quizSchema = new schema(
     },
 
     isShuffle: {
-      type: Number,
+      type: Boolean,
       required: true,
     },
     difficultyLevel: {
@@ -49,9 +49,16 @@ const quizSchema = new schema(
         questionNumber: Number,
         question: String,
         options: {},
+        questionImages: {
+          type: Array,
+          default: [],
+        },
       },
     ],
-    answers: {},
+    answers: {
+      type: Object,
+      require: true,
+    },
     passingPercentage: {
       type: Number,
       required: true,
@@ -67,6 +74,7 @@ const quizSchema = new schema(
 
     isPublicQuiz: {
       type: Boolean,
+      default: false,
       required: true,
     },
     allowedUser: {

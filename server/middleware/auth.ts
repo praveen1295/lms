@@ -15,8 +15,7 @@ export const isAuthenticated = CatchAsyncError(
         new ErrorHandler("Please login to access this resource", 400)
       );
     }
-    const decoded = jwt.decode(access_token) as JwtPayload
-
+    const decoded = jwt.decode(access_token) as JwtPayload;
 
     if (!decoded) {
       return next(new ErrorHandler("access token is not valid", 400));
@@ -38,11 +37,7 @@ export const isAuthenticated = CatchAsyncError(
       //   );
       // }
 
-
-
       const user = await userModel.findById(decoded.id);
-
-      console.log('user0000000', user)
 
       if (!user) {
         return next(new ErrorHandler("User not found, please login", 400));

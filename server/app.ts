@@ -65,6 +65,11 @@ app.use(
   express.static(path.join(rootDir, "PDF_FILES"))
 );
 
+app.use(
+  "/api/v1/static/question_img",
+  express.static(path.join(rootDir, "QUESTION_IMG"))
+);
+
 // API request limit setup
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
