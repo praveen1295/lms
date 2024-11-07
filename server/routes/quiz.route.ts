@@ -103,7 +103,7 @@ router.put(
         .then((status: Boolean) => {
           if (!status) {
             return Promise.reject(
-              "Please enter a valid quiz having atleast one question, and answers with correct option!"
+              "Please enter a valid quiz having at least one question, and answers with correct option!"
             );
           }
         })
