@@ -6,9 +6,9 @@ import Quiz from "../../models/quiz";
 import { ReturnResponse } from "../../utils/interfaces";
 import userModel from "../../models/user.model";
 
-const createQuiz = async (req, res) => {
+const createQuiz: RequestHandler = async (req, res) => {
   try {
-    const createdBy = req.user._id.toString();
+    const createdBy = req?.user?._id.toString();
 
     const {
       name,
@@ -32,16 +32,18 @@ const createQuiz = async (req, res) => {
         : rawQuestionList;
 
     // Attach images to each question in questionList
-    const formattedQuestionList = questionList.map((question, index) => {
-      const questionImgFiles =
-        req.files[`questionList[${index}][questionImg]`] || [];
-      const questionImages = questionImgFiles.map(
-        (file) =>
-          `${process.env.BACKEND_URL}/api/v1/static/question_img/${file.filename}`
-      );
+    const formattedQuestionList = questionList.map(
+      (question: any, index: number) => {
+        const questionImgFiles =
+          req?.files[`questionList[${index}][questionImg]`] || [];
+        const questionImages = questionImgFiles.map(
+          (file: any) =>
+            `${process.env.BACKEND_URL}/api/v1/static/question_img/${file.filename}`
+        );
 
-      return { ...question, questionImages };
-    });
+        return { ...question, questionImages };
+      }
+    );
 
     // Create and save the quiz
     const quiz = new Quiz({
@@ -68,12 +70,12 @@ const createQuiz = async (req, res) => {
       message: "Quiz created successfully",
       data: { quizId: result._id },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error creating quiz:", error);
     res.status(500).json({
       success: false,
       message: "Quiz creation failed",
-      error: error.message,
+      error: error?.message,
     });
   }
 };
