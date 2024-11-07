@@ -6,7 +6,7 @@ import Quiz from "../../models/quiz";
 import { ReturnResponse } from "../../utils/interfaces";
 import userModel from "../../models/user.model";
 
-const createQuiz: RequestHandler = async (req, res) => {
+const createQuiz = async (req: any, res: any) => {
   try {
     const createdBy = req?.user?._id.toString();
 
