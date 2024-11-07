@@ -21,7 +21,7 @@ import favQuestionRoute from "./routes/favQuestion.route";
 
 // Utility imports
 import { rateLimit } from "express-rate-limit";
-import { rootDir, upload } from "./middleware/fileUpload.middleware";
+import { rootDir, cpUpload } from "./middleware/fileUpload.middleware";
 import path from "path";
 
 // Body parser
