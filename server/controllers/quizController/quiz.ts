@@ -229,11 +229,11 @@ const publishQuiz: RequestHandler = async (req, res, next) => {
       throw err;
     }
     console.log("first", quiz.createdBy, req?.user?._id.toString());
-    if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
-      const err = new ProjectError("You are not authorized!");
-      err.statusCode = 403;
-      throw err;
-    }
+    // if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
+    //   const err = new ProjectError("You are not authorized!");
+    //   err.statusCode = 403;
+    //   throw err;
+    // }
 
     if (!!quiz.isPublished) {
       const err = new ProjectError("Quiz is already published!");
