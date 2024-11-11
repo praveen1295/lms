@@ -36,6 +36,8 @@ const createQuiz = async (req: any, res: any) => {
       (question: any, index: number) => {
         const questionImgFiles =
           req?.files[`questionList[${index}][questionImg]`] || [];
+        console.log("questionImgFiles", questionImgFiles);
+
         const questionImages = questionImgFiles.map(
           (file: any) =>
             `${process.env.BACKEND_URL}/api/v1/static/question_img/${file.filename}`
@@ -194,11 +196,11 @@ const deleteQuiz: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
-      const err = new ProjectError("You are not authorized!");
-      err.statusCode = 403;
-      throw err;
-    }
+    // if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
+    //   const err = new ProjectError("You are not authorized!");
+    //   err.statusCode = 403;
+    //   throw err;
+    // }
 
     if (quiz.isPublished) {
       const err = new ProjectError("You cannot delete, published Quiz!");
@@ -270,6 +272,8 @@ const isValidQuiz = async (
 ) => {
   // Check if questionList is non-empty
   console.log("answers", answers);
+  console.log("questionList", questionList);
+
   if (!questionList.length) {
     console.log("Validation failed: questionList is empty.");
     return false;
