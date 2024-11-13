@@ -26,7 +26,7 @@
 // //       cb(null, path.join(rootDir, "PDF_FILES"));
 // //     } else if (file.fieldname === "thumbnail") {
 // //       cb(null, path.join(rootDir, "THUMBNAIL"));
-// //     } else if (file.fieldname === "questionImg") {
+// //     } else if (file.fieldname === "newQuestionImages") {
 // //       cb(null, path.join(rootDir, "QUESTION_IMG"));
 // //     }
 // //   },
@@ -53,7 +53,7 @@
 
 // const storage = multer.diskStorage({
 //   destination: (req, file, cb) => {
-//     if (file.fieldname === "questionList[0][questionImg]") {
+//     if (file.fieldname === "questionList[0][newQuestionImages]") {
 //       cb(null, path.join(rootDir, "QUESTION_IMG"));
 //     } else if (file.fieldname === "thumbnail") {
 //       cb(null, path.join(rootDir, "THUMBNAIL"));
@@ -74,8 +74,8 @@
 // const cpUpload = upload.fields([
 //   { name: "thumbnail", maxCount: 1 },
 //   { name: "coarsePdf", maxCount: 1 },
-//   { name: "questionList[0][questionImg]", maxCount: 1 },
-//   { name: "questionList[1][questionImg]", maxCount: 1 },
+//   { name: "questionList[0][newQuestionImages]", maxCount: 1 },
+//   { name: "questionList[1][newQuestionImages]", maxCount: 1 },
 //   // Add more as needed for each question's image file
 // ]);
 
@@ -97,7 +97,7 @@ const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     if (
       file.fieldname.startsWith("questionList") &&
-      file.fieldname.endsWith("[questionImg]")
+      file.fieldname.endsWith("[newQuestionImages]")
     ) {
       cb(null, path.join(rootDir, "QUESTION_IMG"));
     } else if (file.fieldname === "thumbnail") {
@@ -113,16 +113,16 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-// Dynamically add questionImg fields for multiple questions
-const questionImgFields = Array.from({ length: 10 }, (_, index) => ({
-  name: `questionList[${index}][questionImg]`,
+// Dynamically add newQuestionImages fields for multiple questions
+const newQuestionImagesFields = Array.from({ length: 10 }, (_, index) => ({
+  name: `questionList[${index}][newQuestionImages]`,
   maxCount: 5,
 }));
 
 const cpUpload = upload.fields([
   { name: "thumbnail", maxCount: 1 },
   { name: "coarsePdf", maxCount: 1 },
-  ...questionImgFields, // Spread the dynamically created fields
+  ...newQuestionImagesFields, // Spread the dynamically created fields
 ]);
 
 export { cpUpload };

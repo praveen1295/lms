@@ -4,7 +4,7 @@ import { body } from "express-validator";
 import {
   createQuiz,
   deleteQuiz,
-  getQuiz,
+  getQuizById,
   isValidQuiz,
   isValidQuizName,
   publishQuiz,
@@ -18,7 +18,7 @@ import { isAuthenticated } from "../middleware/auth";
 import { cpUpload } from "../middleware/fileUpload.middleware";
 // import { upload } from "../middleware/fileUpload.middleware";
 // const cpUpload = upload.fields([
-//   { name: "questionImg", maxCount: 10 },
+//   { name: "newQuestionImages", maxCount: 10 },
 //   // { name: "assetsPhoto", maxCount: 10 },
 //   // { name: "thumbnail", maxCount: 1 },
 //   // { name: "bannerImg", maxCount: 5 },
@@ -72,7 +72,7 @@ router.post(
 );
 
 //Get  quiz/allpublished quiz
-router.get("/allpublishedquiz", getAllQuiz);
+router.get("/getAllQuiz", getAllQuiz);
 
 //Get  quiz/allpublished quiz/exam
 router.get("/allpublishedquiz/exam", isAuthenticated, getAllQuizExam);
@@ -82,7 +82,7 @@ router.get("/allpublishedquiz/test", getAllQuizTest);
 
 // get
 // GET /quiz/:quizId
-router.get("/:quizId", getQuiz);
+router.get("/:quizId", getQuizById);
 
 //
 

@@ -34,11 +34,11 @@ const createQuiz = async (req: any, res: any) => {
     // Attach images to each question in questionList
     const formattedQuestionList = questionList.map(
       (question: any, index: number) => {
-        const questionImgFiles =
-          req?.files[`questionList[${index}][questionImg]`] || [];
-        console.log("questionImgFiles", questionImgFiles);
+        const newQuestionImagesFiles =
+          req?.files[`questionList[${index}][newQuestionImages]`] || [];
+        console.log("newQuestionImagesFiles", newQuestionImagesFiles);
 
-        const questionImages = questionImgFiles.map(
+        const questionImages = newQuestionImagesFiles.map(
           (file: any) =>
             `${process.env.BACKEND_URL}/api/v1/static/question_img/${file.filename}`
         );
@@ -82,22 +82,25 @@ const createQuiz = async (req: any, res: any) => {
   }
 };
 
-const getQuiz: RequestHandler = async (req, res, next) => {
+const getQuizById: RequestHandler = async (req, res, next) => {
   try {
     const quizId = req.params.quizId;
     console.log("quizId", quizId);
     let quiz;
     if (quizId) {
-      quiz = await Quiz.findById(quizId, {
-        name: 1,
-        category: 1,
-        questionList: 1,
-        answers: 1,
-        createdBy: 1,
-        passingPercentage: 1,
-        isPublicQuiz: 1,
-        allowedUser: 1,
-      });
+      quiz = await Quiz.findById(
+        quizId
+        //    {
+        //   name: 1,
+        //   category: 1,
+        //   questionList: 1,
+        //   answers: 1,
+        //   createdBy: 1,
+        //   passingPercentage: 1,
+        //   isPublicQuiz: 1,
+        //   allowedUser: 1,
+        // }
+      );
 
       if (!quiz) {
         const err = new ProjectError("No quiz found!");
@@ -266,7 +269,7 @@ const isValidQuiz = async (
     questionNumber: string;
     question: string;
     options: Record<string, string>;
-    questionImg: any;
+    newQuestionImages: any;
   }[],
   answers: Record<string, string>
 ) => {
@@ -345,21 +348,39 @@ const isValidQuizName = async (name: String) => {
 
 const getAllQuiz: RequestHandler = async (req, res, next) => {
   try {
-    const { filterType } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
+    const { filterType, quizType } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
 
-    let quiz = await Quiz.find(
-      { isPublished: true },
-      {
-        name: 1,
-        category: 1,
-        questionList: 1,
-        createdBy: 1,
-        passingPercentage: 1,
-        isPublicQuiz: 1,
-        allowedUser: 1,
-        isPaid: 1, // assuming you have an 'isPaid' field for filtering paid/free quizzes
-      }
-    );
+    let query: any = {};
+
+    if (quizType === "public") {
+      query.isPublic = true;
+    }
+
+    if (quizType === "private") {
+      query.isPublic = false;
+    }
+
+    if (quizType === "published") {
+      query.isPublished = true;
+    }
+
+    if (quizType === "unPublished") {
+      query.isPublished = false;
+    }
+
+    let quiz = await Quiz.find(query, {
+      name: 1,
+      category: 1,
+      questionList: 1,
+      createdBy: 1,
+      passingPercentage: 1,
+      isPublicQuiz: 1,
+      allowedUser: 1,
+      isPaid: 1,
+      isPublished: 1,
+      examName: 1,
+      difficultyLevel: 1,
+    });
 
     // Filter quizzes created by user itself
     quiz = quiz.filter((item) => {
@@ -481,8 +502,6 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    console.log("quizzzzz======", quiz);
-
     const resp: ReturnResponse = {
       status: "success",
       message: "All Test Quizzes",
@@ -497,7 +516,7 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
 export {
   createQuiz,
   deleteQuiz,
-  getQuiz,
+  getQuizById,
   isValidQuiz,
   isValidQuizName,
   publishQuiz,
