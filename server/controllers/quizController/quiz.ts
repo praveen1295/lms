@@ -1,75 +1,107 @@
 //model
 import { RequestHandler } from "express";
-
+import fs from "fs";
 import ProjectError from "../../helper/error";
 import Quiz from "../../models/quiz";
 import { ReturnResponse } from "../../utils/interfaces";
 import userModel from "../../models/user.model";
-
-const createQuiz: RequestHandler = async (req, res, next) => {
+import { rootDir } from "../../middleware/fileUpload.middleware";
+console.log("rootDir", rootDir);
+const createQuiz = async (req: any, res: any) => {
   try {
     const createdBy = req?.user?._id.toString();
 
-    const user: any = await userModel.findById(req.user?._id);
-
-    if (user.role !== "admin") {
-      const resp: ReturnResponse = {
-        status: "error",
-        message: "Quiz not created!",
-        data: { message: "Only admin/owner can able to create quiz." },
-      };
-      return res.status(500).send(resp);
-    }
-
-    const name = req.body.name;
-    const category = req.body.category;
-    const difficultyLevel = req.body.difficultyLevel;
-    const questionList = req.body.questionList;
-    const answers = req.body.answers;
-    const passingPercentage = req.body.passingPercentage;
-    const attemptsAllowedPerUser = req.body.attemptsAllowedPerUser;
-    const isPublicQuiz = req.body.isPublicQuiz;
-    const allowedUser = req.body.allowedUser;
-    const quiz = new Quiz({
+    const {
       name,
+      description,
       category,
       difficultyLevel,
-      questionList,
-      answers,
       passingPercentage,
-      createdBy,
       attemptsAllowedPerUser,
       isPublicQuiz,
       allowedUser,
+      answers,
+      examName,
+      isShuffle,
+      duration,
+      questionList: rawQuestionList,
+    } = req.body;
+
+    const questionList =
+      typeof rawQuestionList === "string"
+        ? JSON.parse(rawQuestionList)
+        : rawQuestionList;
+
+    // Attach images to each question in questionList
+    const formattedQuestionList = questionList.map(
+      (question: any, index: number) => {
+        const newQuestionImagesFiles =
+          req?.files[`questionList[${index}][newQuestionImages]`] || [];
+        console.log("newQuestionImagesFiles", newQuestionImagesFiles);
+
+        const questionImages = newQuestionImagesFiles.map(
+          (file: any) =>
+            `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/${file.filename}`
+        );
+
+        return { ...question, questionImages };
+      }
+    );
+
+    // Create and save the quiz
+    const quiz = new Quiz({
+      name,
+      description,
+      category,
+      difficultyLevel,
+      questionList: formattedQuestionList,
+      passingPercentage,
+      attemptsAllowedPerUser,
+      isPublicQuiz: isPublicQuiz === "true" ? true : false,
+      allowedUser,
+      createdBy,
+      answers,
+      examName,
+      isShuffle: isShuffle === "true" ? true : false,
+      duration: Number(duration),
     });
+
     const result = await quiz.save();
-    const resp: ReturnResponse = {
-      status: "success",
+
+    res.status(201).json({
+      success: true,
       message: "Quiz created successfully",
       data: { quizId: result._id },
-    };
-    res.status(201).send(resp);
-  } catch (error) {
-    next(error);
+    });
+  } catch (error: any) {
+    console.error("Error creating quiz:", error);
+    res.status(500).json({
+      success: false,
+      message: "Quiz creation failed",
+      error: error?.message,
+    });
   }
 };
 
-const getQuiz: RequestHandler = async (req, res, next) => {
+const getQuizById: RequestHandler = async (req, res, next) => {
   try {
     const quizId = req.params.quizId;
     console.log("quizId", quizId);
     let quiz;
     if (quizId) {
-      quiz = await Quiz.findById(quizId, {
-        name: 1,
-        category: 1,
-        questionList: 1,
-        answers: 1,
-        createdBy: 1,
-        passingPercentage: 1,
-        isPublicQuiz: 1,
-        allowedUser: 1,
-      });
+      quiz = await Quiz.findById(
+        quizId
+        //    {
+        //   name: 1,
+        //   category: 1,
+        //   questionList: 1,
+        //   answers: 1,
+        //   createdBy: 1,
+        //   passingPercentage: 1,
+        //   isPublicQuiz: 1,
+        //   allowedUser: 1,
+        // }
+      );
 
       if (!quiz) {
         const err = new ProjectError("No quiz found!");
@@ -107,9 +139,10 @@ const getQuiz: RequestHandler = async (req, res, next) => {
   }
 };
 
-const updateQuiz: RequestHandler = async (req, res, next) => {
+const updateQuiz: RequestHandler = async (req: any, res, next) => {
   try {
     const quizId = req.body._id;
+
     const quiz = await Quiz.findById(quizId);
 
     if (!quiz) {
@@ -125,20 +158,70 @@ const updateQuiz: RequestHandler = async (req, res, next) => {
     }
 
     if (quiz.isPublished) {
-      const err = new ProjectError("You cannot update, published Quiz!");
+      const err = new ProjectError("You cannot update a published Quiz!");
       err.statusCode = 405;
       throw err;
     }
-    if (quiz.name != req.body.name) {
-      let status = await isValidQuizName(req.body.name);
+
+    if (quiz.name !== req.body.name) {
+      const status = await isValidQuizName(req.body.name);
       if (!status) {
-        const err = new ProjectError("Please enter an unique quiz name.");
+        const err = new ProjectError("Please enter a unique quiz name.");
         err.statusCode = 422;
         throw err;
       }
       quiz.name = req.body.name;
     }
-    quiz.questionList = req.body.questionList;
+
+    // Parse questionList if it's a string
+    const updatedQuestionList =
+      typeof req.body.questionList === "string"
+        ? JSON.parse(req.body.questionList)
+        : req.body.questionList;
+
+    // Update each question's images if provided, and delete old images if replaced
+    const formattedQuestionList = updatedQuestionList.map(
+      (question: any, index: number) => {
+        const newQuestionImagesFiles =
+          req?.files[`questionList[${index}][newQuestionImages]`] || [];
+
+        // If new images are provided, delete the old images
+        if (newQuestionImagesFiles.length > 0 && question.questionImages) {
+          question.questionImages.forEach((imageUrl: string) => {
+            // Logic to delete the old image file, e.g., using `fs.unlink`
+            const filePath = imageUrl.replace(
+              `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/`,
+              ""
+            );
+            const fullFilePath = `${rootDir}/QUESTION_IMG/${filePath}`;
+
+            fs.unlink(fullFilePath, (err: any) => {
+              if (err) {
+                console.error(`Error deleting file: ${filePath}`, err);
+              } else {
+                console.log(`Deleted old image file: ${filePath}`);
+              }
+            });
+          });
+        }
+
+        // Map new images
+        const questionImages = newQuestionImagesFiles.map(
+          (file: any) =>
+            `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/${file.filename}`
+        );
+
+        // Use new images if available, otherwise keep existing images
+        const updatedImages = questionImages.length
+          ? questionImages
+          : question.questionImages || [];
+
+        return { ...question, questionImages: updatedImages };
+      }
+    );
+
+    // Update quiz fields
+    quiz.questionList = formattedQuestionList;
     quiz.answers = req.body.answers;
     quiz.passingPercentage = req.body.passingPercentage;
     quiz.isPublicQuiz = req.body.isPublicQuiz;
@@ -168,11 +251,11 @@ const deleteQuiz: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
-      const err = new ProjectError("You are not authorized!");
-      err.statusCode = 403;
-      throw err;
-    }
+    // if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
+    //   const err = new ProjectError("You are not authorized!");
+    //   err.statusCode = 403;
+    //   throw err;
+    // }
 
     if (quiz.isPublished) {
       const err = new ProjectError("You cannot delete, published Quiz!");
@@ -202,12 +285,11 @@ const publishQuiz: RequestHandler = async (req, res, next) => {
       err.statusCode = 404;
       throw err;
     }
-    console.log("first", quiz.createdBy, req?.user?._id.toString());
-    if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
-      const err = new ProjectError("You are not authorized!");
-      err.statusCode = 403;
-      throw err;
-    }
+    // if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
+    //   const err = new ProjectError("You are not authorized!");
+    //   err.statusCode = 403;
+    //   throw err;
+    // }
 
     if (!!quiz.isPublished) {
       const err = new ProjectError("Quiz is already published!");
@@ -234,34 +316,78 @@ const publishQuiz: RequestHandler = async (req, res, next) => {
 };
 
 const isValidQuiz = async (
-  questionList: [{ questionNumber: Number; question: String; options: {} }],
-  answers: {}
+  questionList: {
+    questionNumber: string;
+    question: string;
+    options: Record<string, string>;
+    newQuestionImages: any;
+  }[],
+  answers: Record<string, string>
 ) => {
+  // Check if questionList is non-empty
+  console.log("answers", answers);
+  console.log("questionList", questionList);
+
   if (!questionList.length) {
+    console.log("Validation failed: questionList is empty.");
     return false;
   }
-  if (questionList.length != Object.keys(answers).length) {
+
+  // Ensure each question has a corresponding answer
+  if (questionList.length !== Object.keys(answers).length) {
+    console.log(
+      "Validation failed: Number of questions and answers do not match."
+    );
     return false;
   }
-  let flag = true;
-  questionList.forEach(
-    (question: { questionNumber: Number; question: String; options: {} }) => {
-      let opt = Object.keys(question["options"]);
-      if (
-        opt.indexOf(
-          `${
-            Object.values(answers)[
-              Object.keys(answers).indexOf(question.questionNumber.toString())
-            ]
-          }`
-        ) == -1
-      ) {
-        flag = false;
-      }
+
+  // Validate each question and its corresponding answer
+  let isValid = true;
+  questionList.forEach((question) => {
+    const answerKey = question.questionNumber.toString(); // Ensure consistent key format
+    const answerValue = answers[answerKey];
+
+    // Check if the answer exists in the options
+    if (!answerValue || !question.options[answerValue]) {
+      console.log(
+        `Validation failed: No matching option for answer "${answerValue}" in question ${question.questionNumber}`
+      );
+      isValid = false;
     }
-  );
-  return flag;
+  });
+
+  return isValid;
 };
+
+// const isValidQuiz = async (
+//   questionList: [{ questionNumber: Number; question: String; options: {} }],
+//   answers: {}
+// ) => {
+//   if (!questionList.length) {
+//     return false;
+//   }
+//   if (questionList.length != Object.keys(answers).length) {
+//     return false;
+//   }
+//   let flag = true;
+//   questionList.forEach(
+//     (question: { questionNumber: Number; question: String; options: {} }) => {
+//       let opt = Object.keys(question["options"]);
+//       if (
+//         opt.indexOf(
+//           `${
+//             Object.values(answers)[
+//               Object.keys(answers).indexOf(question.questionNumber.toString())
+//             ]
+//           }`
+//         ) == -1
+//       ) {
+//         flag = false;
+//       }
+//     }
+//   );
+//   return flag;
+// };
 
 const isValidQuizName = async (name: String) => {
   const quiz = await Quiz.findOne({ name });
@@ -273,21 +399,39 @@ const isValidQuizName = async (name: String) => {
 
 const getAllQuiz: RequestHandler = async (req, res, next) => {
   try {
-    const { filterType } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
+    const { filterType, quizType } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
 
-    let quiz = await Quiz.find(
-      { isPublished: true },
-      {
-        name: 1,
-        category: 1,
-        questionList: 1,
-        createdBy: 1,
-        passingPercentage: 1,
-        isPublicQuiz: 1,
-        allowedUser: 1,
-        isPaid: 1, // assuming you have an 'isPaid' field for filtering paid/free quizzes
-      }
-    );
+    let query: any = {};
+
+    if (quizType === "public") {
+      query.isPublic = true;
+    }
+
+    if (quizType === "private") {
+      query.isPublic = false;
+    }
+
+    if (quizType === "published") {
+      query.isPublished = true;
+    }
+
+    if (quizType === "unPublished") {
+      query.isPublished = false;
+    }
+
+    let quiz = await Quiz.find(query, {
+      name: 1,
+      category: 1,
+      questionList: 1,
+      createdBy: 1,
+      passingPercentage: 1,
+      isPublicQuiz: 1,
+      allowedUser: 1,
+      isPaid: 1,
+      isPublished: 1,
+      examName: 1,
+      difficultyLevel: 1,
+    });
 
     // Filter quizzes created by user itself
     quiz = quiz.filter((item) => {
@@ -389,7 +533,7 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
         passingPercentage: 1,
         isPublicQuiz: 1,
         allowedUser: 1,
-        isPaid: 1, // assuming there's an 'isPaid' field for filtering paid/free quizzes
+        isPaid: 1,
         isDemo: 1,
         examName: 1,
       }
@@ -409,8 +553,6 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    console.log("quizzzzz======", quiz);
-
     const resp: ReturnResponse = {
       status: "success",
       message: "All Test Quizzes",
@@ -425,7 +567,7 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
 export {
   createQuiz,
   deleteQuiz,
-  getQuiz,
+  getQuizById,
   isValidQuiz,
   isValidQuizName,
   publishQuiz,

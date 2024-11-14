@@ -13,12 +13,30 @@ const quizSchema = new schema(
       type: String,
       required: true,
     },
+    description: {
+      type: String,
+    },
     testCategory: {
       type: String,
       require: true,
     },
     examName: {
       type: String,
+      required: true,
+      // enum: ["nursing, GNST/PNST"],
+    },
+    duration: {
+      type: Number,
+      required: true,
+    },
+
+    isShowTimer: {
+      type: Boolean,
+      require: true,
+    },
+
+    isShuffle: {
+      type: Boolean,
       required: true,
     },
     difficultyLevel: {
@@ -31,9 +49,16 @@ const quizSchema = new schema(
         questionNumber: Number,
         question: String,
         options: {},
+        questionImages: {
+          type: Array,
+          default: [],
+        },
       },
     ],
-    answers: {},
+    answers: {
+      type: Object,
+      require: true,
+    },
     passingPercentage: {
       type: Number,
       required: true,
@@ -49,6 +74,7 @@ const quizSchema = new schema(
 
     isPublicQuiz: {
       type: Boolean,
+      default: false,
       required: true,
     },
     allowedUser: {
