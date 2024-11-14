@@ -1,11 +1,12 @@
 //model
 import { RequestHandler } from "express";
-
+import fs from "fs";
 import ProjectError from "../../helper/error";
 import Quiz from "../../models/quiz";
 import { ReturnResponse } from "../../utils/interfaces";
 import userModel from "../../models/user.model";
-
+import { rootDir } from "../../middleware/fileUpload.middleware";
+console.log("rootDir", rootDir);
 const createQuiz = async (req: any, res: any) => {
   try {
     const createdBy = req?.user?._id.toString();
@@ -40,7 +41,7 @@ const createQuiz = async (req: any, res: any) => {
 
         const questionImages = newQuestionImagesFiles.map(
           (file: any) =>
-            `${process.env.BACKEND_URL}/api/v1/static/question_img/${file.filename}`
+            `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/${file.filename}`
         );
 
         return { ...question, questionImages };
@@ -138,9 +139,10 @@ const getQuizById: RequestHandler = async (req, res, next) => {
   }
 };
 
-const updateQuiz: RequestHandler = async (req, res, next) => {
+const updateQuiz: RequestHandler = async (req: any, res, next) => {
   try {
     const quizId = req.body._id;
+
     const quiz = await Quiz.findById(quizId);
 
     if (!quiz) {
@@ -156,20 +158,70 @@ const updateQuiz: RequestHandler = async (req, res, next) => {
     }
 
     if (quiz.isPublished) {
-      const err = new ProjectError("You cannot update, published Quiz!");
+      const err = new ProjectError("You cannot update a published Quiz!");
       err.statusCode = 405;
       throw err;
     }
-    if (quiz.name != req.body.name) {
-      let status = await isValidQuizName(req.body.name);
+
+    if (quiz.name !== req.body.name) {
+      const status = await isValidQuizName(req.body.name);
       if (!status) {
-        const err = new ProjectError("Please enter an unique quiz name.");
+        const err = new ProjectError("Please enter a unique quiz name.");
         err.statusCode = 422;
         throw err;
       }
       quiz.name = req.body.name;
     }
-    quiz.questionList = req.body.questionList;
+
+    // Parse questionList if it's a string
+    const updatedQuestionList =
+      typeof req.body.questionList === "string"
+        ? JSON.parse(req.body.questionList)
+        : req.body.questionList;
+
+    // Update each question's images if provided, and delete old images if replaced
+    const formattedQuestionList = updatedQuestionList.map(
+      (question: any, index: number) => {
+        const newQuestionImagesFiles =
+          req?.files[`questionList[${index}][newQuestionImages]`] || [];
+
+        // If new images are provided, delete the old images
+        if (newQuestionImagesFiles.length > 0 && question.questionImages) {
+          question.questionImages.forEach((imageUrl: string) => {
+            // Logic to delete the old image file, e.g., using `fs.unlink`
+            const filePath = imageUrl.replace(
+              `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/`,
+              ""
+            );
+            const fullFilePath = `${rootDir}/QUESTION_IMG/${filePath}`;
+
+            fs.unlink(fullFilePath, (err: any) => {
+              if (err) {
+                console.error(`Error deleting file: ${filePath}`, err);
+              } else {
+                console.log(`Deleted old image file: ${filePath}`);
+              }
+            });
+          });
+        }
+
+        // Map new images
+        const questionImages = newQuestionImagesFiles.map(
+          (file: any) =>
+            `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/${file.filename}`
+        );
+
+        // Use new images if available, otherwise keep existing images
+        const updatedImages = questionImages.length
+          ? questionImages
+          : question.questionImages || [];
+
+        return { ...question, questionImages: updatedImages };
+      }
+    );
+
+    // Update quiz fields
+    quiz.questionList = formattedQuestionList;
     quiz.answers = req.body.answers;
     quiz.passingPercentage = req.body.passingPercentage;
     quiz.isPublicQuiz = req.body.isPublicQuiz;
@@ -482,7 +534,7 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
         passingPercentage: 1,
         isPublicQuiz: 1,
         allowedUser: 1,
-        isPaid: 1, // assuming there's an 'isPaid' field for filtering paid/free quizzes
+        isPaid: 1,
         isDemo: 1,
         examName: 1,
       }

@@ -9,6 +9,7 @@ import userModel from "../models/user.model";
 // authenticated user
 export const isAuthenticated = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
+    console.log("rrrrrrrr", req.body);
     const access_token = req.headers["access-token"] as string;
     if (!access_token) {
       return next(

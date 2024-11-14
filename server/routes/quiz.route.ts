@@ -91,15 +91,16 @@ router.get("/:quizId", getQuizById);
 router.put(
   "/",
   isAuthenticated,
+  cpUpload,
   [
     body("name")
       .trim()
       .not()
       .isEmpty()
-      .isLength({ min: 10 })
-      .withMessage("Please enter a valid name, minimum 10 character long"),
+      .isLength({ min: 4 })
+      .withMessage("Please enter a valid name, minimum 4 character long"),
     body("questionList").custom((questionList, { req }) => {
-      return isValidQuiz(questionList, req.body["answers"])
+      return isValidQuiz(questionList, JSON.parse(req.body["answers"]))
         .then((status: Boolean) => {
           if (!status) {
             return Promise.reject(
