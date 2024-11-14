@@ -285,7 +285,6 @@ const publishQuiz: RequestHandler = async (req, res, next) => {
       err.statusCode = 404;
       throw err;
     }
-    console.log("first", quiz.createdBy, req?.user?._id.toString());
     // if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
     //   const err = new ProjectError("You are not authorized!");
     //   err.statusCode = 403;
