@@ -143,6 +143,8 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
   try {
     const quizId = req.body._id;
 
+    console.log("req.body", req.body);
+
     const quiz = await Quiz.findById(quizId);
 
     if (!quiz) {
@@ -238,6 +240,8 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
         (question: any, index: number) => {
           const oldQuestionImages = question.oldQuestionImages || [];
 
+          console.log("oldQuestionImages", oldQuestionImages);
+
           const deleteQuestionImages = quiz.questionList
             .filter(
               (item) => item._id.toString() === question._id.toString()
@@ -245,6 +249,8 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
             .questionImages.filter(
               (image) => !oldQuestionImages.includes(image)
             );
+
+          console.log("deleteQuestionImages", deleteQuestionImages);
 
           const newQuestionImagesFiles =
             req?.files[`questionList[${index}][newQuestionImages]`] || [];
@@ -278,6 +284,8 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
           const updatedImages = questionImages.length
             ? [questionImages]
             : question.questionImages || [];
+
+          console.log("updatedImages", updatedImages);
 
           return {
             ...question,
