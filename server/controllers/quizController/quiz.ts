@@ -587,7 +587,11 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
     const { filterType, examName } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
     console.log("examName", examName, "filterType", filterType);
     let quiz = await Quiz.find(
-      { isPublished: true, category: "test", examName },
+      {
+        isPublished: true,
+        examName,
+        // , category: "test"
+      },
       {
         name: 1,
         category: 1,
