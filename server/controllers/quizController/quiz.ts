@@ -151,11 +151,11 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
       throw err;
     }
 
-    if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
-      const err = new ProjectError("You are not authorized!");
-      err.statusCode = 403;
-      throw err;
-    }
+    // if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
+    //   const err = new ProjectError("You are not authorized!");
+    //   err.statusCode = 403;
+    //   throw err;
+    // }
 
     if (quiz.isPublished) {
       const err = new ProjectError("You cannot update a published Quiz!");
@@ -163,7 +163,8 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
       throw err;
     }
 
-    if (quiz.name !== req.body.name) {
+    // Check for unique quiz name if it is being changed
+    if (req.body.name && quiz.name !== req.body.name) {
       const status = await isValidQuizName(req.body.name);
       if (!status) {
         const err = new ProjectError("Please enter a unique quiz name.");
@@ -173,60 +174,122 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
       quiz.name = req.body.name;
     }
 
-    // Parse questionList if it's a string
-    const updatedQuestionList =
-      typeof req.body.questionList === "string"
-        ? JSON.parse(req.body.questionList)
-        : req.body.questionList;
+    // Update fields if they are present in the request
+    if (req.body.description) {
+      quiz.description = req.body.description;
+    }
 
-    // Update each question's images if provided, and delete old images if replaced
-    const formattedQuestionList = updatedQuestionList.map(
-      (question: any, index: number) => {
-        const newQuestionImagesFiles =
-          req?.files[`questionList[${index}][newQuestionImages]`] || [];
+    if (req.body.category) {
+      quiz.category = req.body.category;
+    }
 
-        // If new images are provided, delete the old images
-        if (newQuestionImagesFiles.length > 0 && question.questionImages) {
-          question.questionImages.forEach((imageUrl: string) => {
-            // Logic to delete the old image file, e.g., using `fs.unlink`
-            const filePath = imageUrl.replace(
-              `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/`,
-              ""
+    if (req.body.examName) {
+      quiz.examName = req.body.examName;
+    }
+
+    if (req.body.duration !== undefined) {
+      quiz.duration = req.body.duration;
+    }
+
+    if (req.body.isShuffle !== undefined) {
+      quiz.isShuffle = req.body.isShuffle;
+    }
+
+    if (req.body.difficultyLevel) {
+      quiz.difficultyLevel = req.body.difficultyLevel;
+    }
+
+    if (req.body.answers) {
+      quiz.answers = req.body.answers;
+    }
+
+    if (req.body.passingPercentage !== undefined) {
+      quiz.passingPercentage = req.body.passingPercentage;
+    }
+
+    if (req.body.isPublicQuiz !== undefined) {
+      quiz.isPublicQuiz = req.body.isPublicQuiz;
+    }
+
+    if (req.body.allowedUser) {
+      quiz.allowedUser = req.body.allowedUser;
+    }
+
+    if (req.body.isPaid !== undefined) {
+      quiz.isPaid = req.body.isPaid;
+    }
+
+    if (req.body.isDemo !== undefined) {
+      quiz.isDemo = req.body.isDemo;
+    }
+
+    if (req.body.attemptsAllowedPerUser !== undefined) {
+      quiz.attemptsAllowedPerUser = req.body.attemptsAllowedPerUser;
+    }
+
+    // Parse and update questionList if provided
+    if (req.body.questionList) {
+      const updatedQuestionList =
+        typeof req.body.questionList === "string"
+          ? JSON.parse(req.body.questionList)
+          : req.body.questionList;
+
+      const formattedQuestionList = updatedQuestionList.map(
+        (question: any, index: number) => {
+          const oldQuestionImages = question.oldQuestionImages || [];
+
+          const deleteQuestionImages = quiz.questionList
+            .filter(
+              (item) => item._id.toString() === question._id.toString()
+            )[0]
+            .questionImages.filter(
+              (image) => !oldQuestionImages.includes(image)
             );
-            const fullFilePath = `${rootDir}/QUESTION_IMG/${filePath}`;
 
-            fs.unlink(fullFilePath, (err: any) => {
-              if (err) {
-                console.error(`Error deleting file: ${filePath}`, err);
-              } else {
-                console.log(`Deleted old image file: ${filePath}`);
-              }
+          const newQuestionImagesFiles =
+            req?.files[`questionList[${index}][newQuestionImages]`] || [];
+
+          // If new images are provided, delete the old images
+          if (deleteQuestionImages.length > 0 && question.questionImages) {
+            deleteQuestionImages.forEach((imageUrl: string) => {
+              const filePath = imageUrl.replace(
+                `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/`,
+                ""
+              );
+              const fullFilePath = `${rootDir}/QUESTION_IMG/${filePath}`;
+
+              fs.unlink(fullFilePath, (err: any) => {
+                if (err) {
+                  console.error(`Error deleting file: ${filePath}`, err);
+                } else {
+                  console.log(`Deleted old image file: ${filePath}`);
+                }
+              });
             });
-          });
+          }
+
+          // Map new images
+          const questionImages = newQuestionImagesFiles.map(
+            (file: any) =>
+              `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/${file.filename}`
+          );
+
+          // Use new images if available, otherwise keep existing images
+          const updatedImages = questionImages.length
+            ? [questionImages]
+            : question.questionImages || [];
+
+          return {
+            ...question,
+            questionImages: [updatedImages, ...oldQuestionImages],
+          };
         }
+      );
 
-        // Map new images
-        const questionImages = newQuestionImagesFiles.map(
-          (file: any) =>
-            `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/${file.filename}`
-        );
+      quiz.questionList = formattedQuestionList;
+    }
 
-        // Use new images if available, otherwise keep existing images
-        const updatedImages = questionImages.length
-          ? questionImages
-          : question.questionImages || [];
-
-        return { ...question, questionImages: updatedImages };
-      }
-    );
-
-    // Update quiz fields
-    quiz.questionList = formattedQuestionList;
-    quiz.answers = req.body.answers;
-    quiz.passingPercentage = req.body.passingPercentage;
-    quiz.isPublicQuiz = req.body.isPublicQuiz;
-    quiz.allowedUser = req.body.allowedUser;
-
+    // Save updated quiz
     await quiz.save();
 
     const resp: ReturnResponse = {

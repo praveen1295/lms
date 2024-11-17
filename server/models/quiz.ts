@@ -23,18 +23,15 @@ const quizSchema = new schema(
     examName: {
       type: String,
       required: true,
-      // enum: ["nursing, GNST/PNST"],
     },
     duration: {
       type: Number,
       required: true,
     },
-
     isShowTimer: {
       type: Boolean,
       require: true,
     },
-
     isShuffle: {
       type: Boolean,
       required: true,
@@ -46,6 +43,10 @@ const quizSchema = new schema(
     },
     questionList: [
       {
+        _id: {
+          type: mongoose.Schema.Types.ObjectId,
+          default: new mongoose.Types.ObjectId(), // Automatically generate a unique ID
+        },
         questionNumber: Number,
         question: String,
         options: {},
@@ -71,7 +72,6 @@ const quizSchema = new schema(
       type: Boolean,
       default: false,
     },
-
     isPublicQuiz: {
       type: Boolean,
       default: false,
@@ -82,18 +82,14 @@ const quizSchema = new schema(
       default: [],
     },
     attemptsAllowedPerUser: {
-      //how many times quiz can be attempted by user
-      type: Number, //required is false, if not provided quiz can be attempted multiple times
+      type: Number,
     },
     attemptedUsers: [
-      //Stores an array of objects users who have attempted the quiz
       {
-        //and number of attempts left
         id: String,
         attemptsLeft: Number,
       },
     ],
-
     isPaid: {
       type: Boolean,
       default: true,
