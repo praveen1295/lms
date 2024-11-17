@@ -505,13 +505,13 @@ const getAllQuiz: RequestHandler = async (req, res, next) => {
     });
 
     // Filter quizzes created by user itself
-    quiz = quiz.filter((item) => {
-      return (
-        (item.isPublicQuiz ||
-          item.allowedUser.includes(req?.user?._id.toString())) &&
-        item.createdBy.toString() !== req?.user?._id.toString()
-      );
-    });
+    // quiz = quiz.filter((item) => {
+    //   return (
+    //     (item.isPublicQuiz ||
+    //       item.allowedUser.includes(req?.user?._id.toString())) &&
+    //     item.createdBy.toString() !== req?.user?._id.toString()
+    //   );
+    // });
 
     // Apply additional filter based on query parameter
     if (filterType === "paid") {
