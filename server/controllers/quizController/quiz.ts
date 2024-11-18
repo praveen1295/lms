@@ -60,7 +60,7 @@ const createQuiz = async (req: any, res: any) => {
       isPublicQuiz: isPublicQuiz === "true" ? true : false,
       allowedUser,
       createdBy,
-      answers,
+      answers: typeof answers === "string" ? JSON.parse(answers) : answers,
       examName,
       isShuffle: isShuffle === "true" ? true : false,
       duration: Number(duration),

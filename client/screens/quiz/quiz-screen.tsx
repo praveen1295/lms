@@ -3,7 +3,7 @@ import useUser from "@/hooks/auth/useUser";
 import { SERVER_URI } from "@/utils/uri";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -54,13 +54,13 @@ const QuizScreen = () => {
   };
 
   const handleSubmit = async () => {
-    if (Object.keys(selectedAnswers).length !== quiz.questionList.length) {
-      Alert.alert(
-        "Incomplete",
-        "Please answer all questions before submitting."
-      );
-      return;
-    }
+    // if (Object.keys(selectedAnswers).length !== quiz.questionList.length) {
+    //   Alert.alert(
+    //     "Incomplete",
+    //     "Please answer all questions before submitting."
+    //   );
+    //   return;
+    // }
 
     const reportData = {
       quizId,
@@ -84,12 +84,18 @@ const QuizScreen = () => {
         }
       );
 
-      console.log("response", response);
+      console.log("response", response.data);
 
       const { score, result, percentage, attemptedAnswerWithRightAnswer } =
         response.data.data;
 
-      setSubmitted(true);
+      if (response.data.status === "success") {
+        setSubmitted(true);
+        router.push({
+          pathname: "/(routes)/quiz-result",
+          params: { item: JSON.stringify(response.data.data) },
+        });
+      }
 
       Alert.alert(
         result === "Pass" ? "Congrats!" : "Try again",
@@ -274,7 +280,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     color: "#FF0000",
-    textAlign: "center",
+    textAlign: "right",
     marginBottom: 10,
   },
   questionContainer: {

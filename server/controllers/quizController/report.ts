@@ -17,11 +17,13 @@ const getReport: RequestHandler = async (req, res, next) => {
         throw err;
       }
 
-      if (report.userId.toString() !== req.user?._id) {
-        const err = new ProjectError("You are not allowed");
-        err.statusCode = 405;
-        throw err;
-      }
+      // if (report.userId.toString() !== req.user?._id) {
+      //   const err = new ProjectError("You are not allowed");
+      //   err.statusCode = 405;
+      //   throw err;
+      // }
+
+      report = await Report.findById({ _id: req.params.reportId });
     } else {
       report = await Report.find({ userId: req.user?._id });
     }

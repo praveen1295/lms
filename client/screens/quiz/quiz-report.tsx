@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 
 const QuizReport = ({ report }) => {
   // Format the creation date to a readable format
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: any) => {
     const date = new Date(dateString);
     return date.toLocaleString(); // You can customize the format based on your needs
   };
@@ -26,7 +26,7 @@ const QuizReport = ({ report }) => {
         </Text>
         <Text style={styles.infoText}>
           <Text style={styles.label}>Quiz Date:</Text>{" "}
-          {formatDate(report.createdAt.$date)}
+          {formatDate(report.createdAt)}
         </Text>
       </View>
 

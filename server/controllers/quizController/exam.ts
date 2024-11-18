@@ -21,6 +21,7 @@ const startExam: RequestHandler = async (req, res, next) => {
       passingPercentage: 1,
       isPublicQuiz: 1,
       allowedUser: 1,
+      duration: 1,
     });
 
     if (!quiz) {
@@ -187,6 +188,8 @@ const isValidAttempt = async (
   quizId: Mongoose["Types"]["ObjectId"]
 ) => {
   const quiz = await Quiz.findById(quizId);
+
+  console.log("quiz=========>", quiz);
   if (!quiz) {
     const err = new ProjectError("No quiz found!");
     err.statusCode = 404;
@@ -195,8 +198,8 @@ const isValidAttempt = async (
   const answers = quiz.answers;
   const questions = Object.keys(answers);
   const attemptQ = Object.keys(attemptedQuestion);
-  if (attemptQ.length != questions.length) return false;
 
+  // if (attemptQ.length != questions.length) return false;
   let flag = 0;
   attemptQ.forEach((e) => {
     if (questions.indexOf(e) < 0) {

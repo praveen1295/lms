@@ -1,35 +1,58 @@
 import React, { useState, useEffect } from "react";
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import QuizReport from "./quiz-report";
+import Header from "@/components/header/header";
+import { useLocalSearchParams } from "expo-router";
+import { SERVER_URI } from "@/utils/uri";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const QuizResultScreen = () => {
+  const { item } = useLocalSearchParams();
+  const result: any = JSON.parse(item as string);
+  const [loader, setLoader] = useState<boolean>(false);
+
   // Example report data
   const [report, setReport] = useState(null);
 
   useEffect(() => {
     // Simulate fetching report data from server
     const fetchReport = async () => {
-      // Here you would fetch the report data from the API
-      // Example data:
-      const fetchedReport: any = {
-        _id: { $oid: "66f658929857c19ec3ca1d2e" },
-        userId: { $oid: "66ef923d01858bdedf225022" },
-        quizId: { $oid: "66f656859d672a2ae5e7ece0" },
-        score: 7,
-        total: 25,
-        percentage: 28.0,
-        result: "Fail",
-        createdAt: { $date: "2024-09-27T07:02:42.238Z" },
-        updatedAt: { $date: "2024-09-27T07:02:42.238Z" },
-        __v: 0,
-      };
-      setReport(fetchedReport);
+      try {
+        const accessToken = await AsyncStorage.getItem("access_token");
+        const refreshToken = await AsyncStorage.getItem("refresh_token");
+
+        setLoader(true);
+        const response = await axios.get(
+          `${SERVER_URI}/report/${result.reportId}`,
+          {
+            headers: {
+              "access-token": accessToken,
+              "refresh-token": refreshToken,
+            },
+          }
+        );
+        console.log("reeeeeee", response.data);
+        setReport(response.data.data);
+      } catch (error) {
+        console.log("error, report", error);
+      }
     };
 
     fetchReport();
   }, []);
 
-  return <View>{report && <QuizReport report={report} />}</View>;
+  return (
+    <View style={styles.container}>
+      {report && <QuizReport report={report} />}
+    </View>
+  );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: 50,
+  },
+});
 export default QuizResultScreen;
