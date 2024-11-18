@@ -1,4 +1,4 @@
-package com.entranceexamwarriors.app
+package com.conceptleader.app
 
 import android.app.Application
 import android.content.res.Configuration

@@ -29,7 +29,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="concept-leader"/>
-        <data android:scheme="com.entranceexamwarriors.app"/>
+        <data android:scheme="com.conceptleader.app"/>
         <data android:scheme="exp+concept-leader"/>
       </intent-filter>
     </activity>

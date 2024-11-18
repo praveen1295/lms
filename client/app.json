@@ -14,14 +14,20 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.entranceexamwarriors.app"
+      "bundleIdentifier": "com.conceptleader.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.entranceexamwarriors.app"
+      "package": "com.conceptleader.app",
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -44,7 +50,7 @@
         "stripePublishableKey": "pk_test_51PKXAESISP6fGftpqiahHAMAhasIDUGuRNT1U4WwsWV18zN2y7FXqsrBMeg191CPU44XATyN3Wpj5qe4qtzsyuq6002anizgrF"
       },
       "eas": {
-        "projectId": "4000d70e-865c-45e3-ae9c-42345da0d7d7"
+        "projectId": "4f8f8575-3b3a-41a8-ba68-98c5cf16444b"
       }
     }
   }
