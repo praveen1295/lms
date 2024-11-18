@@ -26,8 +26,8 @@ const Page: FC<Props> = (props) => {
   return (
     <div>
       <Heading
-        title="Entrance Exam Warriors - Admin"
-        description="Entrance Exam Warriors is a platform for students to learn and get help from teachers"
+        title="Concept Leader - Admin"
+        description="Concept Leader is a platform for students to learn and get help from teachers"
         keywords="Prograaming,MERN,Redux,Machine Learning"
       />
       <Header open={open} setOpen={setOpen} activeItem={activeItem} />

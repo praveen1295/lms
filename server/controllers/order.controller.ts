@@ -285,9 +285,9 @@ export const newPayment = CatchAsyncError(
       const myPayment = await stripe.paymentIntents.create({
         amount: req.body.amount,
         currency: "INR",
-        description: "Payment for Entrance Exam Warriors course",
+        description: "Payment for Concept Leader course",
         metadata: {
-          company: "Entrance Exam Warriors",
+          company: "Concept Leader",
         },
         automatic_payment_methods: {
           enabled: true,

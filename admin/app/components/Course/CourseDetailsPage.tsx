@@ -51,9 +51,9 @@ const CourseDetailsPage = ({ id }: Props) => {
       ) : (
         <div>
           <Heading
-            title={data.course.name + " - Entrance Exam Warriors"}
+            title={data.course.name + " - Concept Leader"}
             description={
-              "Entrance Exam Warriors is a programming community which is developed by shahriar sajeeb for helping programmers"
+              "Concept Leader is a programming community which is developed by shahriar sajeeb for helping programmers"
             }
             keywords={data?.course?.tags}
           />

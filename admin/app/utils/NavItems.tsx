@@ -55,7 +55,7 @@ const NavItems: React.FC<Props> = ({ activeItem, isMobile }) => {
               <span
                 className={`text-[25px] font-Poppins font-[500] text-black dark:text-white`}
               >
-                Entrance Exam Warriors
+                Concept Leader
               </span>
             </Link>
           </div>

@@ -143,7 +143,7 @@ export default function SignUpScreen() {
           Let's get started!
         </Text>
         <Text style={styles.learningText}>
-          Create an account to entrance exam warriors to get all features
+          Create an account to concept leader to get all features
         </Text>
         <View style={styles.inputContainer}>
           <View>

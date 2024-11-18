@@ -268,7 +268,7 @@ const QuizScreen = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    marginTop: 12,
+    marginTop: 34,
   },
   quizTitle: {
     fontSize: 24,

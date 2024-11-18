@@ -98,7 +98,7 @@ export default function CartScreen() {
   //     console.log("clientSecret", clientSecret);
 
   //     const initSheetResponse = await initPaymentSheet({
-  //       merchantDisplayName: "entrance exam warriors Private Ltd.",
+  //       merchantDisplayName: "concept leader Private Ltd.",
   //       paymentIntentClientSecret: clientSecret,
   //     });
 
@@ -164,7 +164,7 @@ export default function CartScreen() {
 
       // Step 2: Initialize the payment sheet
       const initSheetResponse = await initPaymentSheet({
-        merchantDisplayName: "entrance exam warriors Private Ltd.",
+        merchantDisplayName: "concept leader Private Ltd.",
         paymentIntentClientSecret: clientSecret,
         // Ensure default payment method is enabled
         defaultBillingDetails: {
