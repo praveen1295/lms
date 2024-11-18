@@ -155,6 +155,15 @@ function RootLayoutNav() {
           }}
         />
 
+        <Stack.Screen
+          name="(routes)/test-reports/index"
+          options={{
+            headerShown: true,
+            title: "All Reports",
+            headerBackTitle: "Back",
+          }}
+        />
+
         {/* <Stack.Screen
           name="(routes)/questions/index"
           options={{

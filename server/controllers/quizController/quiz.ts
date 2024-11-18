@@ -611,6 +611,7 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
         isPaid: 1,
         isDemo: 1,
         examName: 1,
+        attemptedUsers: 1,
       }
     );
 

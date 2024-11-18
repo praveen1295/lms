@@ -3,8 +3,19 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { router } from "expo-router"; // Import the router directly
 import { LinearGradient } from "expo-linear-gradient"; // Gradient background
 import { Ionicons } from "@expo/vector-icons"; // For lock icon
+import useUser from "@/hooks/auth/useUser";
+import Loader from "../loader/loader";
 
 const TestsCard = ({ item }: { item: any }) => {
+  const { user, loading: userLoading } = useUser();
+
+  if (userLoading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <Loader />
+      </View>
+    );
+  }
   return (
     <TouchableOpacity
       style={styles.cardContainer}
@@ -19,6 +30,9 @@ const TestsCard = ({ item }: { item: any }) => {
       >
         <View style={styles.cardContent}>
           <Text style={styles.title}>{item.name}</Text>
+          {item.attemptedUsers.some(
+            (userAttempt: any) => userAttempt.id === user?._id
+          ) && <Text>You have already attempted this quiz</Text>}
           <Text style={styles.demoText}>
             {item.isDemo ? "Demo Quiz" : "Full Quiz"}
           </Text>
@@ -46,18 +60,51 @@ const TestsCard = ({ item }: { item: any }) => {
 
           {/* Show Start Quiz button if not locked */}
           {!item.locked && (
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() =>
-                !item.locked && // Prevent navigation if the quiz is locked
-                router.push({
-                  pathname: "/(routes)/quiz-instruction",
-                  params: { quiz: JSON.stringify(item) },
-                })
-              }
-            >
-              <Text style={styles.buttonText}>Start Quiz</Text>
-            </TouchableOpacity>
+            <>
+              {item.attemptedUsers.some(
+                (userAttempt: any) => userAttempt.id === user?._id
+              ) ? (
+                <>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() =>
+                      !item.locked && // Prevent navigation if the quiz is locked
+                      router.push({
+                        pathname: "/(routes)/test-reports",
+                        params: { quiz: JSON.stringify(item) },
+                      })
+                    }
+                  >
+                    <Text style={styles.buttonText}>Get Report</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.button}
+                    onPress={() =>
+                      !item.locked && // Prevent navigation if the quiz is locked
+                      router.push({
+                        pathname: "/(routes)/quiz-instruction",
+                        params: { quiz: JSON.stringify(item) },
+                      })
+                    }
+                  >
+                    <Text style={styles.buttonText}>Reattempt Quiz</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <TouchableOpacity
+                  style={styles.button}
+                  onPress={() =>
+                    !item.locked && // Prevent navigation if the quiz is locked
+                    router.push({
+                      pathname: "/(routes)/quiz-instruction",
+                      params: { quiz: JSON.stringify(item) },
+                    })
+                  }
+                >
+                  <Text style={styles.buttonText}>Start Quiz</Text>
+                </TouchableOpacity>
+              )}
+            </>
           )}
         </View>
       </LinearGradient>
@@ -123,6 +170,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginLeft: 8,
     fontSize: 16,
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
