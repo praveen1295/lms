@@ -33,7 +33,8 @@ export default function CartScreen() {
   useEffect(() => {
     const subscription = async () => {
       const cart: any = await AsyncStorage.getItem("cart");
-      setCartItems(JSON.parse(cart));
+      console.log("cart=====>", cart);
+      setCartItems(JSON.parse(cart) || { courses: [], tests: [] });
     };
     subscription();
   }, []);
@@ -275,7 +276,7 @@ export default function CartScreen() {
       ) : (
         <>
           <FlatList
-            data={[...cartItems.courses, ...cartItems.tests]}
+            data={[...cartItems?.courses, ...cartItems?.tests]}
             keyExtractor={(item) => item._id.toString()}
             renderItem={({ item }) => (
               <TouchableOpacity
