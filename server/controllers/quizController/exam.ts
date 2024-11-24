@@ -77,7 +77,10 @@ const startExam: RequestHandler = async (req, res, next) => {
     const resp: ReturnResponse = {
       status: "success",
       message: "Quiz",
-      data: quiz,
+      data: {
+        ...quiz,
+        questionList: quiz.questionList.sort(() => Math.random() - 0.5),
+      },
     };
     res.status(200).send(resp);
   } catch (error) {
