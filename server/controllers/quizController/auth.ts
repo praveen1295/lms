@@ -9,11 +9,8 @@
 // import { ReturnResponse } from "../utils/interfaces";
 // import Mailgen from 'mailgen';
 
-
 // import OTP from "../models/otp"
 // import sendEmailOTPRegister from "./otp"
-
-
 
 // const secretKey = process.env.SECRET_KEY || "";
 // const SERVER_BASE_URL = process.env.BASE_URL;
@@ -36,14 +33,14 @@
 //     if (sendOtp) {
 //       // check user already present in User DataBase or not
 //       const checkUserExits = await User.findOne({ email });
-//       // if User present in databse then only update the data 
+//       // if User present in databse then only update the data
 //       if (checkUserExits) {
 //            // update data
 //            checkUserExits.name = name;
 //            checkUserExits.password = password;
 //            await checkUserExits.save()
 //            resp = {
-//               status: "success",
+//               success: true,
 //               message: "OTP has sent on your email. Please Verify..",
 //               // data: { userId: checkUserExits._id, token:token },
 //              data: { email, token: token },
@@ -51,16 +48,16 @@
 //           res.status(201).send(resp);
 //       }
 //       else {
-//         // if user does not present in Databse then create a new entry 
+//         // if user does not present in Databse then create a new entry
 //             const user = new User({ email, name, password });
 //             const result = await user.save();
 //              if (!result) {
-//                 resp = { status: "error", message: "No result found", data: {} };
+//                 resp = { success: false, message: "No result found", data: {} };
 //                 res.status(404).send(resp);
 //              }
 //              else {
 //                  resp = {
-//                  status: "success",
+//                  success: true,
 //                    message: "OTP has sent on your email. Please Verify",
 //                   data: { email,token:token },
 //               };
@@ -73,7 +70,6 @@
 //       err.statusCode = 401;
 //       throw err;
 //     }
-
 
 //   } catch (error) {
 //     next(error);
@@ -124,7 +120,7 @@
 //         throw err;
 //       }
 //     }
-    
+
 //     if(status && !user?.accountBlocked && user?.remainingTry < 1 ){
 //       const err = new ProjectError('Your account is deactivated');
 //         err.statusCode = 401;
@@ -142,7 +138,7 @@
 //       user && (user.isTempKeyUsed = false);
 
 //       await user?.save();
-//       resp = { status: "success", message: "Logged in", data: { token } };
+//       resp = { success: true, message: "Logged in", data: { token } };
 //       res.status(200).send(resp);
 //     } else {  //This function is used if the password is wrong it will decrease the remaining try by 1 and if the remaining try is 0 it will throw an error for the maximum invalid attempts
 //       const updated = await User.findOneAndUpdate({ email: user.email }, { $inc: { remainingTry: -1 } }, { new: true })
@@ -194,7 +190,7 @@
 //       user && (user.remainingTry = 1);
 //       user && (user.isTempKeyUsed = true)
 //       await user?.save();
-//       const resp = { status: "success", message: "Key Validated you have only attempt for login" };
+//       const resp = { success: true, message: "Key Validated you have only attempt for login" };
 //       res.status(200).send(resp);
 //     }
 //     else if (!user?.temperoryKey.length) {
@@ -348,7 +344,7 @@
 //     })
 
 //     resp = {
-//       status: "success",
+//       success: true,
 //       message: "An Email has been sent to your account please verify!",
 //       data: {},
 //     };
@@ -386,7 +382,7 @@
 //     user.isDeactivated = false;
 //     await user.save();
 
-//     resp = { status: "success", message: "Account activated!", data: {} };
+//     resp = { success: true, message: "Account activated!", data: {} };
 //     res.status(200).send(resp);
 //   } catch (error) {
 //     next(error);
@@ -415,11 +411,11 @@
 //     const message = `
 //     Click on the below link to reset the password of your account:
 //     http://${process.env.BASE_URL}/auth/forgotpassword/${emailToken}
-    
+
 //     (Note: If the link is not clickable kindly copy the link and paste it in the browser.)`;
 //     sendEmail(user.email, "Verify Email", message);
 //     resp = {
-//       status: "success",
+//       success: true,
 //       message: "An Email has been sent to your account please verify!",
 //       data: {},
 //     };
@@ -484,7 +480,7 @@
 
 //     user.password = password;
 //     await user.save();
-//     resp = { status: "success", message: "Password updated", data: {} };
+//     resp = { success: true, message: "Password updated", data: {} };
 //     res.send(resp);
 //   } catch (error) {
 //     next(error);
@@ -551,8 +547,6 @@
 //   return false;
 // };
 
-
-
 // // Verify Registration Email OTP
 
 // const verifyRegistrationOTP: RequestHandler = async (req, res, next) => {
@@ -585,7 +579,7 @@
 //       throw err;
 //     }
 
-//     // find last send otp for this email 
+//     // find last send otp for this email
 //     const matchOTP = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
 //     // if otp not present for this email
 //     if (matchOTP.length === 0) {
@@ -603,18 +597,16 @@
 //       throw err;
 //     }
 
-//     // update data verified true 
+//     // update data verified true
 //     user.isVerified = true;
 //     const result = await user.save();
-//     resp = { status: "success", message: "Registration Done !!", data: { userId : user._id,email } };
+//     resp = { success: true, message: "Registration Done !!", data: { userId : user._id,email } };
 //     res.status(200).send(resp);
 //   } catch (error) {
 //     console.log("Error in verify Registration OTP : ", error);
 //     next(error);
 //    }
 // }
-
-
 
 // export {
 //   activateUser,

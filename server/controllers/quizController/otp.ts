@@ -6,12 +6,10 @@
 // import { ReturnResponse } from "../../utils/interfaces";
 // import { RequestHandler } from "express";
 
-
-
 // // Define a function to send emails
 
 // async function sendEmailOTPRegister(email: string) {
-    
+
 //     try {
 //         let resp: ReturnResponse;
 //         // check if user already present
@@ -27,7 +25,7 @@
 //             throw err;
 //         }
 
-//         // generate otp 
+//         // generate otp
 //         var otp = otpGenerator.generate(6, {
 //             upperCaseAlphabets: false,
 //             lowerCaseAlphabets: false,
@@ -42,7 +40,7 @@
 //                 lowerCaseAlphabets: false,
 //                 specialChars: false
 //             })
-//         }        
+//         }
 //         const mailResponse = await sendEmail(
 //             email,
 //             "Verification Registration Email OTP ",
@@ -51,14 +49,14 @@
 
 //         const saveOTP = new OTP({ email, otp });
 //         const saveResult = await saveOTP.save();
-        
+
 //         if (!saveResult) {
 //             const err = new ProjectError("OTP has not save in DataBase");
 //             err.statusCode = 401;
 //             throw err;
 //         } else {
 //             return true;
-           
+
 //         }
 //     }
 //     catch (error) {
@@ -77,7 +75,7 @@
 //         let decodedToken : {email : String}
 //          decodedToken = <any>jwt.verify(req.params.token, secretKey);
 //         const email = decodedToken.email.toString();
-        
+
 //         const checkUserExits = await User.findOne({ email });
 //         if (!checkUserExits) {
 //             const err = new ProjectError("User not exist..");
@@ -90,7 +88,7 @@
 //             throw err;
 //         }
 //         const otpExist = await OTP.findOne({ email });
-        
+
 //         if (otpExist) {
 //             const otpExistCreatedAt = new Date(otpExist.createdAt); // Assuming otpExist.createdAt is a Date object
 
@@ -110,17 +108,16 @@
 //             err.statusCode = 401;
 //             throw err;
 //         }
-//         resp = { status: "success", message: "OTP send successfully. Please Verify Account", data: {  } };
+//         resp = { success: true, message: "OTP send successfully. Please Verify Account", data: {  } };
 //         res.status(200).send(resp);
-        
+
 //     } catch (error) {
 //         next(error);
 //     }
 // }
 
 // export { resendRegistrationOTP };
-    
-    
+
 // async function sendDeactivateEmailOTP(email: string) {
 
 //     try {
@@ -138,7 +135,7 @@
 //             throw err;
 //         }
 
-//         // generate otp 
+//         // generate otp
 //         var otp = otpGenerator.generate(6, {
 //             upperCaseAlphabets: false,
 //             lowerCaseAlphabets: false,
@@ -180,7 +177,4 @@
 //     }
 // }
 
-// export { sendDeactivateEmailOTP }; 
-
-
-
+// export { sendDeactivateEmailOTP };

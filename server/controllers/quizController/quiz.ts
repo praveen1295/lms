@@ -6,6 +6,7 @@ import Quiz from "../../models/quiz";
 import { ReturnResponse } from "../../utils/interfaces";
 import userModel from "../../models/user.model";
 import { rootDir } from "../../middleware/fileUpload.middleware";
+import apiResponse from "../../utils/apiResponse";
 console.log("rootDir", rootDir);
 const createQuiz = async (req: any, res: any) => {
   try {
@@ -68,11 +69,11 @@ const createQuiz = async (req: any, res: any) => {
 
     const result = await quiz.save();
 
-    res.status(201).json({
-      success: true,
-      message: "Quiz created successfully",
-      data: { quizId: result._id },
-    });
+    apiResponse.success(
+      res,
+      { quizId: result._id },
+      "Quiz created successfully"
+    );
   } catch (error: any) {
     console.error("Error creating quiz:", error);
     res.status(500).json({
@@ -129,7 +130,7 @@ const getQuizById: RequestHandler = async (req, res, next) => {
     }
 
     const resp: ReturnResponse = {
-      status: "success",
+      success: true,
       message: "Quiz",
       data: quiz,
     };
@@ -304,7 +305,7 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
     await quiz.save();
 
     const resp: ReturnResponse = {
-      status: "success",
+      success: true,
       message: "Quiz updated successfully",
       data: {},
     };
@@ -339,7 +340,7 @@ const deleteQuiz: RequestHandler = async (req, res, next) => {
 
     await Quiz.deleteOne({ _id: quizId });
     const resp: ReturnResponse = {
-      status: "success",
+      success: true,
       message: "Quiz deleted successfully",
       data: {},
     };
@@ -379,7 +380,7 @@ const publishQuiz: RequestHandler = async (req, res, next) => {
     quiz.isPublished = true;
     await quiz.save();
     const resp: ReturnResponse = {
-      status: "success",
+      success: true,
       message: "Quiz published!",
       data: {},
     };
@@ -531,7 +532,7 @@ const getAllQuiz: RequestHandler = async (req, res, next) => {
     }
 
     const resp: ReturnResponse = {
-      status: "success",
+      success: true,
       message: "All Published Quiz",
       data: quiz,
     };
@@ -583,7 +584,7 @@ const getAllQuizExam: RequestHandler = async (req, res, next) => {
     }
 
     const resp: ReturnResponse = {
-      status: "success",
+      success: true,
       message: "All Exam Quizzes",
       data: quiz,
     };
@@ -633,7 +634,7 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
     }
 
     const resp: ReturnResponse = {
-      status: "success",
+      success: true,
       message: "All Test Quizzes",
       data: quiz,
     };

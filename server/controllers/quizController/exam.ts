@@ -75,7 +75,7 @@ const startExam: RequestHandler = async (req, res, next) => {
       }
     }
     const resp: ReturnResponse = {
-      status: "success",
+      success: true,
       message: "Quiz",
       data: {
         ...quiz,
@@ -161,7 +161,7 @@ const submitExam: RequestHandler = async (req, res, next) => {
     const data = await report.save();
 
     const resp: ReturnResponse = {
-      status: "success",
+      success: true,
       message: "Quiz submitted",
       data: {
         total,

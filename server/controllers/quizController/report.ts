@@ -35,7 +35,7 @@ const getReport: RequestHandler = async (req, res, next) => {
     }
 
     let resp: ReturnResponse = {
-      status: "success",
+      success: true,
       message: "Report!",
       data: report,
     };

@@ -1,5 +1,5 @@
 interface ReturnResponse {
-  status: "success" | "error";
+  success: boolean;
   message: String;
   data: {} | [];
 }
