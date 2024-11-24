@@ -10,14 +10,12 @@ const success = (res: any, data: any, message = "Request successful") => {
 
 const error = (
   res: any,
-  data: any,
   message = "Something went wrong",
   statusCode = 400
 ) => {
   return res.status(statusCode).json({
     success: false,
     message,
-    data,
   });
 };
 

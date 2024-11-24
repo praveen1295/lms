@@ -40,12 +40,7 @@ export const logOut: RequestHandler = async (req, res, next) => {
     const authHeader = req.get("Authorization");
 
     if (!authHeader) {
-      return apiResponse.error(
-        res,
-        {},
-        "Authorization header is missing!",
-        424
-      );
+      return apiResponse.error(res, "Authorization header is missing!", 424);
     }
 
     const token = authHeader.split(" ")[1];
@@ -59,7 +54,7 @@ export const logOut: RequestHandler = async (req, res, next) => {
         exp: number;
       };
     } catch (err) {
-      return apiResponse.error(res, {}, "Invalid or expired token!", 401);
+      return apiResponse.error(res, "Invalid or expired token!", 401);
     }
 
     const expiryAt = decodedToken.exp;
@@ -70,7 +65,6 @@ export const logOut: RequestHandler = async (req, res, next) => {
     if (!result) {
       return apiResponse.error(
         res,
-        {},
         "Something went wrong while logging out!",
         424
       );

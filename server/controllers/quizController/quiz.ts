@@ -76,11 +76,7 @@ const createQuiz = async (req: any, res: any) => {
     );
   } catch (error: any) {
     console.error("Error creating quiz:", error);
-    res.status(500).json({
-      success: false,
-      message: "Quiz creation failed",
-      error: error?.message,
-    });
+    apiResponse.error(res, "Quiz creation failed", 500);
   }
 };
 
@@ -129,12 +125,7 @@ const getQuizById: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    const resp: ReturnResponse = {
-      success: true,
-      message: "Quiz",
-      data: quiz,
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, quiz, "Quiz");
   } catch (error) {
     next(error);
   }
@@ -304,12 +295,7 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
     // Save updated quiz
     await quiz.save();
 
-    const resp: ReturnResponse = {
-      success: true,
-      message: "Quiz updated successfully",
-      data: {},
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, {}, "Quiz updated successfully");
   } catch (error) {
     next(error);
   }
@@ -339,12 +325,8 @@ const deleteQuiz: RequestHandler = async (req, res, next) => {
     }
 
     await Quiz.deleteOne({ _id: quizId });
-    const resp: ReturnResponse = {
-      success: true,
-      message: "Quiz deleted successfully",
-      data: {},
-    };
-    res.status(200).send(resp);
+
+    apiResponse.success(res, {}, "Quiz deleted successfully");
   } catch (error) {
     next(error);
   }
@@ -379,12 +361,7 @@ const publishQuiz: RequestHandler = async (req, res, next) => {
 
     quiz.isPublished = true;
     await quiz.save();
-    const resp: ReturnResponse = {
-      success: true,
-      message: "Quiz published!",
-      data: {},
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, {}, "Quiz published!");
   } catch (error) {
     next(error);
   }
@@ -531,12 +508,7 @@ const getAllQuiz: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    const resp: ReturnResponse = {
-      success: true,
-      message: "All Published Quiz",
-      data: quiz,
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, quiz, "All Published Quiz");
   } catch (error) {
     next(error);
   }
@@ -583,12 +555,7 @@ const getAllQuizExam: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    const resp: ReturnResponse = {
-      success: true,
-      message: "All Exam Quizzes",
-      data: quiz,
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, quiz, "All Exam Quizzes");
   } catch (error) {
     next(error);
   }
@@ -633,12 +600,7 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    const resp: ReturnResponse = {
-      success: true,
-      message: "All Test Quizzes",
-      data: quiz,
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, quiz, "All Test Quizzes");
   } catch (error) {
     next(error);
   }

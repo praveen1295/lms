@@ -1,7 +1,7 @@
 interface ReturnResponse {
   success: boolean;
-  message: String;
   data: {} | [];
+  message: String;
 }
 
 export { ReturnResponse };
