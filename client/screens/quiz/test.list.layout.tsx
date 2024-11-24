@@ -110,7 +110,7 @@ export default function TestListLayout({}) {
               renderItem={({ item }) => (
                 <View style={styles.courseCard}>
                   <Image
-                    source={require("@/assets/images/icon.png")}
+                    source={require("@/assets/images/icon1.png")}
                     style={styles.courseImage}
                   />
                   <View style={styles.courseContent}>

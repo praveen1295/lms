@@ -202,7 +202,10 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
     }
 
     if (req.body.answers) {
-      quiz.answers = req.body.answers;
+      quiz.answers =
+        typeof req.body.answers === "string"
+          ? JSON.parse(req.body.answers)
+          : req.body.answers;
     }
 
     if (req.body.passingPercentage !== undefined) {
