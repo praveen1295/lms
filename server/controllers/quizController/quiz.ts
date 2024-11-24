@@ -283,7 +283,7 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
 
           return {
             ...question,
-            questionImages: [updatedImages, ...oldQuestionImages],
+            questionImages: [...updatedImages, ...oldQuestionImages],
           };
         }
       );
