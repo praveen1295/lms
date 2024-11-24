@@ -16,6 +16,7 @@ import Loader from "../loader/loader";
 import TestsCard from "../cards/tests.card";
 
 export default function AllQuizzes({ examName, filter, examId, isPaid }) {
+  console.log("isPaid===>>>>>>>>>>>>>", isPaid);
   const [quizzes, setQuizzes] = useState<any>([]);
   const { user, loading, setRefetch } = useUser();
   const [loader, setLoader] = useState(false);

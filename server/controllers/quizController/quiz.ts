@@ -562,8 +562,15 @@ const getAllQuizExam: RequestHandler = async (req, res, next) => {
 
 const getAllQuizTest: RequestHandler = async (req, res, next) => {
   try {
-    const { filterType, examName } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
-    console.log("examName", examName, "filterType", filterType);
+    const { filterType, examName, isDemo } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
+    console.log(
+      "examName",
+      examName,
+      "filterType",
+      filterType,
+      "isDemo",
+      isDemo
+    );
     let quiz = await Quiz.find(
       {
         isPublished: true,
@@ -593,11 +600,11 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
     }
     // If 'all', no additional filtering is needed
 
-    if (!quiz || quiz.length === 0) {
-      const err = new ProjectError("No test quiz found!");
-      err.statusCode = 404;
-      throw err;
-    }
+    // if (!quiz || quiz.length === 0) {
+    //   const err = new ProjectError("No test quiz found!");
+    //   err.statusCode = 404;
+    //   throw err;
+    // }
 
     apiResponse.success(res, quiz, "All Test Quizzes");
   } catch (error) {

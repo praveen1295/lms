@@ -23,6 +23,8 @@ export default function TestsList() {
   const { item } = useLocalSearchParams();
   const testCourse = JSON.parse(item as string);
 
+  console.log("testCourse+++++++++++++++++++++>>>>", testCourse.filter);
+
   const [tests, setTests] = useState<any>([]);
   const [featuredTest, setFeaturedTest] = useState(null);
 
@@ -30,9 +32,10 @@ export default function TestsList() {
     setLoader(true);
     axios
       .get(
-        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${testCourse?.filter}&examName=${testCourse.value}`
+        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${testCourse?.filter}&examName=${testCourse.value}&isDemo=${testCourse?.isDemo}`
       )
       .then((res) => {
+        console.log("rrrrrrrrrrrrrr", res.data);
         const demoTest = res.data.data.filter(
           (item: any) => item.isDemo === true
         );
@@ -51,7 +54,7 @@ export default function TestsList() {
         setTests([...demoTest, ...newTests]);
       })
       .catch((error) => {
-        console.error(error);
+        console.error(JSON.stringify(error));
       })
       .finally(() => {
         setLoader(false);
@@ -78,6 +81,7 @@ export default function TestsList() {
           filter={testCourse.filter}
           examName={testCourse.value}
           examId={testCourse._id}
+          isPaid={testCourse?.isPaid}
           // tests={tests}
           // featuredTest={featuredTest}
         />

@@ -161,6 +161,7 @@ export default function TestListLayout({}) {
                                   item: JSON.stringify({
                                     ...item,
                                     filter: category.filter,
+                                    isDemo: true,
                                   }),
                                 },
                               })
