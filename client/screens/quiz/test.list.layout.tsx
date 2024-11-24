@@ -119,9 +119,60 @@ export default function TestListLayout({}) {
                       {item.description.split(" ").slice(0, 7).join(" ") +
                         (item.description.split(" ").length > 7 ? "..." : "")}
                     </Text>
-                    <View style={styles.buttonContainer}>
-                      <View>
-                        {user?.tests?.some((d: any) => d._id === item._id) ? (
+                    {item.isPaid ? (
+                      <View style={styles.buttonContainer}>
+                        <View>
+                          {user?.tests?.some((d: any) => d._id === item._id) ? (
+                            <TouchableOpacity
+                              style={[styles.button, styles.goButton]}
+                              onPress={() =>
+                                router.push({
+                                  pathname: "/(routes)/test-list",
+                                  params: {
+                                    item: JSON.stringify({
+                                      ...item,
+                                      filter: category.filter,
+                                    }),
+                                  },
+                                })
+                              }
+                            >
+                              <Text style={styles.buttonText}>Start </Text>
+                            </TouchableOpacity>
+                          ) : (
+                            <TouchableOpacity
+                              style={styles.button}
+                              onPress={() => {
+                                const cartItems = { tests: [{ ...item }] };
+                                handlePayment(cartItems, setOrderSuccess);
+                              }}
+                            >
+                              <Text style={styles.buttonText}>Buy Test</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                        {!user?.tests?.some((d: any) => d._id === item._id) && (
+                          <TouchableOpacity
+                            style={[styles.button, styles.demoButton]}
+                            onPress={() =>
+                              router.push({
+                                pathname: "/(routes)/test-list",
+                                params: {
+                                  item: JSON.stringify({
+                                    ...item,
+                                    filter: category.filter,
+                                  }),
+                                },
+                              })
+                            }
+                          >
+                            <Text style={styles.buttonText}>View Demo</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    ) : (
+                      <View style={styles.buttonContainer}>
+                        <View>
                           <TouchableOpacity
                             style={[styles.button, styles.goButton]}
                             onPress={() =>
@@ -138,37 +189,9 @@ export default function TestListLayout({}) {
                           >
                             <Text style={styles.buttonText}>Start </Text>
                           </TouchableOpacity>
-                        ) : (
-                          <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                              const cartItems = { tests: [{ ...item }] };
-                              handlePayment(cartItems, setOrderSuccess);
-                            }}
-                          >
-                            <Text style={styles.buttonText}>Buy Test</Text>
-                          </TouchableOpacity>
-                        )}
+                        </View>
                       </View>
-                      {!user?.tests?.some((d: any) => d._id === item._id) && (
-                        <TouchableOpacity
-                          style={[styles.button, styles.demoButton]}
-                          onPress={() =>
-                            router.push({
-                              pathname: "/(routes)/test-list",
-                              params: {
-                                item: JSON.stringify({
-                                  ...item,
-                                  filter: category.filter,
-                                }),
-                              },
-                            })
-                          }
-                        >
-                          <Text style={styles.buttonText}>View Demo</Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
+                    )}
                   </View>
                 </View>
               )}
@@ -180,10 +203,6 @@ export default function TestListLayout({}) {
     </LinearGradient>
   );
 }
-
-TestListLayout.propTypes = {
-  isPayed: PropTypes.bool.isRequired,
-};
 
 const styles = StyleSheet.create({
   container: {

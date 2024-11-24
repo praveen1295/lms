@@ -21,7 +21,7 @@ export default function TestsList() {
   const [loader, setLoader] = useState(false);
   const flatListRef = useRef(null);
   const { item } = useLocalSearchParams();
-  const layout = JSON.parse(item as string);
+  const testCourse = JSON.parse(item as string);
 
   const [tests, setTests] = useState<any>([]);
   const [featuredTest, setFeaturedTest] = useState(null);
@@ -30,20 +30,25 @@ export default function TestsList() {
     setLoader(true);
     axios
       .get(
-        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${layout?.filter}&examName=${layout.value}`
+        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${testCourse?.filter}&examName=${testCourse.value}`
       )
       .then((res) => {
         const demoTest = res.data.data.filter(
           (item: any) => item.isDemo === true
         );
-        const paidTests = res.data.data.filter(
-          (item: any) => item.isDemo === false
-        );
+
+        let newTests;
+
+        if (testCourse.isPaid) {
+          newTests = res.data.data.filter((item: any) => item.isDemo === false);
+        } else {
+          newTests = res.data.data.filter((item: any) => item.isPaid === false);
+        }
 
         // Set the first test as the featured test (you can modify this logic)
-        setFeaturedTest(paidTests[0]);
+        setFeaturedTest(newTests[0]);
 
-        setTests([...demoTest, ...paidTests]);
+        setTests([...demoTest, ...newTests]);
       })
       .catch((error) => {
         console.error(error);
@@ -70,9 +75,9 @@ export default function TestsList() {
         renderNoData()
       ) : (
         <AllQuizzes
-          filter={layout.filter}
-          examName={layout.value}
-          examId={layout._id}
+          filter={testCourse.filter}
+          examName={testCourse.value}
+          examId={testCourse._id}
           // tests={tests}
           // featuredTest={featuredTest}
         />
@@ -80,10 +85,6 @@ export default function TestsList() {
     </LinearGradient>
   );
 }
-
-TestsList.propTypes = {
-  isPayed: PropTypes.bool.isRequired,
-};
 
 const styles = StyleSheet.create({
   container: {
