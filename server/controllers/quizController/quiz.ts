@@ -276,7 +276,7 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
 
           // Use new images if available, otherwise keep existing images
           const updatedImages = questionImages.length
-            ? [questionImages]
+            ? questionImages
             : question.questionImages || [];
 
           console.log("updatedImages", updatedImages);
