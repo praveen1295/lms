@@ -3,6 +3,7 @@ import { RequestHandler } from "express";
 import ProjectError from "../../helper/error";
 import Report from "../../models/report";
 import { ReturnResponse } from "../../utils/interfaces";
+import apiResponse from "../../utils/apiResponse";
 
 const getReport: RequestHandler = async (req, res, next) => {
   try {
@@ -34,12 +35,7 @@ const getReport: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    let resp: ReturnResponse = {
-      success: true,
-      message: "Report!",
-      data: report,
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, report, "Report!");
   } catch (error) {
     next(error);
   }

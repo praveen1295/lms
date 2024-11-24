@@ -1,12 +1,11 @@
 import { RequestHandler } from "express";
-import { ReturnResponse } from "../../utils/interfaces";
 
 import userModel from "../../models/user.model";
 import favQuestion from "../../models/favQuestion";
 import ProjectError from "../../helper/error";
+import apiResponse from "../../utils/apiResponse";
 
 const addFavQuestion: RequestHandler = async (req, res, next) => {
-  let resp: ReturnResponse;
   const userId = req?.user?._id;
   const options = req.body.options;
   const question = req.body.question;
@@ -21,12 +20,8 @@ const addFavQuestion: RequestHandler = async (req, res, next) => {
 
     const favQues = new favQuestion({ question, options, userId });
     await favQues.save();
-    resp = {
-      success: true,
-      message: "Question added to Favourites!",
-      data: {},
-    };
-    res.status(200).send(resp);
+
+    apiResponse.success(res, {}, "Question added to Favorites!");
   } catch (error) {
     next(error);
   }
@@ -34,15 +29,10 @@ const addFavQuestion: RequestHandler = async (req, res, next) => {
 
 const showFavQuestion: RequestHandler = async (req, res, next) => {
   const userId = req?.user?._id;
-  let resp: ReturnResponse;
   try {
     const favQues = await favQuestion.find({ userId });
-    resp = {
-      success: true,
-      message: "Favourite Questions!",
-      data: { favQues },
-    };
-    res.status(200).send(resp);
+
+    apiResponse.success(res, { favQues }, "Favourite Questions!");
   } catch (error) {
     next(error);
   }
@@ -54,12 +44,11 @@ const removeFavQuestion: RequestHandler = async (req, res, next) => {
   const questionId = req.params.favquestionId;
   try {
     await favQuestion.deleteOne({ _id: questionId });
-    const resp: ReturnResponse = {
-      success: true,
-      message: "Question removed from favourites successfully",
-      data: {},
-    };
-    res.status(200).send(resp);
+    apiResponse.success(
+      res,
+      {},
+      "Question removed from favourites successfully"
+    );
   } catch (error) {
     next(error);
   }

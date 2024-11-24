@@ -3,7 +3,6 @@ import { RequestHandler } from "express";
 import fs from "fs";
 import ProjectError from "../../helper/error";
 import Quiz from "../../models/quiz";
-import { ReturnResponse } from "../../utils/interfaces";
 import userModel from "../../models/user.model";
 import { rootDir } from "../../middleware/fileUpload.middleware";
 import apiResponse from "../../utils/apiResponse";

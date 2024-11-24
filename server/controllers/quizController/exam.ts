@@ -4,7 +4,7 @@ import { Mongoose } from "mongoose";
 import ProjectError from "../../helper/error";
 import Quiz from "../../models/quiz";
 import Report from "../../models/report";
-import { ReturnResponse } from "../../utils/interfaces";
+import apiResponse from "../../utils/apiResponse";
 
 const startExam: RequestHandler = async (req, res, next) => {
   const userId = req?.user?._id;
@@ -74,15 +74,15 @@ const startExam: RequestHandler = async (req, res, next) => {
         }
       }
     }
-    const resp: ReturnResponse = {
-      success: true,
-      message: "Quiz",
-      data: {
+
+    apiResponse.success(
+      res,
+      {
         ...quiz,
         questionList: quiz.questionList.sort(() => Math.random() - 0.5),
       },
-    };
-    res.status(200).send(resp);
+      "Quiz"
+    );
   } catch (error) {
     next(error);
   }
@@ -160,21 +160,17 @@ const submitExam: RequestHandler = async (req, res, next) => {
     });
     const data = await report.save();
 
-    const resp: ReturnResponse = {
-      success: true,
-      message: "Quiz submitted",
-      data: {
+    apiResponse.success(
+      res,
+      {
         total,
         score,
         result,
         reportId: data._id,
         attemptedAnswerWithRightAnswer,
       },
-    };
-
-    console.log("ccccccccccc", resp);
-
-    res.status(200).send(resp);
+      "Quiz submitted"
+    );
   } catch (error) {
     next(error);
   }
