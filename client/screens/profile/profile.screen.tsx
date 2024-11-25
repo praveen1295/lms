@@ -68,27 +68,28 @@ export default function ProfileScreen() {
       const accessToken = await AsyncStorage.getItem("access_token");
       const refreshToken = await AsyncStorage.getItem("refresh_token");
 
-      try {
-        const response = await axios.put(
-          `${SERVER_URI}/update-user-avatar`,
-          {
-            avatar: base64Image,
-          },
-          {
-            headers: {
-              "access-token": accessToken,
-              "refresh-token": refreshToken,
-            },
-          }
-        );
-        if (response.data) {
-          setRefetch(true);
-          setLoader(false);
-        }
-      } catch (error) {
-        setLoader(false);
-        console.log(error);
-      }
+      // try {
+      //   const response = await axios.put(
+      //     `${SERVER_URI}/update-user-avatar`,
+      //     {
+      //       avatar: base64Image,
+      //     },
+      //     {
+      //       headers: {
+      //         "access-token": accessToken,
+      //         "refresh-token": refreshToken,
+      //       },
+      //     }
+      //   );
+      //   if (response.data) {
+      //     setRefetch(true);
+      //     setLoader(false);
+      //   }
+      // } catch (error) {
+      //   setLoader(false);
+      //   console.log(error);
+      // }
+      setLoader(false);
     }
   };
 

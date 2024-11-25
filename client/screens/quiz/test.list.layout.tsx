@@ -41,7 +41,6 @@ export default function TestListLayout({}) {
       .get(`${SERVER_URI}/get-test-courses?isPaid=${category.filter}`)
       .then((res) => {
         setTestCourses(res.data.testCourses);
-        console.log("res.data.+++++++", res.data);
       })
       .catch((error) => {
         console.error(error);

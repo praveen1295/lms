@@ -33,7 +33,6 @@ export const registrationUser = CatchAsyncError(
       const { name, phone_number, email, password } = req.body;
 
       const isEmailExist = await userModel.findOne({ email });
-      console.log(isEmailExist);
 
       if (isEmailExist) {
         return next(new ErrorHandler("Email already exist", 400));
@@ -47,8 +46,6 @@ export const registrationUser = CatchAsyncError(
       };
 
       const activationToken = createActivationToken(user);
-
-      console.log("activationToken", activationToken);
 
       const activationCode = activationToken.activationCode;
 
@@ -118,11 +115,9 @@ export const activateUser = CatchAsyncError(
         activation_token,
         process.env.ACTIVATION_SECRET as string
       ) as { user: IUser; activationCode: string };
-      console.log("newUser=====", newUser);
       if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler("Invalid activation code", 400));
       }
-      console.log(";;;;;;;;;;;;;;;;;;;;");
       const { name, phone_number, email, password } = newUser.user;
 
       const existUser = await userModel.findOne({ email });
@@ -156,7 +151,6 @@ export const loginUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body as ILoginRequest;
-      console.log(email, password);
       if (!email || !password) {
         return next(new ErrorHandler("Please enter email and password", 400));
       }
@@ -167,10 +161,7 @@ export const loginUser = CatchAsyncError(
         return next(new ErrorHandler("Invalid email or password", 400));
       }
 
-      console.log("user", user);
-
       const isPasswordMatch = await user.comparePassword(password);
-      console.log("isPasswordMatch", isPasswordMatch);
       if (!isPasswordMatch) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }

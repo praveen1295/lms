@@ -32,7 +32,6 @@ const QuizResultScreen = () => {
             },
           }
         );
-        console.log("reeeeeee", response.data);
         setReport(response.data.data);
       } catch (error) {
         console.log("error, report", error);

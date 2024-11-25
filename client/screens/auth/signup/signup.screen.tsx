@@ -112,7 +112,6 @@ export default function SignUpScreen() {
           res.data.activationToken
         );
 
-        console.log(" res.data.activationToken", res.data.activationToken);
         Toast.show(res.data.message, {
           type: "success",
         });

@@ -6,7 +6,6 @@ import Quiz from "../../models/quiz";
 import userModel from "../../models/user.model";
 import { rootDir } from "../../middleware/fileUpload.middleware";
 import apiResponse from "../../utils/apiResponse";
-console.log("rootDir", rootDir);
 const createQuiz = async (req: any, res: any) => {
   try {
     const createdBy = req?.user?._id.toString();
@@ -37,7 +36,6 @@ const createQuiz = async (req: any, res: any) => {
       (question: any, index: number) => {
         const newQuestionImagesFiles =
           req?.files[`questionList[${index}][newQuestionImages]`] || [];
-        console.log("newQuestionImagesFiles", newQuestionImagesFiles);
 
         const questionImages = newQuestionImagesFiles.map(
           (file: any) =>
@@ -82,7 +80,6 @@ const createQuiz = async (req: any, res: any) => {
 const getQuizById: RequestHandler = async (req, res, next) => {
   try {
     const quizId = req.params.quizId;
-    console.log("quizId", quizId);
     let quiz;
     if (quizId) {
       quiz = await Quiz.findById(
@@ -133,8 +130,6 @@ const getQuizById: RequestHandler = async (req, res, next) => {
 const updateQuiz: RequestHandler = async (req: any, res, next) => {
   try {
     const quizId = req.body._id;
-
-    console.log("req.body", req.body);
 
     const quiz = await Quiz.findById(quizId);
 
@@ -234,8 +229,6 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
         (question: any, index: number) => {
           const oldQuestionImages = question.oldQuestionImages || [];
 
-          console.log("oldQuestionImages", oldQuestionImages);
-
           const deleteQuestionImages = quiz.questionList
             .filter(
               (item) => item._id.toString() === question._id.toString()
@@ -243,8 +236,6 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
             .questionImages.filter(
               (image) => !oldQuestionImages.includes(image)
             );
-
-          console.log("deleteQuestionImages", deleteQuestionImages);
 
           const newQuestionImagesFiles =
             req?.files[`questionList[${index}][newQuestionImages]`] || [];
@@ -278,8 +269,6 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
           const updatedImages = questionImages.length
             ? questionImages
             : question.questionImages || [];
-
-          console.log("updatedImages", updatedImages);
 
           return {
             ...question,
@@ -376,8 +365,6 @@ const isValidQuiz = async (
   answers: Record<string, string>
 ) => {
   // Check if questionList is non-empty
-  console.log("answers", answers);
-  console.log("questionList", questionList);
 
   if (!questionList.length) {
     console.log("Validation failed: questionList is empty.");
@@ -516,7 +503,6 @@ const getAllQuiz: RequestHandler = async (req, res, next) => {
 const getAllQuizExam: RequestHandler = async (req, res, next) => {
   try {
     const { filterType, examName } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
-    console.log("examName", examName, "filterType", filterType);
     let quiz = await Quiz.find(
       { isPublished: true, category: "exam", examName },
       {
@@ -589,8 +575,6 @@ const getAllQuizTest: RequestHandler = async (req, res, next) => {
       examName: 1,
       attemptedUsers: 1,
     });
-
-    console.log("quizquiz", quiz);
 
     // Apply additional filter based on query parameter
 

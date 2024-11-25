@@ -128,21 +128,15 @@ export const getAllCourses = CatchAsyncError(
         "-courseData.videoUrl -courseData.suggestion -courseData.questions -courseData.links"
       );
 
-      console.log("Fetched courses:", courses); // Log to check structure
-
       // Apply filtering based on the filterType
       if (filterType === "paid") {
         courses = courses.filter((course: any) => {
-          console.log("Course `isPaid` value:", course.isPaid); // Debugging
           return course.isPaid === true;
         });
-        console.log("Filtered paid courses:", courses);
       } else if (filterType === "free") {
         courses = courses.filter((course: any) => {
-          console.log("Course `isPaid` value:", course.isPaid); // Debugging
           return course.isPaid === false;
         });
-        console.log("Filtered free courses:", courses);
       }
 
       // If 'all', no additional filtering is required
@@ -168,8 +162,6 @@ export const getCourseByUser = CatchAsyncError(
         (course: any) => course._id.toString() === courseId
       );
 
-      console.log("userCourseList", userCourseList, courseId, courseExists);
-
       // if (!courseExists) {
       //   return next(
       //     new ErrorHandler("You are not eligible to access this course", 404)
@@ -184,8 +176,6 @@ export const getCourseByUser = CatchAsyncError(
       //   course = await CourseModel.findById(courseId);
       // }
       course = await CourseModel.findById(courseId);
-
-      console.log("courseeeeeeeeeeee", course);
 
       const content = course?.courseData;
 

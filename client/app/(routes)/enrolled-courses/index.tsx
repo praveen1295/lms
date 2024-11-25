@@ -19,7 +19,6 @@ export default function index() {
         user?.courses?.some((d: any) => d._id === i._id)
       );
 
-      console.log("dataaaaaa, data", data);
       setcourses(data);
     });
   }, [loader, user]);

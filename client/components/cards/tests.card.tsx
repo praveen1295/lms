@@ -9,6 +9,8 @@ import Loader from "../loader/loader";
 const TestsCard = ({ item }: { item: any }) => {
   const { user, loading: userLoading } = useUser();
 
+  console.log("itemitem=======>", item);
+
   if (userLoading) {
     return (
       <View style={styles.loaderContainer}>

@@ -76,8 +76,6 @@ export default function CoursesScreen() {
     }
   };
 
-  console.log("courses=====", courses);
-
   return (
     <>
       {loading ? (

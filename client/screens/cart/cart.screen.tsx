@@ -33,7 +33,6 @@ export default function CartScreen() {
   useEffect(() => {
     const subscription = async () => {
       const cart: any = await AsyncStorage.getItem("cart");
-      console.log("cart=====>", cart);
       setCartItems(JSON.parse(cart) || { courses: [], tests: [] });
     };
     subscription();
@@ -73,7 +72,6 @@ export default function CartScreen() {
   };
 
   // const handlePayment = async () => {
-  //   console.log("handlePayment");
 
   //   try {
   //     const accessToken = await AsyncStorage.getItem("access_token");
@@ -81,8 +79,6 @@ export default function CartScreen() {
   //     const amount = Math.round(
   //       cartItems.reduce((total, item) => total + item.price, 0) * 100
   //     );
-
-  //     console.log("handlePayment", accessToken, refreshToken, amount);
 
   //     const paymentIntentResponse = await axios.post(
   //       `${SERVER_URI}/payment`,
@@ -96,14 +92,11 @@ export default function CartScreen() {
   //     );
 
   //     const { client_secret: clientSecret } = paymentIntentResponse.data;
-  //     console.log("clientSecret", clientSecret);
 
   //     const initSheetResponse = await initPaymentSheet({
   //       merchantDisplayName: "concept leader Private Ltd.",
   //       paymentIntentClientSecret: clientSecret,
   //     });
-
-  //     console.log("Init sheet response:", initSheetResponse);
 
   //     if (initSheetResponse.error) {
   //       console.error(
@@ -118,7 +111,6 @@ export default function CartScreen() {
   //     if (paymentResponse.error) {
   //       console.error("Payment failed:", paymentResponse.error);
   //     } else {
-  //       console.log("Payment successful:", paymentResponse);
   //       await createOrder(paymentResponse);
   //     }
   //   } catch (error) {
@@ -127,8 +119,6 @@ export default function CartScreen() {
   // };
 
   const handlePayment = async () => {
-    console.log("handlePayment");
-
     try {
       const accessToken = await AsyncStorage.getItem("access_token");
       const refreshToken = await AsyncStorage.getItem("refresh_token");
@@ -146,8 +136,6 @@ export default function CartScreen() {
 
       const amount = coursesAmount + testsAmount;
 
-      console.log("handlePayment", accessToken, refreshToken, amount);
-
       // Step 1: Create payment intent on the server
       const paymentIntentResponse = await axios.post(
         `${SERVER_URI}/payment`,
@@ -161,7 +149,6 @@ export default function CartScreen() {
       );
 
       const { client_secret: clientSecret } = paymentIntentResponse.data;
-      console.log("clientSecret", clientSecret);
 
       // Step 2: Initialize the payment sheet
       const initSheetResponse = await initPaymentSheet({
@@ -190,14 +177,12 @@ export default function CartScreen() {
 
       if (paymentResponse.error) {
         if (paymentResponse.error.code === "Canceled") {
-          console.log("Payment was canceled by the user");
           alert("Payment flow was canceled. Please try again.");
         } else {
           console.error("Payment failed:", paymentResponse.error.message);
           alert(`Payment failed: ${paymentResponse.error.message}`);
         }
       } else {
-        console.log("Payment successful:", paymentResponse);
         await createOrder(paymentResponse);
         alert("Payment successful!");
       }

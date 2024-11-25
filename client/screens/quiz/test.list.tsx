@@ -23,8 +23,6 @@ export default function TestsList() {
   const { item } = useLocalSearchParams();
   const testCourse = JSON.parse(item as string);
 
-  console.log("testCourse+++++++++++++++++++++>>>>", testCourse.filter);
-
   const [tests, setTests] = useState<any>([]);
   const [featuredTest, setFeaturedTest] = useState(null);
 
@@ -39,7 +37,6 @@ export default function TestsList() {
         }&category=${"test"}`
       )
       .then((res) => {
-        console.log("rrrrrrrrrrrrrr", res.data);
         const demoTest = res.data.data.filter(
           (item: any) => item.isDemo === true
         );

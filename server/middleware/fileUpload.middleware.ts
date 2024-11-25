@@ -4,7 +4,6 @@
 
 // // // Correctly resolve the root directory
 // // export const rootDir = path.resolve(__dirname, "../../");
-// // console.log("rootDir", rootDir);
 
 // // // http://localhost:8000/api/v1/static/pdf_files/project_file.pdf
 

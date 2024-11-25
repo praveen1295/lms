@@ -116,7 +116,6 @@ export const createMobileOrder = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { courseId, testId, payment_info } = req.body as IOrder;
-      console.log("courseId, payment_info", courseId, testId, payment_info);
       const user = await userModel.findById(req.user?._id);
       let courseExistInUser;
       let course: any = null;
@@ -137,29 +136,24 @@ export const createMobileOrder = CatchAsyncError(
         courseExistInUser = user?.tests.some(
           (test: any) => test._id.toString() === testId
         );
-        console.log("test", test);
       }
-      console.log("courseExistInUser", courseExistInUser);
       if (courseExistInUser) {
         return next(
           new ErrorHandler("You have already purchased this course", 400)
         );
       }
-      console.log("courseExistInUser111", courseExistInUser);
 
       if (!course && courseId) {
         return next(new ErrorHandler("Course not found", 404));
       } else if (!test && testId) {
         return next(new ErrorHandler("Course not found", 404));
       }
-      console.log("courseExistInUser22222", courseExistInUser);
 
       const data: any = {
         [objKey]: courseId ? course._id : test._id,
         userId: user?._id,
         payment_info,
       };
-      console.log("data", data);
 
       const mailData = {
         order: {
@@ -176,14 +170,10 @@ export const createMobileOrder = CatchAsyncError(
         },
       };
 
-      console.log("datarrrrrrrr", data);
-
       // const html = await ejs.renderFile(
       //   path.join(__dirname, "../mails/order-confirmation.ejs"),
       //   { order: mailData }
       // );
-
-      // console.log("html", html);
 
       try {
         if (user) {
@@ -227,8 +217,6 @@ export const createMobileOrder = CatchAsyncError(
 
       newOrder(data, res, next);
     } catch (error: any) {
-      console.log("eee2", error);
-
       return next(new ErrorHandler(error.message, 500));
     }
   }

@@ -35,48 +35,53 @@ const startExam: RequestHandler = async (req, res, next) => {
       err.statusCode = 405;
       throw err;
     }
+
     if (quiz.createdBy.toString() === userId) {
       const err = new ProjectError("You can't attend your own quiz!");
       err.statusCode = 405;
+      throw err;
     }
-    // if(!quiz.isPublicQuiz && !quiz.allowedUser.includes(req?.user?._id)){
+
+    // Uncomment this section if you want to check for user authorization
+    // if (!quiz.isPublicQuiz && !quiz.allowedUser.includes(req?.user?._id)) {
     //   const err = new ProjectError("You are not authorized!");
     //   err.statusCode = 403;
     //   throw err;
     // }
-    if (quiz.category === "test") {
-      if (quiz.attemptsAllowedPerUser) {
-        if (quiz.attemptedUsers.length) {
-          quiz.attemptedUsers.forEach((user) => {
-            const id = user.id;
-            if (id === req?.user?._id) {
-              if (user.attemptsLeft !== undefined) {
-                if (user.attemptsLeft > 0) {
-                  user.attemptsLeft -= 1;
-                } else {
-                  const err = new ProjectError("You have zero attempts left!");
-                  err.statusCode = 405;
-                  throw err;
-                }
-              }
-            }
-          });
-          const updated = await quiz.save();
+
+    if (quiz.category === "test" && quiz.attemptsAllowedPerUser) {
+      const existingUser = quiz.attemptedUsers.find(
+        (user) => user.id === userId.toString()
+      );
+
+      if (existingUser) {
+        if (
+          existingUser.attemptsLeft !== undefined &&
+          existingUser.attemptsLeft > 0
+        ) {
+          existingUser.attemptsLeft -= 1;
         } else {
-          if (req?.user?._id && quiz.attemptsAllowedPerUser) {
-            const newUser = {
-              id: req?.user?._id.toString(),
-              attemptsLeft: quiz.attemptsAllowedPerUser - 1,
-            };
-            quiz.attemptedUsers.push(newUser);
-            const updated = await quiz.save();
-          }
+          // const err = new ProjectError("You have zero attempts left!");
+          // err.statusCode = 405;
+          // throw err;
         }
+      } else {
+        // If user hasn't attempted before, add them with initial attempts
+        const newUser = {
+          id: userId.toString(),
+          attemptsLeft: quiz.attemptsAllowedPerUser - 1,
+        };
+        quiz.attemptedUsers.push(newUser);
       }
+
+      // Save the updated quiz document
+      await quiz.save();
     }
 
+    // Randomize the question order
     quiz.questionList = quiz.questionList.sort(() => Math.random() - 0.5);
 
+    // Return the quiz details
     apiResponse.success(res, quiz, "Quiz");
   } catch (error) {
     next(error);
@@ -183,7 +188,6 @@ const isValidAttempt = async (
 ) => {
   const quiz = await Quiz.findById(quizId);
 
-  console.log("quiz=========>", quiz);
   if (!quiz) {
     const err = new ProjectError("No quiz found!");
     err.statusCode = 404;

@@ -1,5 +1,6 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Button } from "react-native";
+import { router } from "expo-router"; // Import the router directly
 
 const QuizReport = ({ report }) => {
   // Format the creation date to a readable format
@@ -40,6 +41,13 @@ const QuizReport = ({ report }) => {
           Better luck next time! Keep practicing!
         </Text>
       )}
+
+      {/* Button to go to the home screen */}
+      <Button
+        title="Go to Home"
+        onPress={() => router.push("/(tabs)")}
+        color="#2467EC"
+      />
     </View>
   );
 };

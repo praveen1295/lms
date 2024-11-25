@@ -15,15 +15,10 @@ import userModel from "../models/user.model";
 //   // }
 // };
 
-
-
 export const getUserById = async (id: string, res: Response) => {
-
   try {
     // Fetch user from the database by ID
     const user = await userModel.findById(id);
-
-    console.log('user', user)
 
     if (!user) {
       return res.status(404).json({
@@ -45,7 +40,6 @@ export const getUserById = async (id: string, res: Response) => {
   }
 };
 
-
 // Get All users
 export const getAllUsersService = async (res: Response) => {
   const users = await userModel.find().sort({ createdAt: -1 });
@@ -57,11 +51,15 @@ export const getAllUsersService = async (res: Response) => {
 };
 
 // update user role
-export const updateUserRoleService = async (res:Response,id: string,role:string) => {
+export const updateUserRoleService = async (
+  res: Response,
+  id: string,
+  role: string
+) => {
   const user = await userModel.findByIdAndUpdate(id, { role }, { new: true });
 
   res.status(201).json({
     success: true,
     user,
   });
-}
+};

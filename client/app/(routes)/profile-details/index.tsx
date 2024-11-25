@@ -44,7 +44,6 @@ export default function UserProfile() {
         }
       );
       if (response.data) {
-        console.log("response.data", response.data.data);
         setUserInfo(response.data.data);
         setLoader(false);
         Toast.show(response.data.message, {
@@ -57,7 +56,6 @@ export default function UserProfile() {
     }
 
     setIsEditing(false);
-    console.log("Updated user info:", userInfo);
   };
 
   if (loading || loader) return <Loader />;

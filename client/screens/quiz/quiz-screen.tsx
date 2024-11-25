@@ -18,6 +18,7 @@ import {
   Alert,
   Image,
 } from "react-native";
+import { Toast } from "react-native-toast-notifications";
 
 const QuizScreen = () => {
   const { quizId }: any = useLocalSearchParams();
@@ -74,7 +75,6 @@ const QuizScreen = () => {
     const accessToken = await AsyncStorage.getItem("access_token");
     const refreshToken = await AsyncStorage.getItem("refresh_token");
 
-    console.log("reportData", reportData);
     try {
       setLoader(true);
       const response = await axios.post(
@@ -88,12 +88,10 @@ const QuizScreen = () => {
         }
       );
 
-      console.log("response", response.data);
-
       const { score, result, percentage, attemptedAnswerWithRightAnswer } =
         response.data.data;
 
-      if (response.data.status === "success") {
+      if (response.data.success === true) {
         setSubmitted(true);
         router.push({
           pathname: "/(routes)/quiz-result",
@@ -133,18 +131,22 @@ const QuizScreen = () => {
           },
         });
 
-        console.log("Fetched quizzes", response.data);
+        console.log("response====[[[[[[", response);
+
         const quizData = response.data.data;
 
-        console.log("quizData", quizData.duration);
         setQuiz(quizData);
 
         // Initialize the timer based on the quiz duration
         if (quizData?.duration) {
           setTimeLeft(quizData.duration * 60); // Convert minutes to seconds
         }
-      } catch (error) {
-        console.error(error);
+      } catch (error: any) {
+        console.error("error=========>", error.response.data.message);
+
+        Toast.show(error.response.data.message, {
+          type: "error",
+        });
       } finally {
         setLoader(false);
       }
