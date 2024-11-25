@@ -159,6 +159,7 @@ export default function ProfileScreen() {
                   justifyContent: "space-between",
                   marginBottom: 20,
                 }}
+                onPress={() => router.push("/(routes)/profile-details")}
               >
                 <View
                   style={{
@@ -188,7 +189,7 @@ export default function ProfileScreen() {
                     <Text
                       style={{ fontSize: 16, fontFamily: "Nunito_700Bold" }}
                     >
-                      Detail Profile
+                      Profile Detail
                     </Text>
                     <Text
                       style={{

@@ -16,6 +16,7 @@ import {
   updateUserRoleService,
 } from "../services/user.service";
 import cloudinary from "cloudinary";
+import apiResponse from "../utils/apiResponse";
 
 // register user
 interface IRegistrationBody {
@@ -329,7 +330,7 @@ interface IUpdateUserInfo {
 export const updateUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name } = req.body as IUpdateUserInfo;
+      const { name, email, phone_number } = req.body as IUpdateUserInfo;
 
       const userId = req.user?._id;
       const user = await userModel.findById(userId);
@@ -337,15 +338,18 @@ export const updateUserInfo = CatchAsyncError(
       if (name && user) {
         user.name = name;
       }
+      if (email && user) {
+        user.email = email;
+      }
+      if (phone_number && user) {
+        user.phone_number = phone_number;
+      }
 
       await user?.save();
 
       // await redis.set(userId, JSON.stringify(user));
 
-      res.status(201).json({
-        success: true,
-        user,
-      });
+      apiResponse.success(res, user, "User information update successfully");
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }
