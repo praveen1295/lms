@@ -26,7 +26,7 @@ export default function TestListLayout({}) {
   const category = JSON.parse(item as string);
   const { user, setRefetch } = useUser();
 
-  const [layout, setLayout] = useState<any>([]);
+  const [testCourses, setTestCourses] = useState<any>([]);
   const [loader, setLoader] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [isPurchased, setIsPurchased] = useState(false);
@@ -40,7 +40,7 @@ export default function TestListLayout({}) {
     axios
       .get(`${SERVER_URI}/get-test-courses?isPaid=${category.filter}`)
       .then((res) => {
-        setLayout(res.data.testCourses);
+        setTestCourses(res.data.testCourses);
         console.log("res.data.+++++++", res.data);
       })
       .catch((error) => {
@@ -95,7 +95,7 @@ export default function TestListLayout({}) {
         <ScrollView showsVerticalScrollIndicator={false}>
           {loader ? (
             <Text style={styles.loadingText}>Loading Tests...</Text>
-          ) : layout.length === 0 ? (
+          ) : testCourses.length === 0 ? (
             <View style={styles.noDataContainer}>
               <Text style={styles.noDataText}>No Tests Found</Text>
               <Text style={styles.suggestionText}>
@@ -105,7 +105,7 @@ export default function TestListLayout({}) {
           ) : (
             <FlatList
               ref={flatListRef}
-              data={layout}
+              data={testCourses}
               keyExtractor={(item) => item._id.toString()}
               renderItem={({ item }) => (
                 <View style={styles.courseCard}>

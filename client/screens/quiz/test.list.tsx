@@ -32,7 +32,11 @@ export default function TestsList() {
     setLoader(true);
     axios
       .get(
-        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${testCourse?.filter}&examName=${testCourse.value}&isDemo=${testCourse?.isDemo}`
+        `${SERVER_URI}/quiz/allpublishedquiz/test?filterType=${
+          testCourse?.filter
+        }&examName=${testCourse.value}&isDemo=${
+          testCourse?.isDemo
+        }&category=${"test"}`
       )
       .then((res) => {
         console.log("rrrrrrrrrrrrrr", res.data);

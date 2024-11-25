@@ -23,6 +23,7 @@ const quizSchema = new schema(
     examName: {
       type: String,
       required: true,
+      enum: ["pnst", "aiims", "ANM", "bsc_nursing"],
     },
     duration: {
       type: Number,

@@ -562,42 +562,38 @@ const getAllQuizExam: RequestHandler = async (req, res, next) => {
 
 const getAllQuizTest: RequestHandler = async (req, res, next) => {
   try {
-    const { filterType, examName, isDemo } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
-    console.log(
-      "examName",
+    const { filterType, examName, isDemo, category } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
+
+    const query: any = {
+      isPublished: true,
       examName,
-      "filterType",
-      filterType,
-      "isDemo",
-      isDemo
-    );
-    let quiz = await Quiz.find(
-      {
-        isPublished: true,
-        examName,
-        // , category: "test"
-      },
-      {
-        name: 1,
-        category: 1,
-        questionList: 1,
-        createdBy: 1,
-        passingPercentage: 1,
-        isPublicQuiz: 1,
-        allowedUser: 1,
-        isPaid: 1,
-        isDemo: 1,
-        examName: 1,
-        attemptedUsers: 1,
-      }
-    );
+    };
+
+    if (filterType === "paid") {
+      query.isPaid === true;
+    } else if (filterType === "free") {
+      query.isPaid === false;
+    }
+
+    let quiz = await Quiz.find(query, {
+      name: 1,
+      category: 1,
+      questionList: 1,
+      createdBy: 1,
+      duration: 1,
+      passingPercentage: 1,
+      isPublicQuiz: 1,
+      allowedUser: 1,
+      isPaid: 1,
+      isDemo: 1,
+      examName: 1,
+      attemptedUsers: 1,
+    });
+
+    console.log("quizquiz", quiz);
 
     // Apply additional filter based on query parameter
-    if (filterType === "paid") {
-      quiz = quiz.filter((item) => item.isPaid === true);
-    } else if (filterType === "free") {
-      quiz = quiz.filter((item) => item.isPaid === false);
-    }
+
     // If 'all', no additional filtering is needed
 
     // if (!quiz || quiz.length === 0) {

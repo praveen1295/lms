@@ -5,6 +5,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { router, useLocalSearchParams } from "expo-router";
 import React, { useEffect, useState } from "react";
+import { Dimensions } from "react-native";
+
+const { width: fullWidth, height: fullHeight } = Dimensions.get("window");
+
 import {
   View,
   Text,
@@ -131,6 +135,8 @@ const QuizScreen = () => {
 
         console.log("Fetched quizzes", response.data);
         const quizData = response.data.data;
+
+        console.log("quizData", quizData.duration);
         setQuiz(quizData);
 
         // Initialize the timer based on the quiz duration
@@ -178,6 +184,13 @@ const QuizScreen = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* <Image
+        source={{
+          uri: "http://192.168.39.64:8000/api/v1/static/QUESTION_IMG/1732521272925_Screenshot_from_2024-09-21_10-39-26.png",
+        }}
+        style={styles.questionImage}
+        resizeMode="contain"
+      /> */}
       <View>
         <Text style={styles.quizTitle}>{quiz?.name}</Text>
         {timeLeft !== null && (
@@ -188,9 +201,9 @@ const QuizScreen = () => {
       </View>
       {currentQuestion && (
         <View style={styles.questionContainer}>
-          <Text
-            style={styles.questionText}
-          >{`${currentQuestion.questionNumber}. ${currentQuestion.question}`}</Text>
+          <Text style={styles.questionText}>{`${currentQuestionIndex + 1}. ${
+            currentQuestion.question
+          }`}</Text>
 
           {/* Display question images if available */}
           {currentQuestion.questionImg &&
@@ -298,7 +311,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   questionImage: {
-    width: 200,
+    width: fullWidth,
     height: 150,
     margin: 5,
   },

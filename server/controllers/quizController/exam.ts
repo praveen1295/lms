@@ -75,14 +75,9 @@ const startExam: RequestHandler = async (req, res, next) => {
       }
     }
 
-    apiResponse.success(
-      res,
-      {
-        ...quiz,
-        questionList: quiz.questionList.sort(() => Math.random() - 0.5),
-      },
-      "Quiz"
-    );
+    quiz.questionList = quiz.questionList.sort(() => Math.random() - 0.5);
+
+    apiResponse.success(res, quiz, "Quiz");
   } catch (error) {
     next(error);
   }

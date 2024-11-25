@@ -113,6 +113,15 @@ function RootLayoutNav() {
             headerBackTitle: "Back",
           }}
         />
+
+        <Stack.Screen
+          name="(routes)/questions/index"
+          options={{
+            headerShown: true,
+            title: "Questions",
+            headerBackTitle: "Back",
+          }}
+        />
         <Stack.Screen
           name="(routes)/course-list-layout/index"
           options={{
