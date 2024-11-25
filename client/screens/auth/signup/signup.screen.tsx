@@ -42,6 +42,7 @@ export default function SignUpScreen() {
   const [buttonSpinner, setButtonSpinner] = useState(false);
   const [userInfo, setUserInfo] = useState({
     name: "",
+    phone_number: "",
     email: "",
     password: "",
   });
@@ -101,6 +102,7 @@ export default function SignUpScreen() {
     await axios
       .post(`${SERVER_URI}/registration`, {
         name: userInfo.name,
+        phone_number: userInfo.phone_number,
         email: userInfo.email,
         password: userInfo.password,
       })
@@ -109,14 +111,17 @@ export default function SignUpScreen() {
           "activation_token",
           res.data.activationToken
         );
+
+        console.log(" res.data.activationToken", res.data.activationToken);
         Toast.show(res.data.message, {
           type: "success",
         });
-        setUserInfo({
-          name: "",
-          email: "",
-          password: "",
-        });
+        // setUserInfo({
+        //   name: "",
+        //   phone_number: "",
+        //   email: "",
+        //   password: "",
+        // });
         setButtonSpinner(false);
         router.push("/(routes)/verifyAccount");
       })
@@ -162,6 +167,28 @@ export default function SignUpScreen() {
               size={20}
               color={"#A1A1A1"}
             />
+          </View>
+          <View style={{ marginTop: 15 }}>
+            <TextInput
+              style={[styles.input, { paddingLeft: 40 }]}
+              keyboardType="numeric"
+              value={userInfo.phone_number}
+              placeholder="0000000000"
+              onChangeText={(value) =>
+                setUserInfo({ ...userInfo, phone_number: value })
+              }
+            />
+            <Fontisto
+              style={{ position: "absolute", left: 26, top: 17.8 }}
+              name="phone"
+              size={20}
+              color={"#A1A1A1"}
+            />
+            {required && (
+              <View style={commonStyles.errorContainer}>
+                <Entypo name="cross" size={18} color={"red"} />
+              </View>
+            )}
           </View>
           <View>
             <TextInput

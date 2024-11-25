@@ -20,6 +20,7 @@ import cloudinary from "cloudinary";
 // register user
 interface IRegistrationBody {
   name: string;
+  phone_number: Number;
   email: string;
   password: string;
   avatar?: string;
@@ -28,7 +29,7 @@ interface IRegistrationBody {
 export const registrationUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, email, password } = req.body;
+      const { name, phone_number, email, password } = req.body;
 
       const isEmailExist = await userModel.findOne({ email });
       console.log(isEmailExist);
@@ -39,6 +40,7 @@ export const registrationUser = CatchAsyncError(
 
       const user: IRegistrationBody = {
         name,
+        phone_number,
         email,
         password,
       };
@@ -50,10 +52,10 @@ export const registrationUser = CatchAsyncError(
       const activationCode = activationToken.activationCode;
 
       const data = { user: { name: user.name }, activationCode };
-      const html = await ejs.renderFile(
-        path.join(__dirname, "../../mails/activation-mail.ejs"),
-        data
-      );
+      // const html = await ejs.renderFile(
+      //   path.join(__dirname, "../../mails/activation-mail.ejs"),
+      //   data
+      // );
 
       try {
         await sendMail({
@@ -115,12 +117,12 @@ export const activateUser = CatchAsyncError(
         activation_token,
         process.env.ACTIVATION_SECRET as string
       ) as { user: IUser; activationCode: string };
-
+      console.log("newUser=====", newUser);
       if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler("Invalid activation code", 400));
       }
-
-      const { name, email, password } = newUser.user;
+      console.log(";;;;;;;;;;;;;;;;;;;;");
+      const { name, phone_number, email, password } = newUser.user;
 
       const existUser = await userModel.findOne({ email });
 
@@ -129,6 +131,7 @@ export const activateUser = CatchAsyncError(
       }
       const user = await userModel.create({
         name,
+        phone_number: Number(phone_number),
         email,
         password,
       });
