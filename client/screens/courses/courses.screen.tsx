@@ -22,14 +22,14 @@ export default function CoursesScreen() {
   const [courses, setCourses] = useState<CoursesType[]>([]);
   const [originalCourses, setOriginalCourses] = useState<CoursesType[]>([]);
   const [loading, setLoading] = useState(true);
-  const [categories, setcategories] = useState([]);
-  const [activeCategory, setactiveCategory] = useState("All");
+  const [categories, setCategories] = useState([]);
+  const [activeCategory, setActiveCategory] = useState("All");
 
   useEffect(() => {
     axios
       .get(`${SERVER_URI}/get-layout/Categories`)
       .then((res) => {
-        setcategories(res.data.layout.categories);
+        setCategories(res.data.layout.categories);
         fetchCourses();
       })
       .catch((error) => {
@@ -65,7 +65,7 @@ export default function CoursesScreen() {
   }
 
   const handleCategories = (e: string) => {
-    setactiveCategory(e);
+    setActiveCategory(e);
     if (e === "All") {
       setCourses(originalCourses);
     } else {
@@ -75,8 +75,6 @@ export default function CoursesScreen() {
       setCourses(filterCourses);
     }
   };
-
-  console.log("courses=====", courses);
 
   return (
     <>

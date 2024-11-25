@@ -13,7 +13,7 @@ const page = (props: Props) => {
       <AdminProtected>
         <Heading
           title="Elearning - Admin"
-          description="Entrance Exam Warriors is a platform for students to learn and get help from teachers"
+          description="Concept Leader is a platform for students to learn and get help from teachers"
           keywords="Programming,MERN,Redux,Machine Learning"
         />
         <div className="flex min-h-screen">

@@ -3,10 +3,9 @@ import { RequestHandler } from "express";
 import fs from "fs";
 import ProjectError from "../../helper/error";
 import Quiz from "../../models/quiz";
-import { ReturnResponse } from "../../utils/interfaces";
 import userModel from "../../models/user.model";
 import { rootDir } from "../../middleware/fileUpload.middleware";
-console.log("rootDir", rootDir);
+import apiResponse from "../../utils/apiResponse";
 const createQuiz = async (req: any, res: any) => {
   try {
     const createdBy = req?.user?._id.toString();
@@ -37,7 +36,6 @@ const createQuiz = async (req: any, res: any) => {
       (question: any, index: number) => {
         const newQuestionImagesFiles =
           req?.files[`questionList[${index}][newQuestionImages]`] || [];
-        console.log("newQuestionImagesFiles", newQuestionImagesFiles);
 
         const questionImages = newQuestionImagesFiles.map(
           (file: any) =>
@@ -60,7 +58,7 @@ const createQuiz = async (req: any, res: any) => {
       isPublicQuiz: isPublicQuiz === "true" ? true : false,
       allowedUser,
       createdBy,
-      answers,
+      answers: typeof answers === "string" ? JSON.parse(answers) : answers,
       examName,
       isShuffle: isShuffle === "true" ? true : false,
       duration: Number(duration),
@@ -68,25 +66,20 @@ const createQuiz = async (req: any, res: any) => {
 
     const result = await quiz.save();
 
-    res.status(201).json({
-      success: true,
-      message: "Quiz created successfully",
-      data: { quizId: result._id },
-    });
+    apiResponse.success(
+      res,
+      { quizId: result._id },
+      "Quiz created successfully"
+    );
   } catch (error: any) {
     console.error("Error creating quiz:", error);
-    res.status(500).json({
-      success: false,
-      message: "Quiz creation failed",
-      error: error?.message,
-    });
+    apiResponse.error(res, "Quiz creation failed", 500);
   }
 };
 
 const getQuizById: RequestHandler = async (req, res, next) => {
   try {
     const quizId = req.params.quizId;
-    console.log("quizId", quizId);
     let quiz;
     if (quizId) {
       quiz = await Quiz.findById(
@@ -128,12 +121,7 @@ const getQuizById: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    const resp: ReturnResponse = {
-      status: "success",
-      message: "Quiz",
-      data: quiz,
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, quiz, "Quiz");
   } catch (error) {
     next(error);
   }
@@ -151,11 +139,11 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
       throw err;
     }
 
-    if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
-      const err = new ProjectError("You are not authorized!");
-      err.statusCode = 403;
-      throw err;
-    }
+    // if (req?.user?._id.toString() !== quiz.createdBy.toString()) {
+    //   const err = new ProjectError("You are not authorized!");
+    //   err.statusCode = 403;
+    //   throw err;
+    // }
 
     if (quiz.isPublished) {
       const err = new ProjectError("You cannot update a published Quiz!");
@@ -163,7 +151,8 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
       throw err;
     }
 
-    if (quiz.name !== req.body.name) {
+    // Check for unique quiz name if it is being changed
+    if (req.body.name && quiz.name !== req.body.name) {
       const status = await isValidQuizName(req.body.name);
       if (!status) {
         const err = new ProjectError("Please enter a unique quiz name.");
@@ -173,68 +162,128 @@ const updateQuiz: RequestHandler = async (req: any, res, next) => {
       quiz.name = req.body.name;
     }
 
-    // Parse questionList if it's a string
-    const updatedQuestionList =
-      typeof req.body.questionList === "string"
-        ? JSON.parse(req.body.questionList)
-        : req.body.questionList;
+    // Update fields if they are present in the request
+    if (req.body.description) {
+      quiz.description = req.body.description;
+    }
 
-    // Update each question's images if provided, and delete old images if replaced
-    const formattedQuestionList = updatedQuestionList.map(
-      (question: any, index: number) => {
-        const newQuestionImagesFiles =
-          req?.files[`questionList[${index}][newQuestionImages]`] || [];
+    if (req.body.category) {
+      quiz.category = req.body.category;
+    }
 
-        // If new images are provided, delete the old images
-        if (newQuestionImagesFiles.length > 0 && question.questionImages) {
-          question.questionImages.forEach((imageUrl: string) => {
-            // Logic to delete the old image file, e.g., using `fs.unlink`
-            const filePath = imageUrl.replace(
-              `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/`,
-              ""
+    if (req.body.examName) {
+      quiz.examName = req.body.examName;
+    }
+
+    if (req.body.duration !== undefined) {
+      quiz.duration = req.body.duration;
+    }
+
+    if (req.body.isShuffle !== undefined) {
+      quiz.isShuffle = req.body.isShuffle;
+    }
+
+    if (req.body.difficultyLevel) {
+      quiz.difficultyLevel = req.body.difficultyLevel;
+    }
+
+    if (req.body.answers) {
+      quiz.answers =
+        typeof req.body.answers === "string"
+          ? JSON.parse(req.body.answers)
+          : req.body.answers;
+    }
+
+    if (req.body.passingPercentage !== undefined) {
+      quiz.passingPercentage = req.body.passingPercentage;
+    }
+
+    if (req.body.isPublicQuiz !== undefined) {
+      quiz.isPublicQuiz = req.body.isPublicQuiz;
+    }
+
+    if (req.body.allowedUser) {
+      quiz.allowedUser = req.body.allowedUser;
+    }
+
+    if (req.body.isPaid !== undefined) {
+      quiz.isPaid = req.body.isPaid;
+    }
+
+    if (req.body.isDemo !== undefined) {
+      quiz.isDemo = req.body.isDemo;
+    }
+
+    if (req.body.attemptsAllowedPerUser !== undefined) {
+      quiz.attemptsAllowedPerUser = req.body.attemptsAllowedPerUser;
+    }
+
+    // Parse and update questionList if provided
+    if (req.body.questionList) {
+      const updatedQuestionList =
+        typeof req.body.questionList === "string"
+          ? JSON.parse(req.body.questionList)
+          : req.body.questionList;
+
+      const formattedQuestionList = updatedQuestionList.map(
+        (question: any, index: number) => {
+          const oldQuestionImages = question.oldQuestionImages || [];
+
+          const deleteQuestionImages = quiz.questionList
+            .filter(
+              (item) => item._id.toString() === question._id.toString()
+            )[0]
+            .questionImages.filter(
+              (image) => !oldQuestionImages.includes(image)
             );
-            const fullFilePath = `${rootDir}/QUESTION_IMG/${filePath}`;
 
-            fs.unlink(fullFilePath, (err: any) => {
-              if (err) {
-                console.error(`Error deleting file: ${filePath}`, err);
-              } else {
-                console.log(`Deleted old image file: ${filePath}`);
-              }
+          const newQuestionImagesFiles =
+            req?.files[`questionList[${index}][newQuestionImages]`] || [];
+
+          // If new images are provided, delete the old images
+          if (deleteQuestionImages.length > 0 && question.questionImages) {
+            deleteQuestionImages.forEach((imageUrl: string) => {
+              const filePath = imageUrl.replace(
+                `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/`,
+                ""
+              );
+              const fullFilePath = `${rootDir}/QUESTION_IMG/${filePath}`;
+
+              fs.unlink(fullFilePath, (err: any) => {
+                if (err) {
+                  console.error(`Error deleting file: ${filePath}`, err);
+                } else {
+                  console.log(`Deleted old image file: ${filePath}`);
+                }
+              });
             });
-          });
+          }
+
+          // Map new images
+          const questionImages = newQuestionImagesFiles.map(
+            (file: any) =>
+              `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/${file.filename}`
+          );
+
+          // Use new images if available, otherwise keep existing images
+          const updatedImages = questionImages.length
+            ? questionImages
+            : question.questionImages || [];
+
+          return {
+            ...question,
+            questionImages: [...updatedImages, ...oldQuestionImages],
+          };
         }
+      );
 
-        // Map new images
-        const questionImages = newQuestionImagesFiles.map(
-          (file: any) =>
-            `${process.env.BACKEND_URL}/api/v1/static/QUESTION_IMG/${file.filename}`
-        );
+      quiz.questionList = formattedQuestionList;
+    }
 
-        // Use new images if available, otherwise keep existing images
-        const updatedImages = questionImages.length
-          ? questionImages
-          : question.questionImages || [];
-
-        return { ...question, questionImages: updatedImages };
-      }
-    );
-
-    // Update quiz fields
-    quiz.questionList = formattedQuestionList;
-    quiz.answers = req.body.answers;
-    quiz.passingPercentage = req.body.passingPercentage;
-    quiz.isPublicQuiz = req.body.isPublicQuiz;
-    quiz.allowedUser = req.body.allowedUser;
-
+    // Save updated quiz
     await quiz.save();
 
-    const resp: ReturnResponse = {
-      status: "success",
-      message: "Quiz updated successfully",
-      data: {},
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, {}, "Quiz updated successfully");
   } catch (error) {
     next(error);
   }
@@ -264,12 +313,8 @@ const deleteQuiz: RequestHandler = async (req, res, next) => {
     }
 
     await Quiz.deleteOne({ _id: quizId });
-    const resp: ReturnResponse = {
-      status: "success",
-      message: "Quiz deleted successfully",
-      data: {},
-    };
-    res.status(200).send(resp);
+
+    apiResponse.success(res, {}, "Quiz deleted successfully");
   } catch (error) {
     next(error);
   }
@@ -304,12 +349,7 @@ const publishQuiz: RequestHandler = async (req, res, next) => {
 
     quiz.isPublished = true;
     await quiz.save();
-    const resp: ReturnResponse = {
-      status: "success",
-      message: "Quiz published!",
-      data: {},
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, {}, "Quiz published!");
   } catch (error) {
     next(error);
   }
@@ -325,8 +365,6 @@ const isValidQuiz = async (
   answers: Record<string, string>
 ) => {
   // Check if questionList is non-empty
-  console.log("answers", answers);
-  console.log("questionList", questionList);
 
   if (!questionList.length) {
     console.log("Validation failed: questionList is empty.");
@@ -434,13 +472,13 @@ const getAllQuiz: RequestHandler = async (req, res, next) => {
     });
 
     // Filter quizzes created by user itself
-    quiz = quiz.filter((item) => {
-      return (
-        (item.isPublicQuiz ||
-          item.allowedUser.includes(req?.user?._id.toString())) &&
-        item.createdBy.toString() !== req?.user?._id.toString()
-      );
-    });
+    // quiz = quiz.filter((item) => {
+    //   return (
+    //     (item.isPublicQuiz ||
+    //       item.allowedUser.includes(req?.user?._id.toString())) &&
+    //     item.createdBy.toString() !== req?.user?._id.toString()
+    //   );
+    // });
 
     // Apply additional filter based on query parameter
     if (filterType === "paid") {
@@ -456,12 +494,7 @@ const getAllQuiz: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    const resp: ReturnResponse = {
-      status: "success",
-      message: "All Published Quiz",
-      data: quiz,
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, quiz, "All Published Quiz");
   } catch (error) {
     next(error);
   }
@@ -470,7 +503,6 @@ const getAllQuiz: RequestHandler = async (req, res, next) => {
 const getAllQuizExam: RequestHandler = async (req, res, next) => {
   try {
     const { filterType, examName } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
-    console.log("examName", examName, "filterType", filterType);
     let quiz = await Quiz.find(
       { isPublished: true, category: "exam", examName },
       {
@@ -508,12 +540,7 @@ const getAllQuizExam: RequestHandler = async (req, res, next) => {
       throw err;
     }
 
-    const resp: ReturnResponse = {
-      status: "success",
-      message: "All Exam Quizzes",
-      data: quiz,
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, quiz, "All Exam Quizzes");
   } catch (error) {
     next(error);
   }
@@ -521,44 +548,45 @@ const getAllQuizExam: RequestHandler = async (req, res, next) => {
 
 const getAllQuizTest: RequestHandler = async (req, res, next) => {
   try {
-    const { filterType, examName } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
-    console.log("examName", examName, "filterType", filterType);
-    let quiz = await Quiz.find(
-      { isPublished: true, category: "test", examName },
-      {
-        name: 1,
-        category: 1,
-        questionList: 1,
-        createdBy: 1,
-        passingPercentage: 1,
-        isPublicQuiz: 1,
-        allowedUser: 1,
-        isPaid: 1,
-        isDemo: 1,
-        examName: 1,
-      }
-    );
+    const { filterType, examName, isDemo, category } = req.query; // expecting 'paid', 'free', or 'all' from query parameter
+
+    const query: any = {
+      isPublished: true,
+      examName,
+    };
+
+    if (filterType === "paid") {
+      query.isPaid === true;
+    } else if (filterType === "free") {
+      query.isPaid === false;
+    }
+
+    let quiz = await Quiz.find(query, {
+      name: 1,
+      category: 1,
+      questionList: 1,
+      createdBy: 1,
+      duration: 1,
+      passingPercentage: 1,
+      isPublicQuiz: 1,
+      allowedUser: 1,
+      isPaid: 1,
+      isDemo: 1,
+      examName: 1,
+      attemptedUsers: 1,
+    });
 
     // Apply additional filter based on query parameter
-    if (filterType === "paid") {
-      quiz = quiz.filter((item) => item.isPaid === true);
-    } else if (filterType === "free") {
-      quiz = quiz.filter((item) => item.isPaid === false);
-    }
+
     // If 'all', no additional filtering is needed
 
-    if (!quiz || quiz.length === 0) {
-      const err = new ProjectError("No test quiz found!");
-      err.statusCode = 404;
-      throw err;
-    }
+    // if (!quiz || quiz.length === 0) {
+    //   const err = new ProjectError("No test quiz found!");
+    //   err.statusCode = 404;
+    //   throw err;
+    // }
 
-    const resp: ReturnResponse = {
-      status: "success",
-      message: "All Test Quizzes",
-      data: quiz,
-    };
-    res.status(200).send(resp);
+    apiResponse.success(res, quiz, "All Test Quizzes");
   } catch (error) {
     next(error);
   }

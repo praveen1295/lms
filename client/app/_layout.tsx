@@ -109,7 +109,16 @@ function RootLayoutNav() {
           name="(routes)/quiz-instruction/index"
           options={{
             headerShown: true,
-            title: "Quiz",
+            title: "Quiz Instructions",
+            headerBackTitle: "Back",
+          }}
+        />
+
+        <Stack.Screen
+          name="(routes)/questions/index"
+          options={{
+            headerShown: true,
+            title: "Questions",
             headerBackTitle: "Back",
           }}
         />
@@ -142,7 +151,7 @@ function RootLayoutNav() {
           name="(routes)/test-list-layout/index"
           options={{
             headerShown: true,
-            title: "Tests Courses",
+            title: "Courses",
             headerBackTitle: "Back",
           }}
         />
@@ -150,7 +159,34 @@ function RootLayoutNav() {
           name="(routes)/test-list/index"
           options={{
             headerShown: true,
-            title: "Tests",
+            title: "Available Tests",
+            headerBackTitle: "Back",
+          }}
+        />
+
+        <Stack.Screen
+          name="(routes)/test-reports/index"
+          options={{
+            headerShown: true,
+            title: "All Reports",
+            headerBackTitle: "Back",
+          }}
+        />
+
+        {/* <Stack.Screen
+          name="(routes)/questions/index"
+          options={{
+            headerShown: true,
+            title: "Started",
+            headerBackTitle: "Back",
+          }}
+        /> */}
+
+        <Stack.Screen
+          name="(routes)/quiz-result/index"
+          options={{
+            // headerShown: true,
+            title: "Test Report",
             headerBackTitle: "Back",
           }}
         />

@@ -23,7 +23,6 @@ export default function CourseListLayout({}) {
 
   const { category: item } = useLocalSearchParams();
 
-  console.log("Item0000000000", item);
   const category: any = JSON.parse(item as string);
 
   const [layout, setLayout] = useState<any>({});
@@ -41,7 +40,6 @@ export default function CourseListLayout({}) {
       .get(`${SERVER_URI}/get-layout/${category.layout}`)
       .then((res) => {
         setLayout(res.data.layout.categories);
-        console.log("res.data.+++++++", res.data.layout);
       })
       .catch((error) => {
         console.error(error);
@@ -50,7 +48,6 @@ export default function CourseListLayout({}) {
         setLoader(false);
       });
   }, [createNavigatorFactory]); // Re-run effect when filter changes
-  console.log("layout", layout);
 
   return (
     <LinearGradient colors={["#E5ECF9", "#F6F7F9"]} style={styles.container}>

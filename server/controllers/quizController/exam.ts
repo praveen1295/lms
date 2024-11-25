@@ -4,7 +4,7 @@ import { Mongoose } from "mongoose";
 import ProjectError from "../../helper/error";
 import Quiz from "../../models/quiz";
 import Report from "../../models/report";
-import { ReturnResponse } from "../../utils/interfaces";
+import apiResponse from "../../utils/apiResponse";
 
 const startExam: RequestHandler = async (req, res, next) => {
   const userId = req?.user?._id;
@@ -21,6 +21,7 @@ const startExam: RequestHandler = async (req, res, next) => {
       passingPercentage: 1,
       isPublicQuiz: 1,
       allowedUser: 1,
+      duration: 1,
     });
 
     if (!quiz) {
@@ -34,51 +35,54 @@ const startExam: RequestHandler = async (req, res, next) => {
       err.statusCode = 405;
       throw err;
     }
+
     if (quiz.createdBy.toString() === userId) {
       const err = new ProjectError("You can't attend your own quiz!");
       err.statusCode = 405;
+      throw err;
     }
-    // if(!quiz.isPublicQuiz && !quiz.allowedUser.includes(req?.user?._id)){
+
+    // Uncomment this section if you want to check for user authorization
+    // if (!quiz.isPublicQuiz && !quiz.allowedUser.includes(req?.user?._id)) {
     //   const err = new ProjectError("You are not authorized!");
     //   err.statusCode = 403;
     //   throw err;
     // }
-    if (quiz.category === "test") {
-      if (quiz.attemptsAllowedPerUser) {
-        if (quiz.attemptedUsers.length) {
-          quiz.attemptedUsers.forEach((user) => {
-            const id = user.id;
-            if (id === req?.user?._id) {
-              if (user.attemptsLeft !== undefined) {
-                if (user.attemptsLeft > 0) {
-                  user.attemptsLeft -= 1;
-                } else {
-                  const err = new ProjectError("You have zero attempts left!");
-                  err.statusCode = 405;
-                  throw err;
-                }
-              }
-            }
-          });
-          const updated = await quiz.save();
+
+    if (quiz.category === "test" && quiz.attemptsAllowedPerUser) {
+      const existingUser = quiz.attemptedUsers.find(
+        (user) => user.id === userId.toString()
+      );
+
+      if (existingUser) {
+        if (
+          existingUser.attemptsLeft !== undefined &&
+          existingUser.attemptsLeft > 0
+        ) {
+          existingUser.attemptsLeft -= 1;
         } else {
-          if (req?.user?._id && quiz.attemptsAllowedPerUser) {
-            const newUser = {
-              id: req?.user?._id.toString(),
-              attemptsLeft: quiz.attemptsAllowedPerUser - 1,
-            };
-            quiz.attemptedUsers.push(newUser);
-            const updated = await quiz.save();
-          }
+          // const err = new ProjectError("You have zero attempts left!");
+          // err.statusCode = 405;
+          // throw err;
         }
+      } else {
+        // If user hasn't attempted before, add them with initial attempts
+        const newUser = {
+          id: userId.toString(),
+          attemptsLeft: quiz.attemptsAllowedPerUser - 1,
+        };
+        quiz.attemptedUsers.push(newUser);
       }
+
+      // Save the updated quiz document
+      await quiz.save();
     }
-    const resp: ReturnResponse = {
-      status: "success",
-      message: "Quiz",
-      data: quiz,
-    };
-    res.status(200).send(resp);
+
+    // Randomize the question order
+    quiz.questionList = quiz.questionList.sort(() => Math.random() - 0.5);
+
+    // Return the quiz details
+    apiResponse.success(res, quiz, "Quiz");
   } catch (error) {
     next(error);
   }
@@ -156,21 +160,17 @@ const submitExam: RequestHandler = async (req, res, next) => {
     });
     const data = await report.save();
 
-    const resp: ReturnResponse = {
-      status: "success",
-      message: "Quiz submitted",
-      data: {
+    apiResponse.success(
+      res,
+      {
         total,
         score,
         result,
         reportId: data._id,
         attemptedAnswerWithRightAnswer,
       },
-    };
-
-    console.log("ccccccccccc", resp);
-
-    res.status(200).send(resp);
+      "Quiz submitted"
+    );
   } catch (error) {
     next(error);
   }
@@ -187,6 +187,7 @@ const isValidAttempt = async (
   quizId: Mongoose["Types"]["ObjectId"]
 ) => {
   const quiz = await Quiz.findById(quizId);
+
   if (!quiz) {
     const err = new ProjectError("No quiz found!");
     err.statusCode = 404;
@@ -195,8 +196,8 @@ const isValidAttempt = async (
   const answers = quiz.answers;
   const questions = Object.keys(answers);
   const attemptQ = Object.keys(attemptedQuestion);
-  if (attemptQ.length != questions.length) return false;
 
+  // if (attemptQ.length != questions.length) return false;
   let flag = 0;
   attemptQ.forEach((e) => {
     if (questions.indexOf(e) < 0) {

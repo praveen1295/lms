@@ -16,10 +16,12 @@ import {
   updateUserRoleService,
 } from "../services/user.service";
 import cloudinary from "cloudinary";
+import apiResponse from "../utils/apiResponse";
 
 // register user
 interface IRegistrationBody {
   name: string;
+  phone_number: Number;
   email: string;
   password: string;
   avatar?: string;
@@ -28,10 +30,9 @@ interface IRegistrationBody {
 export const registrationUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name, email, password } = req.body;
+      const { name, phone_number, email, password } = req.body;
 
       const isEmailExist = await userModel.findOne({ email });
-      console.log(isEmailExist);
 
       if (isEmailExist) {
         return next(new ErrorHandler("Email already exist", 400));
@@ -39,21 +40,20 @@ export const registrationUser = CatchAsyncError(
 
       const user: IRegistrationBody = {
         name,
+        phone_number,
         email,
         password,
       };
 
       const activationToken = createActivationToken(user);
 
-      console.log("activationToken", activationToken);
-
       const activationCode = activationToken.activationCode;
 
       const data = { user: { name: user.name }, activationCode };
-      const html = await ejs.renderFile(
-        path.join(__dirname, "../../mails/activation-mail.ejs"),
-        data
-      );
+      // const html = await ejs.renderFile(
+      //   path.join(__dirname, "../../mails/activation-mail.ejs"),
+      //   data
+      // );
 
       try {
         await sendMail({
@@ -115,12 +115,10 @@ export const activateUser = CatchAsyncError(
         activation_token,
         process.env.ACTIVATION_SECRET as string
       ) as { user: IUser; activationCode: string };
-
       if (newUser.activationCode !== activation_code) {
         return next(new ErrorHandler("Invalid activation code", 400));
       }
-
-      const { name, email, password } = newUser.user;
+      const { name, phone_number, email, password } = newUser.user;
 
       const existUser = await userModel.findOne({ email });
 
@@ -129,6 +127,7 @@ export const activateUser = CatchAsyncError(
       }
       const user = await userModel.create({
         name,
+        phone_number: Number(phone_number),
         email,
         password,
       });
@@ -152,7 +151,6 @@ export const loginUser = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { email, password } = req.body as ILoginRequest;
-      console.log(email, password);
       if (!email || !password) {
         return next(new ErrorHandler("Please enter email and password", 400));
       }
@@ -163,10 +161,7 @@ export const loginUser = CatchAsyncError(
         return next(new ErrorHandler("Invalid email or password", 400));
       }
 
-      console.log("user", user);
-
       const isPasswordMatch = await user.comparePassword(password);
-      console.log("isPasswordMatch", isPasswordMatch);
       if (!isPasswordMatch) {
         return next(new ErrorHandler("Invalid email or password", 400));
       }
@@ -326,7 +321,7 @@ interface IUpdateUserInfo {
 export const updateUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name } = req.body as IUpdateUserInfo;
+      const { name, email, phone_number } = req.body as IUpdateUserInfo;
 
       const userId = req.user?._id;
       const user = await userModel.findById(userId);
@@ -334,15 +329,18 @@ export const updateUserInfo = CatchAsyncError(
       if (name && user) {
         user.name = name;
       }
+      if (email && user) {
+        user.email = email;
+      }
+      if (phone_number && user) {
+        user.phone_number = phone_number;
+      }
 
       await user?.save();
 
       // await redis.set(userId, JSON.stringify(user));
 
-      res.status(201).json({
-        success: true,
-        user,
-      });
+      apiResponse.success(res, user, "User information update successfully");
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 400));
     }

@@ -15,7 +15,7 @@ import useUser from "@/hooks/auth/useUser";
 import Loader from "../loader/loader";
 import TestsCard from "../cards/tests.card";
 
-export default function AllQuizzes({ examName, filter, examId }) {
+export default function AllQuizzes({ examName, filter, examId, isPaid }) {
   const [quizzes, setQuizzes] = useState<any>([]);
   const { user, loading, setRefetch } = useUser();
   const [loader, setLoader] = useState(false);
@@ -32,19 +32,23 @@ export default function AllQuizzes({ examName, filter, examId }) {
         const demoTest = res.data.data.filter(
           (item: any) => item.isDemo === true
         );
-        const paidTests = res.data.data.filter(
-          (item: any) => item.isDemo === false
-        );
+        let newTests = [];
 
-        console.log("user.tests", user?.tests, "examId", examId);
+        if (isPaid) {
+          newTests = res.data.data.filter((item: any) => item.isDemo === false);
+        } else {
+          newTests = res.data.data.filter((item: any) => item.isPaid === false);
+        }
 
-        const data = paidTests.map((i: any) => {
-          if (user?.tests?.some((d: any) => d._id === examId)) {
-            console.log("user.tests1111111", user?.tests, "examId", examId);
-
-            return { ...i, locked: false };
+        const data = newTests.map((i: any) => {
+          if (isPaid) {
+            if (user?.tests?.some((d: any) => d._id === examId)) {
+              return { ...i, locked: false };
+            } else {
+              return { ...i, locked: true };
+            }
           } else {
-            return { ...i, locked: true };
+            return { ...i, locked: false };
           }
         });
 
@@ -80,7 +84,7 @@ export default function AllQuizzes({ examName, filter, examId }) {
       {featuredTest && showBanner && (
         <View style={styles.bannerCard}>
           <Image
-            source={require("@/assets/images/icon.png")}
+            source={require("@/assets/images/icon1.png")}
             style={styles.bannerImage}
           />
           <View style={styles.bannerContent}>

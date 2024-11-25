@@ -24,8 +24,6 @@ interface CartItemsType {
 const { initPaymentSheet, presentPaymentSheet } = useStripe();
 
 const handlePayment = async (cartItems: any, setOrderSuccess: any) => {
-  console.log("handlePayment cartItems", cartItems);
-
   try {
     const accessToken = await AsyncStorage.getItem("access_token");
     const refreshToken = await AsyncStorage.getItem("refresh_token");
@@ -54,8 +52,6 @@ const handlePayment = async (cartItems: any, setOrderSuccess: any) => {
 
     // const totalAmount = coursesAmount + testsAmount;
 
-    console.log("handlePayment", accessToken, refreshToken, amount);
-
     // Step 1: Create payment intent on the server
     const paymentIntentResponse = await axios.post(
       `${SERVER_URI}/payment`,
@@ -69,11 +65,10 @@ const handlePayment = async (cartItems: any, setOrderSuccess: any) => {
     );
 
     const { client_secret: clientSecret } = paymentIntentResponse.data;
-    console.log("clientSecret", clientSecret);
 
     // Step 2: Initialize the payment sheet
     const initSheetResponse = await initPaymentSheet({
-      merchantDisplayName: "entrance exam warriors Private Ltd.",
+      merchantDisplayName: "concept leader Private Ltd.",
       paymentIntentClientSecret: clientSecret,
       // Ensure default payment method is enabled
       defaultBillingDetails: {
@@ -98,14 +93,12 @@ const handlePayment = async (cartItems: any, setOrderSuccess: any) => {
 
     if (paymentResponse.error) {
       if (paymentResponse.error.code === "Canceled") {
-        console.log("Payment was canceled by the user");
         alert("Payment flow was canceled. Please try again.");
       } else {
         console.error("Payment failed:", paymentResponse.error.message);
         alert(`Payment failed: ${paymentResponse.error.message}`);
       }
     } else {
-      console.log("Payment successful:", paymentResponse);
       await createOrder(paymentResponse, setOrderSuccess, cartItems);
       alert("Payment successful!");
     }
@@ -120,10 +113,8 @@ const createOrder = async (
   setOrderSuccess: any,
   cartItems: any
 ) => {
-  console.log("createOrder calllled");
   const accessToken = await AsyncStorage.getItem("access_token");
   const refreshToken = await AsyncStorage.getItem("refresh_token");
-  console.log("cartItems", accessToken, refreshToken, cartItems);
 
   let keyId = "";
   let valueId = "";
@@ -135,7 +126,6 @@ const createOrder = async (
     keyId = "courseId";
     valueId = cartItems.courses[0]._id;
   }
-  console.log("cartItems", cartItems);
   await axios
     .post(
       `${SERVER_URI}/create-mobile-order`,

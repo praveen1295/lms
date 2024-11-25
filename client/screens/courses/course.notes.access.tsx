@@ -72,7 +72,6 @@ import { useLocalSearchParams } from "expo-router";
 const PDFViewer = () => {
   const { courseData: item } = useLocalSearchParams();
   const courseData: any = JSON.parse(item as string);
-  console.log("courseData?.notes.url", courseData?.notes);
   const PdfResource = {
     uri: courseData?.notes.notesUrl,
     cache: true,
@@ -85,9 +84,7 @@ const PDFViewer = () => {
         trustAllCerts={false}
         source={PdfResource}
         style={styles.pdf}
-        onLoadComplete={(numberOfPages: any, filePath: any) => {
-          console.log(`number of pages: ${numberOfPages}`);
-        }}
+        onLoadComplete={(numberOfPages: any, filePath: any) => {}}
       />
     </View>
   );

@@ -23,12 +23,10 @@ export default function useUser() {
         })
         .then((res: any) => {
           setUser(res.data.user);
-          console.log("useUser Response", res.data.user);
           setLoading(false);
         })
         .catch((error: any) => {
           setError(error?.message);
-          console.log("useUser Error", error?.message);
 
           setLoading(false);
         });

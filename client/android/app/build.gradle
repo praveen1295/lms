@@ -131,9 +131,9 @@ android {
     }
 
 
-    namespace 'com.entranceexamwarriors.app'
+    namespace 'com.conceptleader.app'
     defaultConfig {
-        applicationId 'com.entranceexamwarriors.app'
+        applicationId 'com.conceptleader.app'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

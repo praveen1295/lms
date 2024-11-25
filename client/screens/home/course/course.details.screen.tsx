@@ -31,7 +31,6 @@ export default function CourseDetailScreen() {
 
   const [orderSuccess, setOrderSuccess] = useState(false);
 
-  console.log("courseData", courseData.isPaid, "===========================");
   useEffect(() => {
     if (user?.courses?.find((i: any) => i._id === courseData?._id)) {
       setCheckPurchased(true);
@@ -42,7 +41,6 @@ export default function CourseDetailScreen() {
     // AsyncStorage.removeItem("cart");
     const existingCartData = await AsyncStorage.getItem("cart");
     const cartData = existingCartData ? JSON.parse(existingCartData) : {};
-    console.log("cartData", cartData);
     const itemExists = cartData.courses.some(
       (item: any) => item._id === courseData._id
     );

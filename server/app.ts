@@ -38,6 +38,7 @@ const allowedOrigins = [
   "http://www.biotronix.com",
   "http://3.111.3.98",
   "http://3.111.3.98/api",
+  "https://eew-five.vercel.app"
 ];
 
 app.use(

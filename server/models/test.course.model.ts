@@ -88,10 +88,13 @@ const TestCourseSchema = new Schema<ICourse>(
     name: {
       type: String,
       required: true,
+
+      enum: ["PNST", "AIIMS", "ANM", "BSc Nursing"],
     },
     value: {
       type: String,
       required: true,
+      enum: ["pnst", "aiims", "anm", "bsc_nursing"],
     },
     description: {
       type: String,

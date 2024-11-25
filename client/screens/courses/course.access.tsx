@@ -150,8 +150,6 @@ export default function CourseAccessScreen() {
     return starts;
   };
 
-  console.log("courseContentData", courseContentData);
-
   return (
     <>
       {isLoading ? (

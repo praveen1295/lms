@@ -26,7 +26,7 @@ export default function TestListLayout({}) {
   const category = JSON.parse(item as string);
   const { user, setRefetch } = useUser();
 
-  const [layout, setLayout] = useState<any>([]);
+  const [testCourses, setTestCourses] = useState<any>([]);
   const [loader, setLoader] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [isPurchased, setIsPurchased] = useState(false);
@@ -40,8 +40,7 @@ export default function TestListLayout({}) {
     axios
       .get(`${SERVER_URI}/get-test-courses?isPaid=${category.filter}`)
       .then((res) => {
-        setLayout(res.data.testCourses);
-        console.log("res.data.+++++++", res.data);
+        setTestCourses(res.data.testCourses);
       })
       .catch((error) => {
         console.error(error);
@@ -95,7 +94,7 @@ export default function TestListLayout({}) {
         <ScrollView showsVerticalScrollIndicator={false}>
           {loader ? (
             <Text style={styles.loadingText}>Loading Tests...</Text>
-          ) : layout.length === 0 ? (
+          ) : testCourses.length === 0 ? (
             <View style={styles.noDataContainer}>
               <Text style={styles.noDataText}>No Tests Found</Text>
               <Text style={styles.suggestionText}>
@@ -105,12 +104,12 @@ export default function TestListLayout({}) {
           ) : (
             <FlatList
               ref={flatListRef}
-              data={layout}
+              data={testCourses}
               keyExtractor={(item) => item._id.toString()}
               renderItem={({ item }) => (
                 <View style={styles.courseCard}>
                   <Image
-                    source={require("@/assets/images/icon.png")}
+                    source={require("@/assets/images/icon1.png")}
                     style={styles.courseImage}
                   />
                   <View style={styles.courseContent}>
@@ -119,9 +118,61 @@ export default function TestListLayout({}) {
                       {item.description.split(" ").slice(0, 7).join(" ") +
                         (item.description.split(" ").length > 7 ? "..." : "")}
                     </Text>
-                    <View style={styles.buttonContainer}>
-                      <View>
-                        {user?.tests?.some((d: any) => d._id === item._id) ? (
+                    {item.isPaid ? (
+                      <View style={styles.buttonContainer}>
+                        <View>
+                          {user?.tests?.some((d: any) => d._id === item._id) ? (
+                            <TouchableOpacity
+                              style={[styles.button, styles.goButton]}
+                              onPress={() =>
+                                router.push({
+                                  pathname: "/(routes)/test-list",
+                                  params: {
+                                    item: JSON.stringify({
+                                      ...item,
+                                      filter: category.filter,
+                                    }),
+                                  },
+                                })
+                              }
+                            >
+                              <Text style={styles.buttonText}>Start </Text>
+                            </TouchableOpacity>
+                          ) : (
+                            <TouchableOpacity
+                              style={styles.button}
+                              onPress={() => {
+                                const cartItems = { tests: [{ ...item }] };
+                                handlePayment(cartItems, setOrderSuccess);
+                              }}
+                            >
+                              <Text style={styles.buttonText}>Buy Test</Text>
+                            </TouchableOpacity>
+                          )}
+                        </View>
+                        {!user?.tests?.some((d: any) => d._id === item._id) && (
+                          <TouchableOpacity
+                            style={[styles.button, styles.demoButton]}
+                            onPress={() =>
+                              router.push({
+                                pathname: "/(routes)/test-list",
+                                params: {
+                                  item: JSON.stringify({
+                                    ...item,
+                                    filter: category.filter,
+                                    isDemo: true,
+                                  }),
+                                },
+                              })
+                            }
+                          >
+                            <Text style={styles.buttonText}>View Demo</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    ) : (
+                      <View style={styles.buttonContainer}>
+                        <View>
                           <TouchableOpacity
                             style={[styles.button, styles.goButton]}
                             onPress={() =>
@@ -138,37 +189,9 @@ export default function TestListLayout({}) {
                           >
                             <Text style={styles.buttonText}>Start </Text>
                           </TouchableOpacity>
-                        ) : (
-                          <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => {
-                              const cartItems = { tests: [{ ...item }] };
-                              handlePayment(cartItems, setOrderSuccess);
-                            }}
-                          >
-                            <Text style={styles.buttonText}>Buy Test</Text>
-                          </TouchableOpacity>
-                        )}
+                        </View>
                       </View>
-                      {!user?.tests?.some((d: any) => d._id === item._id) && (
-                        <TouchableOpacity
-                          style={[styles.button, styles.demoButton]}
-                          onPress={() =>
-                            router.push({
-                              pathname: "/(routes)/test-list",
-                              params: {
-                                item: JSON.stringify({
-                                  ...item,
-                                  filter: category.filter,
-                                }),
-                              },
-                            })
-                          }
-                        >
-                          <Text style={styles.buttonText}>View Demo</Text>
-                        </TouchableOpacity>
-                      )}
-                    </View>
+                    )}
                   </View>
                 </View>
               )}
@@ -180,10 +203,6 @@ export default function TestListLayout({}) {
     </LinearGradient>
   );
 }
-
-TestListLayout.propTypes = {
-  isPayed: PropTypes.bool.isRequired,
-};
 
 const styles = StyleSheet.create({
   container: {

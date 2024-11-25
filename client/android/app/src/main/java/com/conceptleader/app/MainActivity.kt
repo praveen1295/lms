@@ -1,4 +1,4 @@
-package com.entranceexamwarriors.app
+package com.conceptleader.app
 
 import android.os.Build
 import android.os.Bundle

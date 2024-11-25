@@ -24,7 +24,6 @@ import NoDataCard from "@/components/cards/no.data.card";
 export default function CourseList() {
   const { category: item } = useLocalSearchParams();
 
-  console.log("Item0000000000", item);
   const category: any = JSON.parse(item as string);
 
   const [courses, setCourses] = useState<CoursesType[]>([]);

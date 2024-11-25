@@ -23,8 +23,6 @@ export const getTestCourses = async (req: Request, res: Response) => {
     query.isPaid = isPaid === "paid";
   }
 
-  console.log("query", query);
-
   try {
     const testCourses = await TestCourseModel.find(query);
     res.status(200).json({ testCourses });
