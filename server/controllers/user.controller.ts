@@ -315,6 +315,7 @@ export const socialAuth = CatchAsyncError(
 // update user info
 interface IUpdateUserInfo {
   name?: string;
+  phone_number?:Number;
   email?: string;
 }
 
