@@ -93,7 +93,7 @@ const quizSchema = new schema(
     ],
     isPaid: {
       type: Boolean,
-      default: true,
+      default: false,
     },
     isDemo: {
       type: Boolean,
